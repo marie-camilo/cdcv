@@ -7,9 +7,9 @@ Il utilise **React.js** pour le front-end et **Laravel (PHP)** pour le back-end.
 
 - ⚛️ **React.js** – Application front-end SPA
 - 🐘 **Laravel** (PHP 8+) – API REST back-end
-- 💾 **MySQL** – Base de données relationnelle
-- 🔗 API REST – Communication entre front-end et back-end
-- 🎨 CSS / SCSS / Tailwind (selon ce que vous utilisez)
+- **MySQL** – Base de données relationnelle
+- API REST – Communication entre front-end et back-end
+- CSS / SCSS / Tailwind (selon ce que vous utilisez)
 
 ## 🚀 Installation du projet
 
