@@ -1,0 +1,13 @@
+# Ignorer les fichiers des environnements IDE
+.idea/
+
+# Ignorer les dépendances React et Laravel
+front/node_modules/
+back/vendor/
+
+# Ignorer les fichiers d'environnement
+back/.env
+
+# Autres caches ou builds
+front/dist/
+back/storage/
