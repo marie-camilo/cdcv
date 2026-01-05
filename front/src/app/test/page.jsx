@@ -27,7 +27,6 @@ export default function TestPage() {
                 <h1>Atoms – Button</h1>
                 <div style={{ display: "flex", gap: "12px" }}>
                     <NextButton>Primary</NextButton>
-                    <NextButton variant="secondary">Secondary</NextButton>
                     <NextButton disabled>Disabled</NextButton>
                 </div>
             </section>
