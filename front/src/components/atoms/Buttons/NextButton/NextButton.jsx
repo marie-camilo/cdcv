@@ -20,7 +20,7 @@ export default function NextButton({
             disabled={disabled}
             {...props}
         >
-            <GoArrowRight/>
+            <GoArrowRight stroke={"2px"}/>
         </button>
     );
 }
