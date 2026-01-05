@@ -5,7 +5,7 @@ export default function TestPage() {
     return (
         <main
             style={{
-                backgroundColor: "var(--background-dark)",
+                backgroundColor: "var(--color-dark)",
                 color: "white",
                 minHeight: "100vh",
                 padding: "24px",
