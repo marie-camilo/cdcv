@@ -1,0 +1,16 @@
+:root {
+    --background-dark: #193133;
+
+    --color-dark-grey: #193133;
+    --color-light-green: #D0FF71;
+
+    --color-primary: #2563eb;
+    --color-text: #111827;
+
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+
+    --radius-sm: 4px;
+    --radius-md: 6px;
+}
