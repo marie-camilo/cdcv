@@ -1,12 +1,20 @@
 "use client";
 import React, { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import NextButton from "@/components/atoms/Buttons/NextButton";
 import TypewriterTerminal from "@/components/molecules/TypewriterTerminal/TypewriterTerminal";
+import AnswerTerminal from "@/components/organisms/AnswerTerminal/AnswerTerminal";
 
 export default function Enigme1Page() {
+    const router = useRouter();
+
     useEffect(() => {
         document.title = "Énigme 1 | La Click";
     }, []);
+
+    const handleSuccess = () => {
+        router.push('/enigme-2');
+    };
 
     const terminalLines = [
         "RECEPTION MESSAGE ENTRANT...",
@@ -85,6 +93,13 @@ export default function Enigme1Page() {
                         {n.val}
                     </div>
                 ))}
+            </div>
+
+            <div style={{ zIndex: 1, width: "100%", maxWidth: "450px", marginTop: "20px" }}>
+                <AnswerTerminal
+                    expectedAnswer="FOYER"
+                    onValidate={handleSuccess}
+                />
             </div>
 
             <div style={{ zIndex: 1, width: "100%", maxWidth: "450px", display: "flex", justifyContent: "right" }}>
