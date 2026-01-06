@@ -28,12 +28,13 @@ export default function RolePage() {
 
     return (
         <main className="min-h-screen bg-[var(--color-dark)] flex flex-col p-8 text-[var(--color-white)] font-[family-name:var(--font-source)]">
+            <div className="w-full max-w-md self-start mb-10">
+                <h1 className="text-4xl font-bold leading-tight mt-6 text-left">
+                    Ton rôle
+                </h1>
+            </div>
 
-            <h1 className="text-4xl font-medium mt-12 mb-16 italic uppercase tracking-tight">
-                Ton rôle
-            </h1>
-
-            <div className="relative border border-[var(--color-white)]/40 rounded-2xl p-8 pt-10">
+            <div className="relative border border-[var(--color-white)]/40 rounded-2xl p-8 pt-10 mt-10">
                 <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-[var(--color-dark)] px-4">
                     <h2 className="text-[var(--color-light-green)] text-3xl font-bold uppercase tracking-widest italic">
                         {role}
