@@ -1,8 +1,13 @@
 "use client";
+import React, { useEffect } from 'react';
 import NextButton from "@/components/atoms/Buttons/NextButton";
 import TypewriterTerminal from "@/components/molecules/TypewriterTerminal/TypewriterTerminal";
 
 export default function Enigme1Page() {
+    useEffect(() => {
+        document.title = "Énigme 1 | La Click";
+    }, []);
+
     const terminalLines = [
         "RECEPTION MESSAGE ENTRANT...",
         "PROVENANCE : LES CHEMISES ROUGES",
@@ -48,7 +53,6 @@ export default function Enigme1Page() {
                 zIndex: 0
             }} />
 
-            {/* Terminal en haut */}
             <div style={{ zIndex: 1, width: "100%", maxWidth: "450px" }}>
                 <TypewriterTerminal textLines={terminalLines} speed={40} />
             </div>
@@ -71,8 +75,8 @@ export default function Enigme1Page() {
             }}>
                 {numbers.map((n, index) => (
                     <div key={index} style={{
-                        fontSize: "4.5rem",
-                        fontWeight: "900",
+                        fontSize: "6.5rem",
+                        fontWeight: "700",
                         color: n.color,
                         textAlign: "center",
                         lineHeight: "1",
@@ -83,7 +87,7 @@ export default function Enigme1Page() {
                 ))}
             </div>
 
-            <div style={{ zIndex: 1, width: "100%", maxWidth: "450px", display: "flex", justifyContent: "center" }}>
+            <div style={{ zIndex: 1, width: "100%", maxWidth: "450px", display: "flex", justifyContent: "right" }}>
                 <NextButton variant="primary" />
             </div>
         </section>
