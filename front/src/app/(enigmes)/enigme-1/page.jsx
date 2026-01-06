@@ -1,18 +1,24 @@
 "use client";
-import React, { useEffect } from 'react';
+import React, {useEffect, useState} from 'react';
 import { useRouter } from 'next/navigation';
-import NextButton from "@/components/atoms/Buttons/NextButton";
 import TypewriterTerminal from "@/components/molecules/TypewriterTerminal/TypewriterTerminal";
 import AnswerTerminal from "@/components/organisms/AnswerTerminal/AnswerTerminal";
+import BaseModal from "@/components/molecules/Modals/BaseModal";
 
 export default function Enigme1Page() {
     const router = useRouter();
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
         document.title = "Énigme 1 | La Click";
     }, []);
 
     const handleSuccess = () => {
+        setIsModalOpen(true);
+    };
+
+    const goToNextStep = () => {
+        setIsModalOpen(false);
         router.push('/enigme-2');
     };
 
@@ -95,16 +101,19 @@ export default function Enigme1Page() {
                 ))}
             </div>
 
-            <div style={{ zIndex: 1, width: "100%", maxWidth: "450px", marginTop: "20px" }}>
+            <div className="z-10 w-full max-w-[450px] mt-auto">
                 <AnswerTerminal
                     expectedAnswer="FOYER"
                     onValidate={handleSuccess}
                 />
             </div>
 
-            <div style={{ zIndex: 1, width: "100%", maxWidth: "450px", display: "flex", justifyContent: "right" }}>
-                <NextButton variant="primary" />
-            </div>
+            <BaseModal
+                isOpen={isModalOpen}
+                title="< ACCÈS FORCÉ />"
+                message="Pff... Vous avez trouvé ? Jacquot a vraiment engagé des amateurs chanceux. Profitez-en, ça ne durera pas. Allez traîner vos pauvres carcasses au FOYER (RDC). On vous observe, et votre précieux 'Royaume Linux' commence déjà à s'effriter. Dépêchez-vous, si vous ne voulez pas qu'on brûle le reste de sa garde-robe."
+                onConfirm={goToNextStep}
+            />
         </section>
     );
 }
