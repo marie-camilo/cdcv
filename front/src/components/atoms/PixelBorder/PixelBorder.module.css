@@ -1,0 +1,23 @@
+.wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.content {
+    position: relative; /* Ajoute ceci */
+    z-index: 10;        /* Ajoute ceci pour passer devant le SVG */
+    padding: var(--space-md);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--color-white);
+}
+
+.pixelEdge {
+    position: absolute;
+    top: 0;             /* On le cale en haut */
+    left: 0;
+    width: 100%;
+    z-index: 1;         /* Derrière le texte */
+    pointer-events: none; /* Pour pouvoir cliquer sur le texte à travers le SVG */
+}
