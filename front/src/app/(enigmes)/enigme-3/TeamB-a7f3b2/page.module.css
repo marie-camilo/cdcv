@@ -1,0 +1,212 @@
+.container {
+    max-width: 96rem;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.header {
+    background: #1a0d2e;
+    border: 2px solid var(--color-classic-red);
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 0 30px rgba(255, 51, 51, 0.3);
+}
+
+.title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--color-classic-red);
+    margin-bottom: 0.5rem;
+    font-family: var(--font-source), monospace;
+    letter-spacing: 0.05em;
+}
+
+.subtitle {
+    color: var(--color-turquoise);
+    font-family: var(--font-source), monospace;
+    font-size: 1.125rem;
+}
+
+.description {
+    color: rgba(235, 255, 246, 0.7);
+    margin-top: 0.5rem;
+}
+
+.infoGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.infoCard {
+    background: #1a0d2e;
+    border: 1px solid rgba(255, 51, 51, 0.5);
+    border-radius: 4px;
+    padding: 1rem;
+}
+
+.infoLabel {
+    color: var(--color-turquoise);
+    font-family: var(--font-source), monospace;
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+}
+
+.infoValue {
+    color: var(--color-classic-red);
+    font-weight: bold;
+    font-size: 1.25rem;
+}
+
+.controls {
+    background: #1a0d2e;
+    border: 1px solid rgba(39, 234, 166, 0.3);
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.controlsTitle {
+    color: var(--color-turquoise);
+    font-family: var(--font-source), monospace;
+    margin-bottom: 0.75rem;
+    font-weight: bold;
+}
+
+.controlsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+    font-size: 0.875rem;
+}
+
+.controlKey {
+    background: #2B1B47;
+    border: 1px solid rgba(255, 51, 51, 0.3);
+    border-radius: 4px;
+    padding: 0.75rem;
+    text-align: center;
+}
+
+.keyLabel {
+    font-family: var(--font-source), monospace;
+    color: var(--color-turquoise);
+    font-size: 1.25rem;
+    margin-bottom: 0.25rem;
+}
+
+.keyDesc {
+    font-size: 0.75rem;
+}
+
+.legend {
+    background: #1a0d2e;
+    border: 1px solid rgba(39, 234, 166, 0.3);
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.legendTitle {
+    color: var(--color-turquoise);
+    font-family: var(--font-source), monospace;
+    margin-bottom: 0.75rem;
+    font-weight: bold;
+}
+
+.legendGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    font-size: 0.875rem;
+}
+
+.legendItem {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.legendColor {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.legendWall {
+    background: #2B1B47;
+    border: 1px solid rgba(255, 51, 51, 0.3);
+}
+
+.legendCursor {
+    background: var(--color-turquoise);
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.legendEnd {
+    background: var(--color-classic-red);
+}
+
+.instructions {
+    background: #1a0d2e;
+    border: 1px solid rgba(255, 51, 51, 0.3);
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.instructionsTitle {
+    color: var(--color-classic-red);
+    font-family: var(--font-source), monospace;
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.instructionsList {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    color: rgba(235, 255, 246, 0.9);
+}
+
+.instructionsList li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.bullet {
+    color: var(--color-turquoise);
+}
+
+.textRed {
+    color: var(--color-classic-red);
+}
+
+.textCyan {
+    color: var(--color-turquoise);
+}
+
+.logs {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(39, 234, 166, 0.2);
+    border-radius: 8px;
+    padding: 1rem;
+    font-family: var(--font-source), monospace;
+    font-size: 0.75rem;
+}
+
+.logText {
+    color: rgba(39, 234, 166, 0.5);
+    margin-bottom: 0.5rem;
+}
+
+.logCommand {
+    color: rgba(235, 255, 246, 0.3);
+}
