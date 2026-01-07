@@ -1,0 +1,44 @@
+.root {
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100vw;
+    z-index: 50;
+}
+
+.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: var(--space-md);
+}
+
+.left {
+    display: flex;
+    flex-direction: column;
+}
+
+.time {
+    font-family: var(--font-source), serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -1px;
+    font-variant-numeric: tabular-nums;
+}
+
+.name {
+    font-family: var(--font-source), serif;
+    font-size: 0.9rem;
+    text-transform: capitalize;
+    margin-top: 4px;
+}
+
+.menuButton {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+}
