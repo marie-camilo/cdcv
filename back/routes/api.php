@@ -13,6 +13,8 @@ Route::middleware('api.key')
         // Création d'une partie
         Route::post('/games', [GameController::class, 'store']);
 
+        Route::get('/games/all', [GameController::class, 'showAll']);
+
         // Infos lobby
         Route::get('/games/{code}', [GameController::class, 'show']);
 
