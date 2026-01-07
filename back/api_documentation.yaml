@@ -1,0 +1,144 @@
+openapi: 3.0.3
+info:
+  title: Game API
+  description: API de gestion de parties et de joueurs (lobby)
+  version: 1.0.1
+
+servers:
+  - url: http://127.0.0.1:8000/api/v1
+    description: Local development server
+
+security:
+  - BearerAuth: []
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: API_KEY
+
+  schemas:
+    Game:
+      type: object
+      properties:
+        code:
+          type: string
+          example: A9K3Q7
+        status:
+          type: string
+          enum: [waiting, started, finished]
+
+    Lobby:
+      type: object
+      properties:
+        players:
+          type: array
+          items:
+            type: string
+          example: ["Player 1", "Player 2"]
+        count:
+          type: integer
+          example: 2
+        max:
+          type: integer
+          example: 6
+        status:
+          type: string
+          example: waiting
+
+    PlayerToken:
+      type: object
+      properties:
+        token:
+          type: string
+          example: 0d5da6d4-e9cb-46e3-b43e-78fabe22e733
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Forbidden
+
+paths:
+
+  /games:
+    post:
+      summary: Create a new game
+      description: Crée une nouvelle partie et génère un code de 6 caractères.
+      responses:
+        201:
+          description: Game created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: A9K3Q7
+                  join_url:
+                    type: string
+                    example: http://127.0.0.1:8000/join/A9K3Q7
+        401:
+          description: Unauthorized (missing or invalid API key)
+
+  /games/{code}:
+    get:
+      summary: Get lobby state
+      description: Récupère l'état du lobby d'une partie.
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+            example: A9K3Q7
+      responses:
+        200:
+          description: Lobby information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lobby'
+        401:
+          description: Unauthorized
+        404:
+          description: Game not found
+
+  /games/{code}/players:
+    post:
+      summary: Join a game
+      description: Permet à un joueur de rejoindre une partie (max 6 joueurs).
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+            example: A9K3Q7
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+                  example: Player 1
+      responses:
+        201:
+          description: Player joined
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerToken'
+        401:
+          description: Unauthorized
+        403:
+          description: Game full or already started
+        404:
+          description: Game not found
