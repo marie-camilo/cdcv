@@ -3,6 +3,7 @@ import { useTimer } from "@/app/context/TimerContext";
 
 export default function TimerDisplay({ variant = "green", className = "" }) {
     const { seconds } = useTimer();
+    if (seconds === undefined) return null;
 
     const formatTime = (totalSeconds) => {
         const h = Math.floor(totalSeconds / 3600);
