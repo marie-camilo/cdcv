@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'sse' => [
+        'key' => env('SSE_KEY'),
+    ],
+
 ];

@@ -13,8 +13,19 @@ class PlayerController extends Controller
     {
         $game = Game::where('code', $code)->firstOrFail();
 
-        abort_if($game->status !== 'waiting', 403);
-        abort_if($game->players()->count() >= 6, 403);
+        if ($game->status !== 'waiting') {
+            return response()->json([
+                'error' => 'GAME_NOT_JOINABLE',
+                'message' => 'La partie a déjà commencé ou est terminée.'
+            ], 403);
+        }
+
+        if ($game->players()->count() >= 6) {
+            return response()->json([
+                'error' => 'GAME_FULL',
+                'message' => 'La partie est complète.'
+            ], 403);
+        }
 
         $player = $game->players()->create([
             'name' => $request->name,

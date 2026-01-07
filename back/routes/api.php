@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\GameController;
+use App\Http\Controllers\Api\GameStreamController;
 use App\Http\Controllers\Api\PlayerController;
 use App\Http\Controllers\Api\GameFlowController;
 use Illuminate\Support\Facades\Route;
@@ -27,3 +28,9 @@ Route::middleware('api.key')
         // Récupération du rôle (joueur connecté)
         Route::get('/me/role', [PlayerController::class, 'role']);
     });
+
+Route::get(
+    '/v1/games/{code}/stream',
+    [GameStreamController::class, 'stream']
+)->middleware('sse.key');
+
