@@ -10,7 +10,7 @@
     grid-template-columns: repeat(15, 1fr);
     gap: 2px;
     padding: 1rem;
-    background: #1a0d2e;
+    background: var(--color-purple-darker);
     border-radius: 8px;
     border: 2px solid var(--color-classic-red);
     box-shadow: 0 0 20px rgba(255, 51, 51, 0.3);
@@ -23,17 +23,17 @@
 }
 
 .wall {
-    background: #2B1B47;
-    border: 1px solid rgba(255, 51, 51, 0.3);
+    background: var(--color-purple-dark);
+    border: 1px solid rgba(255, 48, 79, 0.3);
 }
 
 .path {
-    background: #1a0d2e;
+    background: var(--color-purple-darker);
 }
 
 .cursor {
-    background: var(--color-turquoise) !important;
-    box-shadow: 0 0 15px rgba(39, 234, 166, 0.8);
+    background: var(--color-cyan-bright) !important;
+    box-shadow: 0 0 15px rgba(0, 217, 255, 0.8);
     animation: pulse 1.5s infinite;
 }
 
@@ -43,31 +43,31 @@
 }
 
 .end {
-    background: var(--color-classic-red) !important;
-    box-shadow: 0 0 10px rgba(255, 51, 51, 0.6);
+    background: var(--color-red-bright) !important;
+    box-shadow: 0 0 10px rgba(255, 23, 68, 0.6);
 }
 
 .start {
-    background: rgba(39, 234, 166, 0.5) !important;
+    background: rgba(0, 217, 255, 0.5) !important;
 }
 
 .solution {
-    background: rgba(255, 51, 51, 0.4) !important;
+    background: rgba(255, 48, 79, 0.4) !important;
 }
 
 .commandBox {
     width: 100%;
     max-width: 40rem;
-    background: #1a0d2e;
-    border: 2px solid var(--color-turquoise);
+    background: var(--color-purple-darker);
+    border: 2px solid var(--color-cyan-bright);
     border-radius: 8px;
     padding: 1.5rem;
-    box-shadow: 0 0 30px rgba(39, 234, 166, 0.4);
+    box-shadow: 0 0 30px rgba(0, 217, 255, 0.4);
 }
 
 .commandHeader {
     font-family: var(--font-source), monospace;
-    color: var(--color-turquoise);
+    color: var(--color-cyan-bright);
     margin-bottom: 1rem;
     font-size: 0.875rem;
 }
@@ -76,17 +76,18 @@
     background: rgba(0, 0, 0, 0.5);
     padding: 1rem;
     border-radius: 4px;
-    border: 1px solid rgba(255, 51, 51, 0.3);
+    border: 1px solid rgba(255, 48, 79, 0.3);
     font-family: var(--font-source), monospace;
-    color: var(--color-white);
+    color: var(--color-beige);
 }
 
 .prompt {
-    color: var(--color-turquoise);
+    color: var(--color-cyan-bright);
 }
 
 .commandFooter {
     margin-top: 1rem;
     font-size: 0.875rem;
-    color: rgba(235, 255, 246, 0.7);
+    color: var(--color-beige);
+    opacity: 0.7;
 }
