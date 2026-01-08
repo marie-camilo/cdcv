@@ -21,10 +21,17 @@ Route::middleware('api.key')
         // Rejoindre une partie
         Route::post('/games/{code}/players', [PlayerController::class, 'store']);
 
-        // Actions de jeu
-        Route::post('/games/{code}/start', [GameFlowController::class, 'start']);
-
         // Récupération du rôle (joueur connecté)
         Route::get('/me/role', [PlayerController::class, 'role']);
+
+        // Démarrer la partie via l’admin
+        Route::post('/games/{code}/start', [GameFlowController::class, 'start']);
+
+        // Récupérer le cookie du joueur
+        Route::get('/session', [PlayerController::class, 'session']);
+
+        // Récupérer l’état de la partie
+        Route::get('/games/{code}/state', [GameFlowController::class, 'state']);
+
     });
 

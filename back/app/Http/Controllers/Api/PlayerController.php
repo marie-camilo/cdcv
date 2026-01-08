@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Events\LobbyUpdated;
-use App\Events\PlayerJoined;
 use App\Http\Controllers\Controller;
 use App\Models\Game;
+use App\Models\Player;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Cookie;
 
 class PlayerController extends Controller
 {
@@ -46,9 +47,74 @@ class PlayerController extends Controller
 
         event(new LobbyUpdated($game->code));
 
+        return response()
+            ->json([
+                'success' => true
+            ], 201)
+            ->cookie(
+                'game_token',
+                $player->token,
+                60 * 24 * 7,   // 7 jours
+                '/',
+                null,
+                false,         // Secure (HTTPS)
+                true,         // HttpOnly
+                false,
+                'Lax'
+            );
+    }
+
+    public function role(Request $request)
+    {
+        $token = $request->cookie('game_token');
+
+        if (!$token) {
+            return response()->json([
+                'error' => 'UNAUTHORIZED'
+            ], 401);
+        }
+
+        $player = Player::where('token', $token)->first();
+
+        if (!$player || !$player->role) {
+            return response()->json([
+                'error' => 'ROLE_NOT_ASSIGNED'
+            ], 404);
+        }
+
         return response()->json([
-            'token' => $player->token
-        ], 201);
+            'role' => $player->role
+        ]);
+    }
+
+    public function session(Request $request)
+    {
+        $token = $request->cookie('game_token');
+
+        if (!$token) {
+            return response()->json([
+                'authenticated' => false,
+                'reason' => 'NO_COOKIE'
+            ], 200);
+        }
+
+        $player = Player::where('token', $token)->first();
+
+        if (!$player) {
+            return response()->json([
+                'authenticated' => false,
+                'reason' => 'INVALID_TOKEN'
+            ], 200);
+        }
+
+        return response()->json([
+            'authenticated' => true,
+            'player' => [
+                'name' => $player->name,
+                'game_id' => $player->game_id,
+                'role_assigned' => !is_null($player->role)
+            ]
+        ]);
     }
 }
 
