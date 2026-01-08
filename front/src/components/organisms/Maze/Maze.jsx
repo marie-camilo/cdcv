@@ -3,32 +3,24 @@
 import { useState, useEffect } from 'react';
 import styles from './Maze.module.css';
 
-// Labyrinthe hardcodé 20x20 (plus grand et plus complexe)
+// Labyrinthe hardcodé 12x12
 // 0 = chemin, 1 = mur
-// Design chaotique et asymétrique, beaucoup de tournants, pas de symétrie
-const MAZE_SIZE = 20; // Taille du labyrinthe
+// Design chaotique et asymétrique
+const MAZE_SIZE = 12;
 
 const MAZE_DATA = [
-  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-  [1,0,0,0,1,0,1,0,0,0,0,1,0,0,1,0,0,0,0,1],
-  [1,1,1,0,1,0,0,0,1,1,0,0,0,1,1,0,1,1,0,1],
-  [1,0,0,0,0,1,1,0,1,0,1,1,0,0,0,0,1,0,0,1],
-  [1,0,1,1,0,0,1,0,0,0,0,1,1,0,1,0,0,0,1,1],
-  [1,0,1,0,1,0,0,1,1,1,0,0,0,0,1,1,1,0,0,1],
-  [1,0,0,0,1,1,0,0,0,1,0,1,1,0,0,0,1,1,0,1],
-  [1,1,1,0,0,1,1,1,0,0,0,1,0,0,1,0,0,0,0,1],
-  [1,0,0,0,1,0,0,0,0,1,1,1,0,1,1,1,1,1,0,1],
-  [1,0,1,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,1,0,1,1,0,1,1,0,1,1,1,1,0,1],
-  [1,1,1,1,0,1,0,0,0,1,0,0,1,0,1,0,0,0,0,1],
-  [1,0,0,0,0,1,1,1,0,0,1,0,0,0,0,0,1,1,0,1],
-  [1,0,1,1,0,0,0,0,0,1,1,1,1,0,1,0,0,1,0,1],
-  [1,0,1,0,1,1,1,0,1,0,0,0,0,0,1,1,0,0,0,1],
-  [1,0,0,0,0,0,1,0,1,0,1,1,1,0,0,0,1,1,0,1],
-  [1,1,1,1,1,0,0,0,0,0,1,0,0,1,1,0,0,0,0,1],
-  [1,0,0,0,0,0,1,1,1,0,0,0,1,0,1,1,1,1,0,1],
-  [1,0,1,1,1,0,0,0,0,1,1,0,1,0,0,0,0,0,0,1],
-  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+  [1,1,1,1,1,1,1,1,1,1,1,1],
+  [1,0,0,0,1,0,0,0,1,0,0,1],
+  [1,1,0,1,1,0,1,0,0,0,1,1],
+  [1,0,0,0,0,0,1,1,1,0,0,1],
+  [1,0,1,1,0,1,0,0,0,1,0,1],
+  [1,0,0,1,0,0,0,1,0,1,0,1],
+  [1,1,0,0,1,1,0,1,0,0,0,1],
+  [1,0,0,1,0,0,0,0,1,1,0,1],
+  [1,0,1,1,1,0,1,0,0,0,0,1],
+  [1,0,0,0,0,0,1,1,1,0,1,1],
+  [1,0,1,1,0,0,0,0,0,0,0,1],
+  [1,1,1,1,1,1,1,1,1,1,1,1],
 ];
 
 // Solution path pour Team A (chemin unique vers la vraie sortie)
@@ -174,7 +166,7 @@ export default function Maze({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [cursorPos, isPlayable, exits, hasReached]);
 
-  // MODE MINIMAL (Team B) - Points flottants sur fond noir
+  // MODE MINIMAL (Team B) - Grille visible mais tout noir + points flottants
   if (minimalMode) {
     return (
         <div className={styles.minimalWrapper}>
@@ -187,7 +179,18 @@ export default function Maze({
           </div>
 
           <div className={styles.minimalContainer}>
-            {/* Sorties flottantes */}
+            {/* Grille en arrière-plan (tout noir, juste pour le repère visuel) */}
+            <div className={styles.backgroundGrid}>
+              {MAZE_DATA.map((row, y) => (
+                  <div key={y} className={styles.backgroundRow}>
+                    {row.map((cell, x) => (
+                        <div key={x} className={styles.backgroundCell}></div>
+                    ))}
+                  </div>
+              ))}
+            </div>
+
+            {/* Sorties flottantes par-dessus */}
             {exits.map((exit, idx) => (
                 <div
                     key={idx}
@@ -199,7 +202,7 @@ export default function Maze({
                 />
             ))}
 
-            {/* Le curseur du joueur */}
+            {/* Le curseur du joueur par-dessus */}
             <div
                 className={styles.playerDot}
                 style={{

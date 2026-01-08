@@ -9,28 +9,25 @@
 
 /* Grid du labyrinthe - CARRÉ comme Team B */
 .mazeGrid {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
+  display: grid;
+  grid-template-rows: repeat(12, 1fr);
+  grid-template-columns: repeat(12, 1fr);
   background: #000;
   padding: 0;
   border: 2px solid var(--color-red-accent);
   border-radius: 8px;
   width: 100%;
   max-width: 600px;
+  height: auto;
   aspect-ratio: 1 / 1;
 }
 
 .mazeRow {
-  display: flex;
-  gap: 0;
-  flex: 1;
-  width: 100%;
+  display: contents;
 }
 
 /* Cellule de base */
 .mazeCell {
-  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -137,50 +134,73 @@
   overflow: hidden;
 }
 
+/* Grille en arrière-plan pour Team B */
+.backgroundGrid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-rows: repeat(12, 1fr);
+  grid-template-columns: repeat(12, 1fr);
+  z-index: 1;
+}
+
+.backgroundRow {
+  display: contents;
+}
+
+.backgroundCell {
+  background: #000;
+  border: 0.5px solid rgba(255, 48, 79, 0.15);
+}
+
 /* Point du joueur en mode minimal */
 .playerDot {
   position: absolute;
-  width: 20px;
-  height: 20px;
+  width: 12px;
+  height: 12px;
   background: var(--color-cyan-bright);
   border-radius: 50%;
   transform: translate(-50%, -50%);
-  box-shadow: 0 0 20px var(--color-cyan-bright);
-  z-index: 10;
+  box-shadow: 0 0 15px var(--color-cyan-bright);
+  z-index: 20;
   animation: playerPulse 1.5s infinite;
 }
 
 @keyframes playerPulse {
   0%, 100% {
-    box-shadow: 0 0 20px var(--color-cyan-bright);
+    box-shadow: 0 0 15px var(--color-cyan-bright);
     transform: translate(-50%, -50%) scale(1);
   }
   50% {
-    box-shadow: 0 0 30px var(--color-cyan-bright);
-    transform: translate(-50%, -50%) scale(1.2);
+    box-shadow: 0 0 25px var(--color-cyan-bright);
+    transform: translate(-50%, -50%) scale(1.3);
   }
 }
 
 /* Sorties en mode minimal */
 .exitDot {
   position: absolute;
-  width: 30px;
-  height: 30px;
+  width: 16px;
+  height: 16px;
   background: var(--color-red-bright);
   border-radius: 50%;
   transform: translate(-50%, -50%);
-  box-shadow: 0 0 25px var(--color-red-bright);
+  box-shadow: 0 0 20px var(--color-red-bright);
+  z-index: 15;
   animation: exitDotPulse 2s infinite;
 }
 
 @keyframes exitDotPulse {
   0%, 100% {
-    box-shadow: 0 0 25px var(--color-red-bright);
+    box-shadow: 0 0 20px var(--color-red-bright);
     opacity: 1;
   }
   50% {
-    box-shadow: 0 0 40px var(--color-red-bright);
-    opacity: 0.7;
+    box-shadow: 0 0 30px var(--color-red-bright);
+    opacity: 0.8;
   }
 }
 
