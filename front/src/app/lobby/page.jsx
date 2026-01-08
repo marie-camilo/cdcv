@@ -1,75 +1,77 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Pusher from "pusher-js";
+import { getPlayersForGivenGame } from "@/hooks/API/gameRequests";
 
 export default function LobbyPage() {
-    const router = useRouter();
     const searchParams = useSearchParams();
     const code = searchParams.get("code");
-
-    const API_BASE_URL = "http://localhost:8000/api/v1";
-
-    const API_HEADERS = {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer testapikey12345",
-    };
 
     const pusherRef = useRef(null);
 
     const [players, setPlayers] = useState([]);
-    const [max] = useState(6);
     const [error, setError] = useState(null);
 
-    /**
-     * 1️⃣ État initial (source de vérité)
-     */
+    const MAX_PLAYERS = 6;
+
+    // Initial fetch
     useEffect(() => {
         if (!code) return;
 
-        fetch(`${API_BASE_URL}/games/${code}`, {
-            headers: API_HEADERS,
-        })
-            .then(res => {
-                if (!res.ok) throw new Error("HTTP error");
-                return res.json();
-            })
-            .then(data => {
-                setPlayers(data.players);
-            })
-            .catch(() => {
+        const fetchPlayers = async () => {
+            try {
+                const gameData = await getPlayersForGivenGame(code);
+                setPlayers(gameData.players ?? []);
+            } catch {
                 setError("Impossible de charger le lobby.");
-            });
+            }
+        };
 
+        fetchPlayers();
     }, [code]);
 
-    /**
-     * 2️⃣ Temps réel (événements uniquement)
-     */
+    // Temps réel
     useEffect(() => {
         if (!code || pusherRef.current) return;
 
+        console.log("PUSHER KEY =", process.env.NEXT_PUBLIC_PUSHER_APP_KEY);
+
+
         const pusher = new Pusher(
             process.env.NEXT_PUBLIC_PUSHER_APP_KEY,
-            {
-                cluster: "eu",
-                forceTLS: true,
-            }
+            { cluster: "eu", forceTLS: true }
         );
 
-        pusherRef.current = pusher;
+        pusher.connection.bind("connected", () => {
+            console.log("✅ Pusher connecté");
+        });
 
+        pusher.connection.bind("error", err => {
+            console.error("❌ Erreur Pusher", err);
+        });
+
+        pusherRef.current = pusher;
         const channel = pusher.subscribe(`game.${code}`);
 
-        channel.bind("PlayerJoined", data => {
-            console.log("EVENT PlayerJoined reçu", data);
-            setPlayers(prev => [...prev, data.playerName]);
+        // channel.bind("PlayerJoined", async () => {
+        //     try {
+        //         const gameData = await getPlayersForGivenGame(code);
+        //         setPlayers(gameData.players ?? []);
+        //     } catch (e) {
+        //         console.error("Lobby resync failed", e);
+        //     }
+        // });
+
+        // après subscribe
+        channel.bind("LobbyUpdated", async () => {
+            console.log("📡 LobbyUpdated reçu");
+            const gameData = await getPlayersForGivenGame(code);
+            setPlayers(gameData.players ?? []);
         });
 
-        channel.bind("GameStarted", () => {
-            router.push("/game");
-        });
+
 
         return () => {
             channel.unbind_all();
@@ -77,28 +79,21 @@ export default function LobbyPage() {
             pusher.disconnect();
             pusherRef.current = null;
         };
-    }, [code, router]);
+    }, [code]);
 
     return (
         <div className="p-6">
             <h1 className="text-xl font-bold mb-2">Salle d’attente</h1>
 
             <p className="text-sm text-gray-500 mb-4">
-                {players.length} / {max} joueurs
+                {players.length} / {MAX_PLAYERS} joueurs
             </p>
 
-            {error && (
-                <p className="text-red-500 text-sm mb-4">
-                    {error}
-                </p>
-            )}
+            {error && <p className="text-red-500">{error}</p>}
 
             <ul className="space-y-2">
-                {players.map((player, index) => (
-                    <li
-                        key={index}
-                        className="border rounded px-3 py-2"
-                    >
+                {players.map(player => (
+                    <li key={player} className="border rounded px-3 py-2">
                         {player}
                     </li>
                 ))}
