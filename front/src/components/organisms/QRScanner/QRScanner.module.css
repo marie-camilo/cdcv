@@ -1,0 +1,98 @@
+.root {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 2rem 1rem;
+    background-color: var(--color-dark);
+}
+
+.header {
+    width: 100%;
+    max-width: 56rem;
+    margin-bottom: 3rem;
+    text-align: center;
+}
+
+.title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--color-light-green);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.cameraContainer {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    aspect-ratio: 3 / 4;
+    background-color: rgba(0, 0, 0, 0.8);
+    border: 1px solid var(--color-medium);
+    border-radius: 1.5rem;
+    overflow: hidden;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+}
+
+.corner {
+    position: absolute;
+    width: 3rem;
+    height: 3rem;
+    border-color: var(--color-light-green);
+    pointer-events: none;
+    z-index: 20;
+}
+
+.topLeft { top: 1.2rem; left: 1.2rem; border-top: 3px solid; border-left: 3px solid; }
+.topRight { top: 1.2rem; right: 1.2rem; border-top: 3px solid; border-right: 3px solid; }
+.bottomLeft { bottom: 1.2rem; left: 1.2rem; border-bottom: 3px solid; border-left: 3px solid; }
+.bottomRight { bottom: 1.2rem; right: 1.2rem; border-bottom: 3px solid; border-right: 3px solid; }
+
+.laser {
+    position: absolute;
+    inset-inline: 0;
+    height: 2px;
+    background-color: var(--color-turquoise);
+    box-shadow: 0 0 15px var(--color-turquoise), 0 0 5px white;
+    animation: scanLineVertical 4s ease-in-out infinite;
+    z-index: 15;
+    pointer-events: none;
+}
+
+@keyframes scanLineVertical {
+    0%, 100% { top: 10%; opacity: 0; }
+    5%, 95% { opacity: 1; }
+    50% { top: 90%; opacity: 1; }
+}
+
+:global(#reader img) {
+    display: none !important;
+}
+
+:global(#reader__dashboard_section_csr button) {
+    background: transparent !important;
+    border: 1px solid var(--color-light-green) !important;
+    color: var(--color-light-green) !important;
+    text-transform: uppercase;
+    padding: 8px 16px !important;
+    border-radius: 4px !important;
+    font-family: var(--font-source) !important;
+    cursor: pointer;
+}
+
+:global(#reader__camera_selection) {
+    background: var(--color-dark) !important;
+    color: white !important;
+    border: 1px solid var(--color-medium) !important;
+    padding: 5px !important;
+    border-radius: 4px !important;
+}
+
+:global(#reader__status_span) {
+    display: none !important;
+}
+
+:global(#reader__header_message) {
+    display: none !important;
+}
