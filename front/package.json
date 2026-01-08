@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
+    "build": "next build",
     "start": "next start"
   },
   "dependencies": {
+    "@next/swc-win32-x64-msvc": "^16.1.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.24.1",
     "html5-qrcode": "^2.3.8",
