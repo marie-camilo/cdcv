@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import NextButton from "@/components/atoms/Buttons/NextButton";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {addPlayer} from "@/hooks/API/gameRequests";
 
 export default function WelcomePage() {
@@ -10,11 +10,24 @@ export default function WelcomePage() {
   const [errorMessage, setErrorMessage] = useState(null);
 
   // Récupération du code dans l'URL
-  const params = new URLSearchParams(window.location.search);
-  const code = params.get("code");
+  const searchParams = useSearchParams();
+  const code = searchParams.get("code");
+
+  if (!code) {
+    return (
+        <main className="min-h-screen flex items-center justify-center">
+          <p className="text-red-500">
+            Code de partie manquant dans l’URL.
+          </p>
+        </main>
+    );
+  }
 
   const handleNext = async () => {
-    setErrorMessage(null);
+    if (!code) {
+      setErrorMessage("Code de partie invalide.");
+      return;
+    }
 
     if (playerName.trim() === "") {
       setErrorMessage("Nom requis");
@@ -23,7 +36,6 @@ export default function WelcomePage() {
 
     try {
       await addPlayer(code, playerName);
-
       localStorage.setItem("currentPlayerName", playerName);
       router.push("/lobby?code=" + encodeURIComponent(code));
 

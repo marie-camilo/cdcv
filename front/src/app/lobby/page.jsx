@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { useRouter, useParams, useSearchParams } from "next/navigation";
-
+import { useEffect, useState, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import Pusher from "pusher-js";
 
 export default function LobbyPage() {
     const router = useRouter();
@@ -10,40 +10,72 @@ export default function LobbyPage() {
     const code = searchParams.get("code");
 
     const API_BASE_URL = "http://localhost:8000/api/v1";
-    const SSE_KEY ="public_read_only_sse_key"
+
+    const API_HEADERS = {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer testapikey12345",
+    };
+
+    const pusherRef = useRef(null);
 
     const [players, setPlayers] = useState([]);
-    const [count, setCount] = useState(0);
-    const [max, setMax] = useState(6);
+    const [max] = useState(6);
     const [error, setError] = useState(null);
 
+    /**
+     * 1️⃣ État initial (source de vérité)
+     */
     useEffect(() => {
         if (!code) return;
 
-        const eventSource = new EventSource(
-            `${API_BASE_URL}/games/${code}/stream?key=${SSE_KEY}`
+        fetch(`${API_BASE_URL}/games/${code}`, {
+            headers: API_HEADERS,
+        })
+            .then(res => {
+                if (!res.ok) throw new Error("HTTP error");
+                return res.json();
+            })
+            .then(data => {
+                setPlayers(data.players);
+            })
+            .catch(() => {
+                setError("Impossible de charger le lobby.");
+            });
+
+    }, [code]);
+
+    /**
+     * 2️⃣ Temps réel (événements uniquement)
+     */
+    useEffect(() => {
+        if (!code || pusherRef.current) return;
+
+        const pusher = new Pusher(
+            process.env.NEXT_PUBLIC_PUSHER_APP_KEY,
+            {
+                cluster: "eu",
+                forceTLS: true,
+            }
         );
 
-        eventSource.onmessage = (event) => {
-            const data = JSON.parse(event.data);
+        pusherRef.current = pusher;
 
-            setPlayers(data.players);
-            setCount(data.count);
-            setMax(data.max);
+        const channel = pusher.subscribe(`game.${code}`);
 
-            if (data.status !== "waiting") {
-                eventSource.close();
-                router.push("/game");
-            }
-        };
+        channel.bind("PlayerJoined", data => {
+            console.log("EVENT PlayerJoined reçu", data);
+            setPlayers(prev => [...prev, data.playerName]);
+        });
 
-        eventSource.onerror = () => {
-            setError("Connexion temps réel perdue.");
-            eventSource.close();
-        };
+        channel.bind("GameStarted", () => {
+            router.push("/game");
+        });
 
         return () => {
-            eventSource.close();
+            channel.unbind_all();
+            pusher.unsubscribe(`game.${code}`);
+            pusher.disconnect();
+            pusherRef.current = null;
         };
     }, [code, router]);
 
@@ -52,7 +84,7 @@ export default function LobbyPage() {
             <h1 className="text-xl font-bold mb-2">Salle d’attente</h1>
 
             <p className="text-sm text-gray-500 mb-4">
-                {count} / {max} joueurs
+                {players.length} / {max} joueurs
             </p>
 
             {error && (
