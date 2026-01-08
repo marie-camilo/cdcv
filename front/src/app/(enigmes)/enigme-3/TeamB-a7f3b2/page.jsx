@@ -11,8 +11,8 @@ export default function TeamBPage() {
     return (
         <section className={styles.container}>
             {/* Juste le maze en mode minimal, rien d'autre */}
-            <Maze 
-                showSolution={false} 
+            <Maze
+                showSolution={false}
                 isPlayable={true}
                 minimalMode={true}
             />

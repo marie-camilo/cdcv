@@ -1,53 +1,57 @@
 /* Container principal */
 .mazeContainer {
   width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 20px;
 }
 
-/* Grid du labyrinthe */
+/* Grid du labyrinthe - CARRÉ comme Team B */
 .mazeGrid {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0;
   background: #000;
-  padding: 4px;
-  border: 2px solid var(--color-turquoise);
+  padding: 0;
+  border: 2px solid var(--color-red-accent);
   border-radius: 8px;
+  width: 100%;
+  max-width: 600px;
+  aspect-ratio: 1 / 1;
 }
 
 .mazeRow {
   display: flex;
-  gap: 2px;
+  gap: 0;
+  flex: 1;
+  width: 100%;
 }
 
 /* Cellule de base */
 .mazeCell {
-  width: 30px;
-  height: 30px;
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  transition: all 0.2s;
+  border: 0.5px solid var(--color-red-accent);
 }
 
 /* Mur */
 .wall {
-  background: var(--color-dark-violet);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--color-purple-dark);
 }
 
 /* Chemin */
 .mazeCell:not(.wall) {
-  background: rgba(0, 0, 0, 0.5);
+  background: #000;
 }
 
 /* Solution path (pour Team A) */
 .solution {
-  background: rgba(255, 68, 68, 0.3) !important;
-  box-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
+  background: rgba(255, 48, 79, 0.3) !important;
+  box-shadow: 0 0 10px var(--color-red-accent);
 }
 
 /* Sortie */
@@ -71,8 +75,8 @@
 
 /* Curseur (joueur) */
 .cursor {
-  background: #3b82f6 !important;
-  box-shadow: 0 0 15px #3b82f6;
+  background: var(--color-cyan-bright) !important;
+  box-shadow: 0 0 15px var(--color-cyan-bright);
   animation: cursorPulse 1s infinite;
 }
 
@@ -95,13 +99,39 @@
 /* MODE MINIMAL (Team B) */
 /* ============================================ */
 
+.minimalWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.controlsInfo {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.controlKey {
+  background: rgba(255, 48, 79, 0.2);
+  border: 1px solid var(--color-red-accent);
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: var(--color-red-bright);
+  font-weight: bold;
+}
+
 .minimalContainer {
   width: 100%;
   max-width: 600px;
-  height: 600px;
+  aspect-ratio: 1 / 1;
   margin: 0 auto;
   background: #000;
-  border: 2px solid var(--color-turquoise);
+  border: 2px solid var(--color-red-accent);
   border-radius: 8px;
   position: relative;
   overflow: hidden;
@@ -112,21 +142,21 @@
   position: absolute;
   width: 20px;
   height: 20px;
-  background: #3b82f6;
+  background: var(--color-cyan-bright);
   border-radius: 50%;
   transform: translate(-50%, -50%);
-  box-shadow: 0 0 20px #3b82f6;
+  box-shadow: 0 0 20px var(--color-cyan-bright);
   z-index: 10;
   animation: playerPulse 1.5s infinite;
 }
 
 @keyframes playerPulse {
   0%, 100% {
-    box-shadow: 0 0 20px #3b82f6;
+    box-shadow: 0 0 20px var(--color-cyan-bright);
     transform: translate(-50%, -50%) scale(1);
   }
   50% {
-    box-shadow: 0 0 30px #3b82f6;
+    box-shadow: 0 0 30px var(--color-cyan-bright);
     transform: translate(-50%, -50%) scale(1.2);
   }
 }
@@ -136,42 +166,31 @@
   position: absolute;
   width: 30px;
   height: 30px;
-  background: var(--color-turquoise);
+  background: var(--color-red-bright);
   border-radius: 50%;
   transform: translate(-50%, -50%);
-  box-shadow: 0 0 25px var(--color-turquoise);
+  box-shadow: 0 0 25px var(--color-red-bright);
   animation: exitDotPulse 2s infinite;
 }
 
 @keyframes exitDotPulse {
   0%, 100% {
-    box-shadow: 0 0 25px var(--color-turquoise);
+    box-shadow: 0 0 25px var(--color-red-bright);
     opacity: 1;
   }
   50% {
-    box-shadow: 0 0 40px var(--color-turquoise);
+    box-shadow: 0 0 40px var(--color-red-bright);
     opacity: 0.7;
   }
 }
 
 /* Responsive */
 @media (max-width: 768px) {
+  .mazeContainer {
+    padding: 10px;
+  }
+
   .mazeCell {
-    width: 20px;
-    height: 20px;
-  }
-  
-  .minimalContainer {
-    height: 400px;
-  }
-  
-  .playerDot {
-    width: 15px;
-    height: 15px;
-  }
-  
-  .exitDot {
-    width: 20px;
-    height: 20px;
+    border: 0.5px solid rgba(255, 48, 79, 0.2);
   }
 }

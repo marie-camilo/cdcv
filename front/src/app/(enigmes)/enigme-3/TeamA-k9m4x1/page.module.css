@@ -1,28 +1,77 @@
 .container {
-  min-height: 100vh;
-  background: var(--color-dark-violet);
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  position: relative;
+    min-height: 100vh;
+    background: var(--color-purple-darker);
+    padding: 20px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/* Wrapper des logs - Prend toute la place */
-.logsWrapper {
-  width: 100%;
-  z-index: 10;
+/* Les logs en fullscreen */
+.fullscreenLogs {
+    width: 100%;
+    height: calc(100vh - 40px);
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
 }
 
-/* Wrapper du maze - En dessous des logs */
-.mazeWrapper {
-  width: 100%;
-  margin-top: 20px;
+/* Les logs cachés (mais toujours montés) */
+.hiddenLogs {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+    width: 100%;
+    height: calc(100vh - 40px);
+    pointer-events: none;
+    opacity: 0;
+}
+
+/* Le maze en fullscreen */
+.fullscreenMaze {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+/* Bouton pour réouvrir les logs */
+.reopenLogsButton {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    color: var(--color-red-bright);
+    background: rgba(0, 0, 0, 0.9);
+    border: 2px solid var(--color-red-accent);
+    padding: 8px 16px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    z-index: 1000;
+    transition: all 0.2s;
+    box-shadow: 0 0 20px rgba(255, 48, 79, 0.3);
+}
+
+.reopenLogsButton:hover {
+    background: rgba(255, 48, 79, 0.1);
+    color: var(--color-red-accent);
+    transform: scale(1.05);
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .container {
-    padding: 10px;
-  }
+    .container {
+        padding: 10px;
+    }
+
+    .fullscreenLogs,
+    .hiddenLogs,
+    .fullscreenMaze {
+        height: calc(100vh - 20px);
+    }
 }

@@ -27,42 +27,37 @@ const LOGS_DATA = [
   { time: "14:32:52", type: "INFO", msg: "Countdown timer initialized - Time remaining: 15:00" }
 ];
 
-export default function TerminalLogs({ minimizable = true }) {
-  const [isMinimized, setIsMinimized] = useState(false);
+export default function TerminalLogs({ minimizable = true, onMinimize }) {
   const [displayedLogs, setDisplayedLogs] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  
+
   const containerRef = useRef(null);
   const logsEndRef = useRef(null);
 
-  // Défilement progressif des logs (1 ligne toutes les 3 secondes)
+  // Défilement progressif des logs (1 ligne par seconde)
+  // Continue même si le composant est minimisé
   useEffect(() => {
     if (currentIndex >= LOGS_DATA.length) return;
 
     const timer = setTimeout(() => {
       setDisplayedLogs(prev => [...prev, LOGS_DATA[currentIndex]]);
       setCurrentIndex(prev => prev + 1);
-    }, 3000); // 3 secondes entre chaque ligne
+    }, 1000); // 1 seconde entre chaque ligne
 
     return () => clearTimeout(timer);
-  }, [currentIndex]);
+  }, [currentIndex]); // Pas de dépendance sur isMinimized
 
-  // Auto-scroll vers le bas quand nouvelle ligne
+  // Auto-scroll vers le bas quand nouvelle ligne (seulement si visible)
   useEffect(() => {
-    logsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (containerRef.current) {
+      logsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
   }, [displayedLogs]);
 
-  // Si minimisé, on affiche rien
-  if (isMinimized) {
-    return (
-      <button
-        onClick={() => setIsMinimized(false)}
-        className={styles.restoreButton}
-      >
-        [+] Afficher Terminal
-      </button>
-    );
-  }
+  // Handle minimize
+  const handleMinimize = () => {
+    if (onMinimize) onMinimize();
+  };
 
   // Style selon le type de log
   const getLogStyle = (type) => {
@@ -78,56 +73,46 @@ export default function TerminalLogs({ minimizable = true }) {
   };
 
   return (
-    <div className={styles.terminalContainer}>
-      {/* Header */}
-      <div className={styles.terminalHeader}>
-        <div className={styles.headerLeft}>
-          <div className={styles.statusDot}></div>
-          <span className={styles.headerTitle}>
+      <div className={styles.terminalContainer}>
+        {/* Header */}
+        <div className={styles.terminalHeader}>
+          <div className={styles.headerLeft}>
+            <div className={styles.statusDot}></div>
+            <span className={styles.headerTitle}>
             🖥️ TERMINAL - SYSTÈME LABYRINTHE
           </span>
+          </div>
+          {minimizable && (
+              <button
+                  onClick={handleMinimize}
+                  className={styles.minimizeButton}
+              >
+                [−] Minimize
+              </button>
+          )}
         </div>
-        {minimizable && (
-          <button
-            onClick={() => setIsMinimized(true)}
-            className={styles.minimizeButton}
-          >
-            [−] Minimize
-          </button>
-        )}
-      </div>
 
-      {/* Logs container */}
-      <div 
-        ref={containerRef}
-        className={styles.logsContainer}
-      >
-        {displayedLogs.map((log, idx) => (
-          <div key={idx} className={styles.logLine}>
-            <span className={styles.logTime}>[{log.time}]</span>
-            <span className={getLogStyle(log.type)}>
+        {/* Logs container */}
+        <div
+            ref={containerRef}
+            className={styles.logsContainer}
+        >
+          {displayedLogs.map((log, idx) => (
+              <div key={idx} className={styles.logLine}>
+                <span className={styles.logTime}>[{log.time}]</span>
+                <span className={getLogStyle(log.type)}>
               [{log.type}]
             </span>
-            <span className={styles.logMessage}>{log.msg}</span>
-          </div>
-        ))}
-        
-        {currentIndex < LOGS_DATA.length && (
-          <div className={styles.cursor}>▊</div>
-        )}
-        
-        <div ref={logsEndRef} />
-      </div>
+                <span className={styles.logMessage}>{log.msg}</span>
+              </div>
+          ))}
 
-      {/* Footer */}
-      <div className={styles.terminalFooter}>
-        <span className={styles.footerProgress}>
-          {displayedLogs.length} / {LOGS_DATA.length} lignes affichées
-        </span>
-        <span className={styles.footerHint}>
-          ⬇️ Scroll pour lire tout
-        </span>
+          {currentIndex < LOGS_DATA.length && (
+              <div className={styles.cursor}>▊</div>
+          )}
+
+          <div ref={logsEndRef} />
+        </div>
       </div>
-    </div>
   );
 }
