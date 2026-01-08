@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\LobbyUpdated;
 use App\Events\PlayerJoined;
 use App\Http\Controllers\Controller;
 use App\Models\Game;
@@ -43,10 +44,7 @@ class PlayerController extends Controller
             'token' => Str::uuid()
         ]);
 
-        event(new PlayerJoined(
-            $game->code,
-            $player->name
-        ));
+        event(new LobbyUpdated($game->code));
 
         return response()->json([
             'token' => $player->token
