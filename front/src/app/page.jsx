@@ -1,13 +1,27 @@
 "use client";
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import NextButton from "@/components/atoms/Buttons/NextButton";
 import { useRouter, useSearchParams } from "next/navigation";
 import {addPlayer} from "@/hooks/API/gameRequests";
+import {checkGameSession} from "@/hooks/API/rules";
 
 export default function WelcomePage() {
   const router = useRouter();
   const [playerName, setPlayerName] = useState("");
   const [errorMessage, setErrorMessage] = useState(null);
+
+
+  useEffect(() => {
+    const init = async () => {
+      const session = await checkGameSession();
+
+      if (session.authenticated) {
+        router.replace("/lobby");
+      }
+    };
+
+    init();
+  }, [router]);
 
   // Récupération du code dans l'URL
   const searchParams = useSearchParams();
@@ -37,7 +51,8 @@ export default function WelcomePage() {
     try {
       await addPlayer(code, playerName);
       localStorage.setItem("currentPlayerName", playerName);
-      router.push("/lobby?code=" + encodeURIComponent(code));
+      localStorage.setItem("currentGameCode", code);
+      router.push("/lobby");
 
     } catch (error) {
       switch (error.error) {
