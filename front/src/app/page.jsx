@@ -67,8 +67,8 @@ export default function WelcomePage() {
           </h1>
 
           <div className="space-y-4 text-color-mint/80 font-light">
-            <p>Avant d'accéder à votre rôle, vous devez enregistrer votre équipe.</p>
-            <p>Chaque participant doit renseigner le nom de son équipe et son nom.</p>
+            <p>Avant d'accéder à votre rôle, vous devez enregistrer dans votre équipe.</p>
+            <p>Chaque participant doit renseigner son nom.</p>
           </div>
 
           <div className="relative border border-white/40 rounded-xl p-6 mt-8">
@@ -77,7 +77,7 @@ export default function WelcomePage() {
             }} className="absolute -top-3 left-6 px-2 text-lime font-bold uppercase text-sm tracking-wider">
               Attention
             </span>
-            <p className="text-mint font-medium">Une fois validé, votre rôle est définitif.</p>
+            <p className="text-mint font-medium">Une fois validé, votre rôle vous sera attribué de façon aléatoire.</p>
           </div>
         </section>
 

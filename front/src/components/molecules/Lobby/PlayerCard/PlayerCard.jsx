@@ -24,7 +24,7 @@ export default function PlayerCard({ name, variant = "default" }) {
             {isEmpty ? (
                 <Text
                     variant="player-card__empty"
-                    text="En attente d’un joueur…"
+                    text="En attente d’un joueur..."
                 />
             ) : (
                 <Text

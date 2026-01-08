@@ -99,7 +99,7 @@ export default function LobbyPage() {
             {/* Attention */}
             <InfoBanner
                 label="Information"
-                text="La partie commencera automatiquement lorsque tous les joueurs seront prêts."
+                text="La partie commencera lorsque tous les joueurs seront prêts."
             />
 
 
