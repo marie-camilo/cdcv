@@ -34,9 +34,4 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
-
-    'sse' => [
-        'key' => env('SSE_KEY'),
-    ],
-
 ];
