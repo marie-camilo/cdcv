@@ -1,93 +1,177 @@
+/* Container principal */
 .mazeContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1.5rem;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
-.grid {
-    display: inline-grid;
-    grid-template-columns: repeat(15, 1fr);
-    gap: 2px;
-    padding: 1rem;
-    background: var(--color-purple-darker);
-    border-radius: 8px;
-    border: 2px solid var(--color-classic-red);
-    box-shadow: 0 0 20px rgba(255, 51, 51, 0.3);
+/* Grid du labyrinthe */
+.mazeGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: #000;
+  padding: 4px;
+  border: 2px solid var(--color-turquoise);
+  border-radius: 8px;
 }
 
-.cell {
-    width: 2rem;
-    height: 2rem;
-    transition: all 150ms;
+.mazeRow {
+  display: flex;
+  gap: 2px;
 }
 
+/* Cellule de base */
+.mazeCell {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.2s;
+}
+
+/* Mur */
 .wall {
-    background: var(--color-purple-dark);
-    border: 1px solid rgba(255, 48, 79, 0.3);
+  background: var(--color-dark-violet);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.path {
-    background: var(--color-purple-darker);
+/* Chemin */
+.mazeCell:not(.wall) {
+  background: rgba(0, 0, 0, 0.5);
 }
 
-.cursor {
-    background: var(--color-cyan-bright) !important;
-    box-shadow: 0 0 15px rgba(0, 217, 255, 0.8);
-    animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.7; }
-}
-
-.end {
-    background: var(--color-red-bright) !important;
-    box-shadow: 0 0 10px rgba(255, 23, 68, 0.6);
-}
-
-.start {
-    background: rgba(0, 217, 255, 0.5) !important;
-}
-
+/* Solution path (pour Team A) */
 .solution {
-    background: rgba(255, 48, 79, 0.4) !important;
+  background: rgba(255, 68, 68, 0.3) !important;
+  box-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
 }
 
-.commandBox {
-    width: 100%;
-    max-width: 40rem;
-    background: var(--color-purple-darker);
-    border: 2px solid var(--color-cyan-bright);
-    border-radius: 8px;
-    padding: 1.5rem;
-    box-shadow: 0 0 30px rgba(0, 217, 255, 0.4);
+/* Sortie */
+.exit {
+  background: var(--color-turquoise) !important;
+  animation: exitPulse 2s infinite;
 }
 
-.commandHeader {
-    font-family: var(--font-source), monospace;
-    color: var(--color-cyan-bright);
-    margin-bottom: 1rem;
-    font-size: 0.875rem;
+@keyframes exitPulse {
+  0%, 100% {
+    box-shadow: 0 0 10px var(--color-turquoise);
+  }
+  50% {
+    box-shadow: 0 0 20px var(--color-turquoise);
+  }
 }
 
-.commandContent {
-    background: rgba(0, 0, 0, 0.5);
-    padding: 1rem;
-    border-radius: 4px;
-    border: 1px solid rgba(255, 48, 79, 0.3);
-    font-family: var(--font-source), monospace;
-    color: var(--color-beige);
+.exitLabel {
+  font-size: 18px;
 }
 
-.prompt {
-    color: var(--color-cyan-bright);
+/* Curseur (joueur) */
+.cursor {
+  background: #3b82f6 !important;
+  box-shadow: 0 0 15px #3b82f6;
+  animation: cursorPulse 1s infinite;
 }
 
-.commandFooter {
-    margin-top: 1rem;
-    font-size: 0.875rem;
-    color: var(--color-beige);
+@keyframes cursorPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+.cursorLabel {
+  color: #fff;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+/* ============================================ */
+/* MODE MINIMAL (Team B) */
+/* ============================================ */
+
+.minimalContainer {
+  width: 100%;
+  max-width: 600px;
+  height: 600px;
+  margin: 0 auto;
+  background: #000;
+  border: 2px solid var(--color-turquoise);
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Point du joueur en mode minimal */
+.playerDot {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: #3b82f6;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 20px #3b82f6;
+  z-index: 10;
+  animation: playerPulse 1.5s infinite;
+}
+
+@keyframes playerPulse {
+  0%, 100% {
+    box-shadow: 0 0 20px #3b82f6;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    box-shadow: 0 0 30px #3b82f6;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+}
+
+/* Sorties en mode minimal */
+.exitDot {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  background: var(--color-turquoise);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 25px var(--color-turquoise);
+  animation: exitDotPulse 2s infinite;
+}
+
+@keyframes exitDotPulse {
+  0%, 100% {
+    box-shadow: 0 0 25px var(--color-turquoise);
+    opacity: 1;
+  }
+  50% {
+    box-shadow: 0 0 40px var(--color-turquoise);
     opacity: 0.7;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .mazeCell {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .minimalContainer {
+    height: 400px;
+  }
+  
+  .playerDot {
+    width: 15px;
+    height: 15px;
+  }
+  
+  .exitDot {
+    width: 20px;
+    height: 20px;
+  }
 }

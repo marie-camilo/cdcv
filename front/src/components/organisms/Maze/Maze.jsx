@@ -23,7 +23,7 @@ const MAZE_DATA = [
   [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
 ];
 
-// Solution path (coordonnées x,y)
+// Solution path pour Team A
 const SOLUTION_PATH = [
   {x:1, y:1}, {x:2, y:1}, {x:3, y:1},
   {x:3, y:2}, {x:3, y:3}, {x:4, y:3}, {x:5, y:3},
@@ -35,10 +35,29 @@ const SOLUTION_PATH = [
 ];
 
 const START_POS = { x: 1, y: 1 };
-const END_POS = { x: 13, y: 13 };
 
-export default function Maze({ showSolution = false, isPlayable = false }) {
+// Génération aléatoire des sorties (2 à 4 sorties)
+const generateRandomExits = () => {
+  const numExits = Math.floor(Math.random() * 3) + 2; // 2-4 sorties
+  const possibleExits = [
+    { x: 13, y: 1, direction: 'NORTH' },
+    { x: 13, y: 13, direction: 'SOUTH' },
+    { x: 1, y: 13, direction: 'EAST' },
+    { x: 13, y: 7, direction: 'WEST' }
+  ];
+  
+  // Shuffle et prendre numExits sorties
+  const shuffled = possibleExits.sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, numExits);
+};
+
+export default function Maze({ 
+  showSolution = false, 
+  isPlayable = false,
+  minimalMode = false // Mode minimal pour Team B
+}) {
   const [cursorPos, setCursorPos] = useState(START_POS);
+  const [exits] = useState(generateRandomExits());
   const [hasReached, setHasReached] = useState(false);
 
   // Gestion des touches clavier
@@ -51,106 +70,100 @@ export default function Maze({ showSolution = false, isPlayable = false }) {
       let newPos = { ...cursorPos };
       
       // ZQSD + Flèches
-      switch(e.key.toLowerCase()) {
-        case 'z':
-        case 'arrowup':
-          newPos.y = Math.max(0, cursorPos.y - 1);
-          break;
-        case 's':
-        case 'arrowdown':
-          newPos.y = Math.min(14, cursorPos.y + 1);
-          break;
-        case 'q':
-        case 'arrowleft':
-          newPos.x = Math.max(0, cursorPos.x - 1);
-          break;
-        case 'd':
-        case 'arrowright':
-          newPos.x = Math.min(14, cursorPos.x + 1);
-          break;
-        default:
-          return;
+      if (e.key === 'z' || e.key === 'Z' || e.key === 'ArrowUp') {
+        newPos.y -= 1;
+      } else if (e.key === 's' || e.key === 'S' || e.key === 'ArrowDown') {
+        newPos.y += 1;
+      } else if (e.key === 'q' || e.key === 'Q' || e.key === 'ArrowLeft') {
+        newPos.x -= 1;
+      } else if (e.key === 'd' || e.key === 'D' || e.key === 'ArrowRight') {
+        newPos.x += 1;
       }
-
-      // Vérifier si c'est un mur
-      if (MAZE_DATA[newPos.y][newPos.x] === 1) {
-        // Collision avec un mur - ne pas bouger
-        return;
-      }
-
-      // Mouvement valide
-      setCursorPos(newPos);
-
-      // Vérifier si arrivé
-      if (newPos.x === END_POS.x && newPos.y === END_POS.y) {
-        setHasReached(true);
+      
+      // Vérifier collision avec les murs
+      if (MAZE_DATA[newPos.y]?.[newPos.x] === 0) {
+        setCursorPos(newPos);
+        
+        // Vérifier si on a atteint une sortie
+        const reachedExit = exits.find(exit => 
+          exit.x === newPos.x && exit.y === newPos.y
+        );
+        
+        if (reachedExit && !hasReached) {
+          setHasReached(true);
+          alert(`Sortie atteinte : ${reachedExit.direction}`);
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [cursorPos, isPlayable]);
+  }, [cursorPos, isPlayable, exits, hasReached]);
 
-  // Vérifier si une cellule est sur le chemin solution
-  const isOnSolutionPath = (x, y) => {
+  // MODE MINIMAL (Team B) - Juste le point et les sorties
+  if (minimalMode) {
+    return (
+      <div className={styles.minimalContainer}>
+        {/* Affichage minimal : juste le curseur et les sorties */}
+        {exits.map((exit, idx) => (
+          <div
+            key={idx}
+            className={styles.exitDot}
+            style={{
+              left: `${(exit.x / 15) * 100}%`,
+              top: `${(exit.y / 15) * 100}%`
+            }}
+          />
+        ))}
+        
+        {/* Le curseur du joueur */}
+        <div
+          className={styles.playerDot}
+          style={{
+            left: `${(cursorPos.x / 15) * 100}%`,
+            top: `${(cursorPos.y / 15) * 100}%`
+          }}
+        />
+      </div>
+    );
+  }
+
+  // MODE NORMAL (Team A) - Vue complète
+  const isSolutionCell = (x, y) => {
     return SOLUTION_PATH.some(pos => pos.x === x && pos.y === y);
+  };
+
+  const isExitCell = (x, y) => {
+    return exits.some(exit => exit.x === x && exit.y === y);
   };
 
   return (
     <div className={styles.mazeContainer}>
-      {/* Grille du labyrinthe */}
-      <div className={styles.grid}>
+      <div className={styles.mazeGrid}>
         {MAZE_DATA.map((row, y) => (
-          row.map((cell, x) => {
-            const isCursor = isPlayable && cursorPos.x === x && cursorPos.y === y;
-            const isStart = x === START_POS.x && y === START_POS.y;
-            const isEnd = x === END_POS.x && y === END_POS.y;
-            const isSolution = showSolution && isOnSolutionPath(x, y);
-            
-            let cellClass = `${styles.cell} `;
-            
-            if (cell === 1) {
-              // Mur
-              cellClass += styles.wall;
-            } else {
-              // Chemin
-              cellClass += styles.path;
-              
-              if (isCursor) {
-                cellClass += ` ${styles.cursor}`;
-              } else if (isEnd) {
-                cellClass += ` ${styles.end}`;
-              } else if (isStart) {
-                cellClass += ` ${styles.start}`;
-              } else if (isSolution) {
-                cellClass += ` ${styles.solution}`;
-              }
-            }
+          <div key={y} className={styles.mazeRow}>
+            {row.map((cell, x) => {
+              const isWall = cell === 1;
+              const isSolution = showSolution && isSolutionCell(x, y);
+              const isExit = isExitCell(x, y);
+              const isCursor = isPlayable && cursorPos.x === x && cursorPos.y === y;
 
-            return (
-              <div
-                key={`${x}-${y}`}
-                className={cellClass}
-              />
-            );
-          })
+              let cellClass = styles.mazeCell;
+              if (isWall) cellClass += ` ${styles.wall}`;
+              if (isSolution) cellClass += ` ${styles.solution}`;
+              if (isExit) cellClass += ` ${styles.exit}`;
+              if (isCursor) cellClass += ` ${styles.cursor}`;
+
+              return (
+                <div key={x} className={cellClass}>
+                  {isExit && <span className={styles.exitLabel}>🚪</span>}
+                  {isCursor && <span className={styles.cursorLabel}>●</span>}
+                </div>
+              );
+            })}
+          </div>
         ))}
       </div>
-
-      {/* Commande Linux si arrivé */}
-      {hasReached && (
-        <div className={styles.commandBox}>
-          <div className={styles.commandHeader}>
-            [ SYSTÈME ] Objectif atteint - Commande de déverrouillage générée
-          </div>
-          <div className={styles.commandContent}> /// COMMANDE DONNEE PAR LE LABY
-            <span className={styles.prompt}>$</span> echo "CODE_ACCES_SALLE_115" | sed 's/ACCES/REUNION/'
-          </div>
-          <div className={styles.commandFooter}>
-            Exécutez cette commande dans le terminal pour obtenir le Code 1
-          </div>
-        </div>
-      )}
     </div>
   );
 }
