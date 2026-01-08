@@ -1,14 +1,19 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import { useSearchParams } from "next/navigation";
+import {useEffect, useState, useRef} from "react";
+import {useSearchParams} from "next/navigation";
 import Pusher from "pusher-js";
-import { getPlayersForGivenGame } from "@/hooks/API/gameRequests";
+import {getPlayersForGivenGame} from "@/hooks/API/gameRequests";
+import SectionTitle from "@/components/molecules/SectionTitle";
+import GameCodeCard from "../../components/molecules/Lobby/GameCodeCard";
+import LobbyStatus from "../../components/molecules/Lobby/LobbyStatus";
+import PlayerCard from "../../components/molecules/Lobby/PlayerCard";
+import InfoBanner from "@/components/molecules/Lobby/InfoBanner";
+import Text from "@/components/atoms/Text/Text";
 
 export default function LobbyPage() {
     const searchParams = useSearchParams();
     const code = searchParams.get("code");
-
     const pusherRef = useRef(null);
 
     const [players, setPlayers] = useState([]);
@@ -16,7 +21,6 @@ export default function LobbyPage() {
 
     const MAX_PLAYERS = 6;
 
-    // Initial fetch
     useEffect(() => {
         if (!code) return;
 
@@ -32,46 +36,21 @@ export default function LobbyPage() {
         fetchPlayers();
     }, [code]);
 
-    // Temps réel
     useEffect(() => {
         if (!code || pusherRef.current) return;
 
-        console.log("PUSHER KEY =", process.env.NEXT_PUBLIC_PUSHER_APP_KEY);
-
-
         const pusher = new Pusher(
             process.env.NEXT_PUBLIC_PUSHER_APP_KEY,
-            { cluster: "eu", forceTLS: true }
+            {cluster: "eu", forceTLS: true}
         );
-
-        pusher.connection.bind("connected", () => {
-            console.log("✅ Pusher connecté");
-        });
-
-        pusher.connection.bind("error", err => {
-            console.error("❌ Erreur Pusher", err);
-        });
 
         pusherRef.current = pusher;
         const channel = pusher.subscribe(`game.${code}`);
 
-        // channel.bind("PlayerJoined", async () => {
-        //     try {
-        //         const gameData = await getPlayersForGivenGame(code);
-        //         setPlayers(gameData.players ?? []);
-        //     } catch (e) {
-        //         console.error("Lobby resync failed", e);
-        //     }
-        // });
-
-        // après subscribe
         channel.bind("LobbyUpdated", async () => {
-            console.log("📡 LobbyUpdated reçu");
             const gameData = await getPlayersForGivenGame(code);
             setPlayers(gameData.players ?? []);
         });
-
-
 
         return () => {
             channel.unbind_all();
@@ -82,26 +61,51 @@ export default function LobbyPage() {
     }, [code]);
 
     return (
-        <div className="p-6">
-            <h1 className="text-xl font-bold mb-2">Salle d’attente</h1>
+        <main className="min-h-screen flex flex-col p-8 md:max-w-md mx-auto py-16">
 
-            <p className="text-sm text-gray-500 mb-4">
-                {players.length} / {MAX_PLAYERS} joueurs
-            </p>
+            {/* Header */}
+            <SectionTitle
+                variant={"lobby"}
+                title={"Salle d'attente"}
+                subtitle={"Les joueurs rejoignent la partie en temps réel"}
+            />
 
-            {error && <p className="text-red-500">{error}</p>}
+            <GameCodeCard variant={"game-code"} label={"Code de la partie"} code={code} />
 
-            <ul className="space-y-2">
-                {players.map(player => (
-                    <li key={player} className="border rounded px-3 py-2">
-                        {player}
-                    </li>
+            {/* Statut */}
+            <LobbyStatus label={"Joueurs connectés"} current={players.length} count={MAX_PLAYERS}/>
+
+
+            {/* Liste joueurs */}
+            <ul className="mt-6 space-y-3">
+                {players.map((player) => (
+                    <PlayerCard
+                        key={`player-${player}`}
+                        name={player}
+                    />
                 ))}
+
+
+                {players.length < MAX_PLAYERS &&
+                    Array.from({length: MAX_PLAYERS - players.length}).map((_, i) => (
+                        <PlayerCard
+                            key={`empty-${i}`}
+                            variant="empty"
+                        />
+
+                    ))}
             </ul>
 
-            <p className="text-sm text-gray-500 mt-6">
-                En attente du lancement de la partie…
-            </p>
-        </div>
+            {/* Attention */}
+            <InfoBanner
+                label="Information"
+                text="La partie commencera automatiquement lorsque tous les joueurs seront prêts."
+            />
+
+
+            {error && (
+                <Text text={error} variant={"lobbyError"}/>
+            )}
+        </main>
     );
 }

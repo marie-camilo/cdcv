@@ -1,0 +1,55 @@
+.root {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 14px 16px;
+    border-radius: 14px;
+
+    background: linear-gradient(
+            90deg,
+            rgba(39, 234, 166, 0.12),
+            rgba(39, 234, 166, 0.02)
+    );
+
+    border: 1px solid rgba(39, 234, 166, 0.4);
+    transition: background 0.25s ease, border 0.25s ease;
+}
+
+/* Point de présence */
+.playerCardDot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--color-turquoise);
+    box-shadow: 0 0 8px rgba(39, 234, 166, 0.8);
+    flex-shrink: 0;
+}
+
+.player-card__name {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--color-white);
+}
+
+/* ========================= */
+/* ===== EMPTY VARIANT ===== */
+/* ========================= */
+
+.empty {
+    background: rgba(208, 255, 113, 0.04);
+    border: 1px dashed rgba(208, 255, 113, 0.35);
+}
+
+.playerCardDotEmpty {
+    background: transparent;
+    border: 1px dashed rgba(208, 255, 113, 0.6);
+    box-shadow: none;
+    opacity: 0.6;
+}
+
+.player-card__empty {
+    font-size: 0.9rem;
+    font-style: italic;
+    color: rgba(208, 255, 113, 0.55);
+}
