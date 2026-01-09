@@ -14,25 +14,36 @@ import PlayerCard from "@/components/molecules/Lobby/PlayerCard";
 import InfoBanner from "@/components/molecules/Lobby/InfoBanner";
 import Text from "@/components/atoms/Text/Text";
 
+const MAX_PLAYERS = 6;
+
 export default function LobbyPage() {
     const router = useRouter();
-    const code = localStorage.getItem("currentGameCode");
     const pusherRef = useRef(null);
 
+    const [code, setCode] = useState(null);
     const [players, setPlayers] = useState([]);
     const [error, setError] = useState(null);
     const [authorized, setAuthorized] = useState(false);
 
-    const MAX_PLAYERS = 6;
-
     /**
-     * 🔒 Guard d’accès basé sur l’état serveur
+     * 1️⃣ Lecture localStorage (client-only)
      */
     useEffect(() => {
-        if (!code) {
+        const storedCode = localStorage.getItem("currentGameCode");
+
+        if (!storedCode) {
             router.replace("/");
             return;
         }
+
+        setCode(storedCode);
+    }, [router]);
+
+    /**
+     * 2️⃣ Guard d’accès serveur
+     */
+    useEffect(() => {
+        if (!code) return;
 
         const checkState = async () => {
             try {
@@ -43,11 +54,9 @@ export default function LobbyPage() {
                         case "starting":
                             router.replace("/starting");
                             break;
-
                         case "started":
                             router.replace("/enigme-1");
                             break;
-
                         default:
                             router.replace("/");
                     }
@@ -64,7 +73,7 @@ export default function LobbyPage() {
     }, [code, router]);
 
     /**
-     * 👥 Chargement des joueurs (uniquement si autorisé)
+     * 3️⃣ Chargement des joueurs
      */
     useEffect(() => {
         if (!authorized || !code) return;
@@ -82,7 +91,7 @@ export default function LobbyPage() {
     }, [authorized, code]);
 
     /**
-     * 📡 Temps réel (uniquement si autorisé)
+     * 4️⃣ Temps réel (Pusher)
      */
     useEffect(() => {
         if (!authorized || !code || pusherRef.current) return;
@@ -100,8 +109,7 @@ export default function LobbyPage() {
             setPlayers(gameData.players ?? []);
         });
 
-        channel.bind("GameStarting", (data) => {
-            const { startingAt } = data;
+        channel.bind("GameStarting", ({ startingAt }) => {
             localStorage.setItem("currentGameStartingAt", startingAt);
             router.push("/starting");
         });
@@ -114,9 +122,7 @@ export default function LobbyPage() {
         };
     }, [authorized, code, router]);
 
-    if (!authorized) {
-        return null; // loading.jsx ou écran vide contrôlé
-    }
+    if (!authorized) return null;
 
     return (
         <main className="min-h-screen flex flex-col p-8 md:max-w-md mx-auto py-16">
@@ -140,10 +146,7 @@ export default function LobbyPage() {
 
             <ul className="mt-6 space-y-3">
                 {players.map((player) => (
-                    <PlayerCard
-                        key={`player-${player}`}
-                        name={player}
-                    />
+                    <PlayerCard key={`player-${player}`} name={player} />
                 ))}
 
                 {players.length < MAX_PLAYERS &&
