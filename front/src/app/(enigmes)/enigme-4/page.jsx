@@ -58,11 +58,21 @@ export default function Enigme4Page() {
         }
     };
 
-    // Validation du QR Code final (Puzzle assemblé)
     const handleFinalScan = (decodedText) => {
-        // Le QR Code formé par le puzzle doit contenir ce texte
-        // Tu peux générer ce QR Code sur un site gratuit avec le texte "MISSION_FINALE_OK"
         if (decodedText.includes("MISSION_FINALE") || decodedText === "SCAN_DEBUG") {
+
+            const currentCodes = JSON.parse(localStorage.getItem('game_codes') || '[]');
+
+            const secretFile = "tux_secret.txt";
+
+            if (!currentCodes.find(c => c.value === secretFile)) {
+                currentCodes.push({
+                    label: "FICHIER SECRET",
+                    value: secretFile
+                });
+                localStorage.setItem('game_codes', JSON.stringify(currentCodes));
+            }
+
             setIsModalOpen(true);
         }
     };
@@ -137,7 +147,8 @@ export default function Enigme4Page() {
             <BaseModal
                 isOpen={isModalOpen}
                 title="< DÉCRYPTAGE RÉUSSI >"
-                message="Tiens, tiens... les enquêteurs savent donc faire un puzzle ? C'est mignon. Vous avez trouvé l'accès au dossier 'mission_finale'. Le fichier contenant la clé finale est dedans. Allez donc au terminal central qu'on vous humilie une dernière fois. Jacquot n'en a plus pour longtemps." onConfirm={() => router.push('/enigme-finale')}
+                message="Tiens, tiens... les enquêteurs savent donc faire un puzzle ? C'est mignon. Le scan a révélé le fichier 'tux_secret.txt'. Il est caché dans le dossier 'mission_finale'. Allez donc au terminal central dans la salle 132 qu'on vous humilie une dernière fois."
+                onConfirm={() => router.push('/enigme-finale')}
             />
         </section>
     );

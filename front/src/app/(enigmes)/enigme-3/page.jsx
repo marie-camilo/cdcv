@@ -100,8 +100,8 @@ export default function Enigme3Page() {
 
             <BaseModal
                 isOpen={isModalOpen}
-                title="< TRANSMISSION FINIE />"
-                message="Jacquot : 'Vous avez réussi à les guider à travers le labyrinthe ! Mais l'ennemi approche. Récupérez la pièce de puzzle finale et rejoignez-moi pour l'ultime décodage.'"
+                title="< TRANSMISSION INTERCEPTÉE />"
+                message="Tiens, vous avez réussi à sortir ? On pariait que vous tourneriez en rond jusqu'à demain. C'est presque... touchant. Allez, récupérez la pièce de puzzle et filez en salle 109."
                 onConfirm={goToNextStep}
             />
         </section>
