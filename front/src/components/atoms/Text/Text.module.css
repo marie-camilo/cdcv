@@ -1,0 +1,53 @@
+.game-code__label {
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--color-turquoise);
+}
+
+.game-code__value {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    color: var(--color-light-green);
+}
+
+.lobby-status__label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--color-turquoise);
+}
+
+
+.lobby-status__count {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-light-green);
+}
+
+.lobby-status__max {
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 400;
+}
+
+.info-banner__label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-lavender);
+}
+
+.info-banner__text {
+    font-size: 0.95rem;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--color-white);
+}
+
+.lobbyError {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-classic-red);
+}
