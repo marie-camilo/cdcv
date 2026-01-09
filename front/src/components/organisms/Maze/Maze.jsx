@@ -3,35 +3,32 @@
 import { useState, useEffect } from 'react';
 import styles from './Maze.module.css';
 
-// Labyrinthe hardcodé 12x12
+// Labyrinthe hardcodé 12x12 (taille réduite pour meilleure jouabilité)
 // 0 = chemin, 1 = mur
-// Design chaotique et asymétrique
-const MAZE_SIZE = 12;
+// Design chaotique et asymétrique, beaucoup de tournants, pas de symétrie
+const MAZE_SIZE = 12; // Taille du labyrinthe
 
 const MAZE_DATA = [
   [1,1,1,1,1,1,1,1,1,1,1,1],
-  [1,0,0,0,1,0,0,0,1,0,0,1],
-  [1,1,0,1,1,0,1,0,0,0,1,1],
-  [1,0,0,0,0,0,1,1,1,0,0,1],
-  [1,0,1,1,0,1,0,0,0,1,0,1],
-  [1,0,0,1,0,0,0,1,0,1,0,1],
-  [1,1,0,0,1,1,0,1,0,0,0,1],
-  [1,0,0,1,0,0,0,0,1,1,0,1],
-  [1,0,1,1,1,0,1,0,0,0,0,1],
-  [1,0,0,0,0,0,1,1,1,0,1,1],
-  [1,0,1,1,0,0,0,0,0,0,0,1],
+  [1,0,0,0,1,0,0,0,0,0,0,1],
+  [1,0,1,0,1,0,1,1,1,0,1,1],
+  [1,0,1,0,0,0,0,0,1,0,0,1],
+  [1,0,1,1,1,1,1,0,1,1,0,1],
+  [1,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,1,1,1,0,1,1,1,1,0,1],
+  [1,0,1,0,0,0,0,0,0,1,0,1],
+  [1,0,0,0,1,1,1,1,0,0,0,1],
+  [1,1,1,0,0,0,0,0,0,1,0,1],
+  [1,0,0,0,1,1,1,1,0,0,0,1],
   [1,1,1,1,1,1,1,1,1,1,1,1],
 ];
 
-// Solution path pour Team A (chemin unique vers la vraie sortie)
+// Solution path pour Team A (chemin vers la sortie OUEST/VERTE)
 const SOLUTION_PATH = [
   {x:1, y:1}, {x:2, y:1}, {x:3, y:1},
-  {x:3, y:2}, {x:3, y:3}, {x:4, y:3}, {x:5, y:3},
-  {x:5, y:4}, {x:5, y:5}, {x:6, y:5}, {x:7, y:5},
-  {x:8, y:5}, {x:9, y:5}, {x:10, y:5},
-  {x:10, y:6}, {x:10, y:7}, {x:10, y:8}, {x:10, y:9},
-  {x:10, y:10}, {x:10, y:11}, {x:10, y:12}, {x:10, y:13},
-  {x:11, y:13}, {x:12, y:13}, {x:13, y:13}
+  {x:3, y:2}, {x:3, y:3}, {x:4, y:3}, {x:5, y:3}, {x:6, y:3}, {x:7, y:3},
+  {x:7, y:4}, {x:7, y:5}, {x:6, y:5}, {x:5, y:5}, {x:4, y:5}, {x:3, y:5}, {x:2, y:5}, {x:1, y:5},
+  {x:1, y:6}
 ];
 
 const START_POS = { x: 1, y: 1 };
@@ -166,7 +163,11 @@ export default function Maze({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [cursorPos, isPlayable, exits, hasReached]);
 
-  // MODE MINIMAL (Team B) - Grille visible mais tout noir + points flottants
+  // ============================================
+  // MODE MINIMAL (Team B)
+  // Grillage visible SANS distinction mur/chemin
+  // Points flottants par dessus (curseur + sorties)
+  // ============================================
   if (minimalMode) {
     return (
         <div className={styles.minimalWrapper}>
@@ -179,35 +180,35 @@ export default function Maze({
           </div>
 
           <div className={styles.minimalContainer}>
-            {/* Grille en arrière-plan (tout noir, juste pour le repère visuel) */}
-            <div className={styles.backgroundGrid}>
+            {/* Grillage uniforme en arrière-plan */}
+            <div className={styles.mazeGrid}>
               {MAZE_DATA.map((row, y) => (
-                  <div key={y} className={styles.backgroundRow}>
+                  <div key={y} className={styles.mazeRow}>
                     {row.map((cell, x) => (
-                        <div key={x} className={styles.backgroundCell}></div>
+                        <div key={x} className={styles.mazeCellMinimal}></div>
                     ))}
                   </div>
               ))}
             </div>
 
-            {/* Sorties flottantes par-dessus */}
+            {/* Sorties flottantes (4 points rouges) */}
             {exits.map((exit, idx) => (
                 <div
                     key={idx}
                     className={styles.exitDot}
                     style={{
-                      left: `${(exit.x / MAZE_SIZE) * 100}%`,
-                      top: `${(exit.y / MAZE_SIZE) * 100}%`
+                      left: `${((exit.x + 0.5) / MAZE_SIZE) * 100}%`,
+                      top: `${((exit.y + 0.5) / MAZE_SIZE) * 100}%`
                     }}
                 />
             ))}
 
-            {/* Le curseur du joueur par-dessus */}
+            {/* Le curseur du joueur (point cyan) */}
             <div
                 className={styles.playerDot}
                 style={{
-                  left: `${(cursorPos.x / MAZE_SIZE) * 100}%`,
-                  top: `${(cursorPos.y / MAZE_SIZE) * 100}%`
+                  left: `${((cursorPos.x + 0.5) / MAZE_SIZE) * 100}%`,
+                  top: `${((cursorPos.y + 0.5) / MAZE_SIZE) * 100}%`
                 }}
             />
           </div>
@@ -215,7 +216,11 @@ export default function Maze({
     );
   }
 
-  // MODE NORMAL (Team A) - Grille complète avec murs visibles
+  // ============================================
+  // MODE NORMAL (Team A)
+  // Grille complète avec distinction mur/chemin
+  // PAS de curseur, PAS de sorties
+  // ============================================
   return (
       <div className={styles.mazeContainer}>
         <div className={styles.mazeGrid}>
@@ -224,9 +229,19 @@ export default function Maze({
                 {row.map((cell, x) => {
                   const isWall = cell === 1;
 
-                  let cellClass = styles.mazeCell;
-                  if (isWall) cellClass += ` ${styles.wall}`;
+                  // Vérifier si c'est le chemin solution (optionnel avec showSolution)
+                  const isSolution = showSolution && SOLUTION_PATH.some(
+                      pos => pos.x === x && pos.y === y
+                  );
 
+                  let cellClass = styles.mazeCell;
+                  if (isWall) {
+                    cellClass += ` ${styles.wall}`;
+                  } else if (isSolution) {
+                    cellClass += ` ${styles.solution}`;
+                  }
+
+                  // On n'affiche PAS les sorties ni le curseur pour Team A
                   return (
                       <div key={x} className={cellClass}></div>
                   );
