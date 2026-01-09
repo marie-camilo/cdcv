@@ -1,0 +1,15 @@
+.root {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+    padding: 2rem 1rem;
+    background-color: #000;
+}
+.cameraContainer {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    aspect-ratio: 3 / 4;
+    border: 1px solid #333;
+}
