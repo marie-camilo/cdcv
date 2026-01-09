@@ -8,11 +8,11 @@
     "start": "next start"
   },
   "dependencies": {
-    "@next/swc-win32-x64-msvc": "^16.1.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.24.1",
     "html5-qrcode": "^2.3.8",
     "next": "^15.5.9",
+    "pusher-js": "^8.4.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-icons": "^5.5.0"

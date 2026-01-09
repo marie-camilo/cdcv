@@ -18,17 +18,8 @@
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-aeonik: "Aeonik", sans-serif;
   --font-source: "Source Code Pro", monospace;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 * {
@@ -37,7 +28,7 @@
 
 body {
     background: var(--color-dark);
-    color: var(--foreground);
+    color: var(--color-white);
     font-family: var(--font-source), serif;
     margin: 0;
     padding: 0;

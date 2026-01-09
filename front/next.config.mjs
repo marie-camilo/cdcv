@@ -1,14 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    output: 'export',
-
-    // Optionnel : Si tu déploies sur GitHub Pages (ex: username.github.io/repo/)
-    // basePath: '/nom-du-repo',
-
-    // Optionnel : Pour éviter les erreurs si tu utilises l'optimisation d'image native
-    // (qui nécessite normalement un serveur Node.js)
-    images: {
-        unoptimized: true,
+    async rewrites() {
+        return [
+            {
+                source: "/api/:path*",
+                destination: "http://127.0.0.1:8000/api/v1/:path*",
+            },
+        ];
     },
 };
 
