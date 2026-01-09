@@ -24,9 +24,6 @@ export default function RootLayout({ children }) {
     return (
         <html lang="fr" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <body className="bg-[var(--color-dark)] text-white h-screen overflow-hidden flex flex-col">
-        <TimerProvider>
-            <Navbar />
-        </TimerProvider>
         <div className="flex-1 overflow-auto">
             {children}
         </div>

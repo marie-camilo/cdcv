@@ -1,15 +1,15 @@
 /** @type {import('next').NextConfig} */
-const FRONT_BASE_URI = process.env.NEXT_PUBLIC_FRONT_BASE_URI || '';
 
 const nextConfig = {
-    basePath: FRONT_BASE_URI,
-    assetPrefix: FRONT_BASE_URI,
+    basePath: '',
+    assetPrefix: '',
+    trailingSlash: true,
     output: 'export',
     async rewrites() {
         return [
             {
-                source: "/api/:path*",
-                destination: "http://127.0.0.1:8000/api/v1/:path*",
+                source: "/api/v1/:path*",
+                destination: "https://cs5d.23.gremmi.fr/api/v1/:path*",
             },
         ];
     },

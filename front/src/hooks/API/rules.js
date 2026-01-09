@@ -7,7 +7,7 @@ import { apiFetch } from "@/hooks/API/fetchAPI";
  * @returns {Promise<{ authenticated: boolean, player?: object, reason?: string }>}
  */
 export async function checkGameSession() {
-    return await apiFetch("/api/session", {
+    return await apiFetch("/api/v1/session", {
         method: "GET"
     });
 }
@@ -16,7 +16,7 @@ export async function checkGameSession() {
  * Vérifie l'état de la partie
  */
 export async function checkGameState(code) {
-    return await apiFetch(`/api/games/${code}/state`, {
+    return await apiFetch(`/api/v1/games/${code}/state`, {
         method: "GET"
     });
 }

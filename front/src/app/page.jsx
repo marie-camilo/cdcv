@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { useRouter } from "next/navigation";
 import { RiDoorLockBoxLine, RiCellphoneFill, RiChat4Line, RiPuzzleLine, RiCameraLine, RiFolder6Line, RiLockLine } from 'react-icons/ri';
 import TypewriterTerminal from "@/components/molecules/TypewriterTerminal/TypewriterTerminal";
+import {TimerProvider} from "@/app/context/TimerContext";
+import Navbar from "@/components/organisms/Navbar/Navbar";
 
 export default function WelcomePage() {
     const router = useRouter();
@@ -71,6 +73,9 @@ export default function WelcomePage() {
 
     return (
         <main className="h-full flex flex-col md:max-w-md mx-auto">
+            <TimerProvider>
+                <Navbar />
+            </TimerProvider>
             <section className="flex flex-col h-full">
                 {/* Zone de texte avec scroll */}
                 <article className="text-(--color-turquoise) py-4 px-4 font-mono text-xs overflow-y-auto flex-shrink-0 max-h-[35vh] border-b-2 border-(--color-turquoise)">

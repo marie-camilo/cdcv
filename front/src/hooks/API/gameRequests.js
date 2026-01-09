@@ -17,7 +17,7 @@ export async function addPlayer(code, player) {
         throw new Error("Nom de joueur invalide");
     }
 
-    return apiFetch(`/api/games/${code}/players`, {
+    return apiFetch(`/api/v1/games/${code}/players`, {
         method: "POST",
         body: JSON.stringify({ name: player })
     });
@@ -33,7 +33,7 @@ export async function getPlayersForGivenGame(code) {
         throw new Error("Code manquant");
     }
 
-    return apiFetch(`/api/games/${code}`, {
+    return apiFetch(`/api/v1/games/${code}`, {
         method: "GET"
     });
 }
@@ -43,7 +43,7 @@ export async function getPlayersForGivenGame(code) {
  * @returns {Promise<{ role: string }>}
  */
 export async function getPlayerRole() {
-    return apiFetch("/api/me/role", {
+    return apiFetch("/api/v1/me/role", {
         method: "GET"
     });
 }
