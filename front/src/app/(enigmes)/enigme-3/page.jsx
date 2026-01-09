@@ -20,6 +20,16 @@ export default function Enigme3Page() {
     };
 
     const handleSuccess = () => {
+        const currentCodes = JSON.parse(localStorage.getItem('game_codes') || '[]');
+
+        if (!currentCodes.find(c => c.value === "LABYRINTHE")) {
+            currentCodes.push({
+                label: "CODE SORTIE",
+                value: "LABYRINTHE"
+            });
+            localStorage.setItem('game_codes', JSON.stringify(currentCodes));
+        }
+
         setIsModalOpen(true);
     };
 
