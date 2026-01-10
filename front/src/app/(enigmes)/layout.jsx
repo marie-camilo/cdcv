@@ -6,7 +6,7 @@ export default function EnigmeLayout({ children }) {
     return (
         <TimerProvider>
             <div className="bg-dark text-light-green h-full flex flex-col overflow-hidden">
-                <div className="p-4 flex-1 overflow-auto">
+                <div className="p-2 flex-1 overflow-auto">
                     {children}
                 </div>
                 <GameOverModal />
