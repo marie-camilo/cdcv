@@ -35,7 +35,6 @@ export default function TerminalLogs({ minimizable = true, onMinimize }) {
   const logsEndRef = useRef(null);
 
   // Défilement progressif des logs (1 ligne par seconde)
-  // Continue même si le composant est minimisé
   useEffect(() => {
     if (currentIndex >= LOGS_DATA.length) return;
 
@@ -45,12 +44,13 @@ export default function TerminalLogs({ minimizable = true, onMinimize }) {
     }, 1000); // 1 seconde entre chaque ligne
 
     return () => clearTimeout(timer);
-  }, [currentIndex]); // Pas de dépendance sur isMinimized
+  }, [currentIndex]);
 
-  // Auto-scroll vers le bas quand nouvelle ligne (seulement si visible)
+  // Auto-scroll vers le bas UNIQUEMENT dans le container du terminal
   useEffect(() => {
-    if (containerRef.current) {
-      logsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (logsEndRef.current && containerRef.current) {
+      // Utiliser scrollTop au lieu de scrollIntoView pour éviter le scroll de page
+      containerRef.current.scrollTop = containerRef.current.scrollHeight;
     }
   }, [displayedLogs]);
 
