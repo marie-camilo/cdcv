@@ -211,7 +211,7 @@
 }
 
 /* ============================================ */
-/* Grid du labyrinthe - CARRÉ (INCHANGÉ) */
+/* Grid du labyrinthe - CARRÉ */
 /* ============================================ */
 .mazeGrid {
   display: flex;
@@ -243,7 +243,7 @@
   border: 0.5px solid var(--color-red-bright);
 }
 
-/* Cellule minimale (Team B) - toutes identiques */
+/* Cellule minimale (Team B) */
 .mazeCellMinimal {
   flex: 1;
   display: flex;
@@ -259,7 +259,7 @@
   background: var(--color-purple-dark) !important;
 }
 
-/* Mur (pour Team A) - utilise la variable violet plus clair */
+/* Mur (pour Team A) */
 .wall {
   background: var(--color-purple-dark);
 }
@@ -269,13 +269,13 @@
   background: #000;
 }
 
-/* Solution path (pour Team A avec showSolution) (INCHANGÉ) */
+/* Solution path (pour Team A avec showSolution) */
 .solution {
   background: rgba(255, 48, 79, 0.3) !important;
   box-shadow: 0 0 10px #FF304F;
 }
 
-/* Sortie (pour Team B) (INCHANGÉ) */
+/* Sortie (pour Team B) */
 .exit {
   background: #FF304F !important;
   animation: exitPulse 2s infinite;
@@ -295,7 +295,7 @@
   color: #fff;
 }
 
-/* Curseur (joueur) pour Team B (INCHANGÉ) */
+/* Curseur (joueur) pour Team B */
 .cursor {
   background: #00FFFF !important;
   box-shadow: 0 0 15px #00FFFF;
@@ -487,7 +487,7 @@
 }
 
 /* ============================================ */
-/* Points flottants (Team B uniquement) (INCHANGÉ) */
+/* Points flottants (Team B uniquement) */
 /* ============================================ */
 
 /* Sortie (point rouge flottant) */

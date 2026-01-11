@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import styles from './Maze.module.css';
 
-// Labyrinthe 17x17 - Tres complexe avec sorties imprevisibles
+// Labyrinthe 17x17
 const MAZE_SIZE = 17;
 
 const MAZE_DATA = [
@@ -132,7 +132,7 @@ export default function Maze({
     setMounted(true);
   }, []);
 
-  // Effet de pénalité visuel (filtre rouge + shake)
+  // Effet de pénalité visuel
   useEffect(() => {
     if (showPenalty) {
       const timer = setTimeout(() => setShowPenalty(false), 1500);
@@ -149,7 +149,7 @@ export default function Maze({
   }, [showLifeLost]);
 
   // ============================================
-  // FONCTION : Appliquer pénalité timer (stackable)
+  // FONCTION : Appliquer pénalité timer
   // ============================================
   const applyTimerPenalty = useCallback(async () => {
     // Effet visuel
@@ -162,12 +162,12 @@ export default function Maze({
       // Calculer malus total stacké (10, 20, 30, 40...)
       const totalPenalty = newPenaltyCount * 10;
 
-      // Callback vers le parent (si fourni)
+      // Callback vers le parent
       if (onTimerPenalty) {
         onTimerPenalty(totalPenalty);
       }
 
-      // Appel API Laravel (si game_session_id fourni)
+      // Appel API Laravel A MODIFIER
       if (gameSessionId) {
         fetch('/api/timer/penalty', {
           method: 'POST',
@@ -201,7 +201,7 @@ export default function Maze({
   };
 
   // ============================================
-  // GESTION DES MOUVEMENTS (modifié)
+  // GESTION DES MOUVEMENTS
   // ============================================
   useEffect(() => {
     if (!isPlayable && !minimalMode) return;
@@ -235,7 +235,7 @@ export default function Maze({
       if (!hasMoved) return;
 
       // ============================================
-      // NOUVEAU : Vérifier collision avec mur
+      // Vérifier collision avec mur
       // ============================================
       const isWall = MAZE_DATA[newPos.y][newPos.x] === 1;
 
@@ -287,7 +287,7 @@ export default function Maze({
   }, [cursorPos, isPlayable, exits, hasReached, lives, minimalMode, startPos, moveCount, applyTimerPenalty]);
 
   // ============================================
-  // MODE MINIMAL (Team B) - MODIFIÉ
+  // MODE MINIMAL (Team B)
   // ============================================
   if (minimalMode) {
     return (
@@ -394,7 +394,7 @@ export default function Maze({
   }
 
   // ============================================
-  // MODE NORMAL (Team A) - Seulement compteur, pas de reset
+  // MODE NORMAL (Team A)
   // ============================================
   return (
       <div className={styles.mazeContainer}>
