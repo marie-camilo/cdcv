@@ -18,32 +18,32 @@
   width: 100%;
   max-width: 600px;
   display: flex;
-  gap: 10px;
+  gap: 15px;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
 }
 
 /* Hearts à gauche */
 .heartsContainer {
   background: transparent;
-  border: 2px solid #FF1744;
-  border-radius: 8px;
-  padding: 8px 12px;
+  border: 3px solid var(--color-red-bright);
+  border-radius: 12px;
+  padding: 12px 20px;
   display: flex;
-  gap: 10px;
+  gap: 12px;
   align-items: center;
-  height: 45px;
+  height: 60px;
 }
 
 .heartFull {
-  font-size: 22px;
-  color: #FF1744;
+  font-size: 28px;
+  color: var(--color-red-bright);
   animation: heartBeat 1.5s infinite;
 }
 
 .heartEmpty {
-  font-size: 26px;
+  font-size: 28px;
   color: rgba(255, 23, 68, 0.2);
 }
 
@@ -56,39 +56,40 @@
 /* Groupe compteur + reset à droite */
 .rightGroup {
   display: flex;
-  gap: 10px;
+  gap: 15px;
   align-items: center;
 }
 
 /* Compteur */
 .counterBox {
-  background: #FF1744;
-  border: 2px solid #FF1744;
-  border-radius: 8px;
-  padding: 0 20px;
+  background: var(--color-red-bright);
+  border: 3px solid var(--color-red-bright);
+  border-radius: 12px;
+  padding: 0 30px;
   font-family: 'Courier New', monospace;
-  font-size: 18px;
+  font-size: 22px;
   color: #000;
   font-weight: bold;
   text-align: center;
-  height: 45px;
+  height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 120px;
 }
 
 /* Reset button à droite */
 .resetButton {
   background: transparent;
-  border: 2px solid #FF1744;
-  border-radius: 8px;
+  border: 3px solid var(--color-red-bright);
+  border-radius: 12px;
   padding: 0;
-  font-size: 28px;
-  color: #FF1744;
+  font-size: 32px;
+  color: var(--color-red-bright);
   cursor: pointer;
   transition: all 0.3s ease;
-  width: 45px;
-  height: 45px;
+  width: 60px;
+  height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -104,29 +105,26 @@
 }
 
 /* ============================================ */
-/* Bouton terminal pour Team A */
+/* Bouton terminal pour Team A - style circulaire */
 /* ============================================ */
 .terminalButton {
-  background: rgba(0, 0, 0, 0.8);
-  border: 2px solid #FF1744;
-  border-radius: 8px;
-  padding: 0 20px;
-  font-family: 'Courier New', monospace;
-  font-size: 14px;
-  color: #00FFFF;
-  font-weight: bold;
+  background: transparent;
+  border: 3px solid var(--color-red-bright);
+  border-radius: 12px;
+  padding: 0;
+  font-size: 32px;
+  color: var(--color-red-bright);
   cursor: pointer;
   transition: all 0.3s ease;
-  height: 50px;
+  width: 60px;
+  height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
-  text-transform: uppercase;
-  letter-spacing: 1px;
 }
 
 .terminalButton:hover {
-  background: rgba(0, 255, 255, 0.1);
+  background: rgba(255, 23, 68, 0.2);
   transform: scale(1.05);
 }
 
@@ -221,7 +219,7 @@
   gap: 0;
   background: #000;
   padding: 0;
-  border: 2px solid #FF1744;
+  border: 2px solid var(--color-red-bright);
   border-radius: 8px;
   width: 100%;
   max-width: 600px;
@@ -242,7 +240,7 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  border: 0.5px solid #FF1744;
+  border: 0.5px solid var(--color-red-bright);
 }
 
 /* Cellule minimale (Team B) - toutes identiques */
@@ -252,18 +250,18 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  border: 0.5px solid #FF1744;
+  border: 0.5px solid var(--color-red-bright);
   background: transparent;
 }
 
 /* Murs des bords pour Team B */
 .borderWall {
-  background: #1a0d2e !important;
+  background: var(--color-purple-dark) !important;
 }
 
-/* Mur (pour Team A) */
+/* Mur (pour Team A) - utilise la variable violet plus clair */
 .wall {
-  background: #1a0d2e;
+  background: var(--color-purple-dark);
 }
 
 /* Chemin (pour Team A) */
@@ -481,7 +479,7 @@
   max-width: 600px;
   aspect-ratio: 1 / 1;
   margin: 0 auto;
-  border: 2px solid #FF1744;
+  border: 2px solid var(--color-red-bright);
   border-radius: 8px;
   position: relative;
   overflow: hidden;
@@ -497,10 +495,10 @@
   position: absolute;
   width: 20px;
   height: 20px;
-  background: #FF1744;
+  background: var(--color-red-bright);
   border-radius: 50%;
   transform: translate(-50%, -50%);
-  box-shadow: 0 0 15px #FF1744;
+  box-shadow: 0 0 15px var(--color-red-bright);
   animation: exitDotPulse 2s infinite;
   z-index: 10;
   pointer-events: none;

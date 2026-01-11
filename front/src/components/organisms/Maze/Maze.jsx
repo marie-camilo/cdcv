@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import styles from './Maze.module.css';
 
 // Labyrinthe 17x17 - Tres complexe avec sorties imprevisibles
@@ -64,35 +64,35 @@ const generateRandomStartPos = () => {
   return centerPossibleStarts[randomIndex];
 };
 
-// Génération des 4 sorties (positions imprevisibles)
+// Génération des 4 sorties (2 vraies + 2 pièges)
 const generateRandomExits = () => {
   return [
     {
       x: 3, y: 1,
       direction: 'NORD',
-      type: 'PIEGE',
-      color: 'red',
-      command: 'echo "ACCES_SALLE_ROUGE_42" | base64'
+      type: 'VERTE',          // VRAIE SORTIE #1
+      color: 'green',
+      command: 'cat /sys/kernel/security/access.log | grep VERTE'
     },
     {
       x: MAZE_SIZE - 2, y: 12,
       direction: 'EST',
-      type: 'VERTE',
+      type: 'VERTE',          // VRAIE SORTIE #2
       color: 'green',
       command: 'grep "LIBERATION" /var/log/system.log'
     },
     {
       x: 11, y: MAZE_SIZE - 2,
       direction: 'SUD',
-      type: 'PIEGE',
-      color: 'orange',
+      type: 'PIEGE',          // PIÈGE #1
+      color: 'red',
       command: 'rm -rf /tmp/*'
     },
     {
       x: 1, y: 5,
       direction: 'OUEST',
-      type: 'PIEGE',
-      color: 'purple',
+      type: 'PIEGE',          // PIÈGE #2
+      color: 'red',
       command: 'cat /dev/null'
     }
   ];
@@ -108,7 +108,8 @@ export default function Maze({
                                isPlayable = true,
                                minimalMode = false,
                                gameSessionId = null, // Pour API Laravel
-                               onTimerPenalty = null // Callback quand pénalité appliquée
+                               onTimerPenalty = null, // Callback quand pénalité appliquée
+                               onTerminalClick = null // Callback pour ouvrir le terminal (Team A)
                              }) {
   const [exits] = useState(generateRandomExits());
   const [startPos] = useState(generateRandomStartPos());
@@ -150,26 +151,25 @@ export default function Maze({
   // ============================================
   // FONCTION : Appliquer pénalité timer (stackable)
   // ============================================
-  const applyTimerPenalty = async () => {
+  const applyTimerPenalty = useCallback(async () => {
     // Effet visuel
     setShowPenalty(true);
 
     // Incrémenter le compteur de pénalités
-    const newPenaltyCount = penaltyCount + 1;
-    setPenaltyCount(newPenaltyCount);
+    setPenaltyCount(prev => {
+      const newPenaltyCount = prev + 1;
 
-    // Calculer malus total stacké (10, 20, 30, 40...)
-    const totalPenalty = newPenaltyCount * 10;
+      // Calculer malus total stacké (10, 20, 30, 40...)
+      const totalPenalty = newPenaltyCount * 10;
 
-    // Callback vers le parent (si fourni)
-    if (onTimerPenalty) {
-      onTimerPenalty(totalPenalty);
-    }
+      // Callback vers le parent (si fourni)
+      if (onTimerPenalty) {
+        onTimerPenalty(totalPenalty);
+      }
 
-    // Appel API Laravel (si game_session_id fourni)
-    if (gameSessionId) {
-      try {
-        const response = await fetch('/api/timer/penalty', {
+      // Appel API Laravel (si game_session_id fourni)
+      if (gameSessionId) {
+        fetch('/api/timer/penalty', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -177,18 +177,18 @@ export default function Maze({
             penalty_minutes: totalPenalty,
             reason: 'lives_depleted'
           })
-        });
-
-        const data = await response.json();
-        console.log('Penalite appliquee:', data);
-      } catch (error) {
-        console.error('Erreur API penalite:', error);
+        })
+            .then(response => response.json())
+            .then(data => console.log('Penalite appliquee:', data))
+            .catch(error => console.error('Erreur API penalite:', error));
       }
-    }
+
+      return newPenaltyCount;
+    });
 
     // Redonner 1 vie après pénalité
     setLives(1);
-  };
+  }, [onTimerPenalty, gameSessionId]);
 
   // ============================================
   // FONCTION : Reset position + coups
@@ -207,6 +207,13 @@ export default function Maze({
     if (!isPlayable && !minimalMode) return;
 
     const handleKeyDown = (e) => {
+      // ============================================
+      // BLOQUER si nombre de mouvements dépassé
+      // ============================================
+      if (moveCount >= MINIMUM_MOVES) {
+        return; // Ne plus permettre de bouger
+      }
+
       let newPos = { ...cursorPos };
       let hasMoved = false;
 
@@ -277,7 +284,7 @@ export default function Maze({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [cursorPos, isPlayable, exits, hasReached, lives, minimalMode, startPos]);
+  }, [cursorPos, isPlayable, exits, hasReached, lives, minimalMode, startPos, moveCount, applyTimerPenalty]);
 
   // ============================================
   // MODE MINIMAL (Team B) - MODIFIÉ
@@ -387,19 +394,14 @@ export default function Maze({
   }
 
   // ============================================
-  // MODE NORMAL (Team A)
+  // MODE NORMAL (Team A) - Seulement compteur, pas de reset
   // ============================================
   return (
       <div className={styles.mazeContainer}>
 
-        {/* Top bar avec bouton terminal et compteur */}
+        {/* Top bar avec seulement le compteur (centré à droite) */}
         <div className={styles.topBar}>
-          {/* Bouton terminal à gauche */}
-          <button className={styles.terminalButton}>
-            TERMINAL
-          </button>
-
-          {/* Espace vide */}
+          {/* Espace vide à gauche */}
           <div style={{flex: 1}}></div>
 
           {/* Compteur à droite */}
