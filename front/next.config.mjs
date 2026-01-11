@@ -1,4 +1,5 @@
 /** @type {import('next').NextConfig} */
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || '';
 
 const nextConfig = {
     basePath: '',
@@ -9,7 +10,7 @@ const nextConfig = {
         return [
             {
                 source: "/api/v1/:path*",
-                destination: "https://cs5d.23.gremmi.fr/api/v1/:path*",
+                destination: `${API_BASE_URL}/api/v1/:path*`,
             },
         ];
     },
