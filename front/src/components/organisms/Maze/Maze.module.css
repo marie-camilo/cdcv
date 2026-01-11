@@ -1,4 +1,6 @@
+/* ============================================ */
 /* Container principal */
+/* ============================================ */
 .mazeContainer {
   width: 100%;
   display: flex;
@@ -9,14 +11,217 @@
   gap: 20px;
 }
 
-/* Grid du labyrinthe - CARRÉ */
+/* ============================================ */
+/* Top bar horizontale avec hearts, compteur, reset */
+/* ============================================ */
+.topBar {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+/* Hearts à gauche */
+.heartsContainer {
+  background: transparent;
+  border: 2px solid #FF1744;
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  height: 45px;
+}
+
+.heartFull {
+  font-size: 22px;
+  color: #FF1744;
+  animation: heartBeat 1.5s infinite;
+}
+
+.heartEmpty {
+  font-size: 26px;
+  color: rgba(255, 23, 68, 0.2);
+}
+
+@keyframes heartBeat {
+  0%, 100% { transform: scale(1); }
+  10% { transform: scale(1.1); }
+  20% { transform: scale(1); }
+}
+
+/* Groupe compteur + reset à droite */
+.rightGroup {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Compteur */
+.counterBox {
+  background: #FF1744;
+  border: 2px solid #FF1744;
+  border-radius: 8px;
+  padding: 0 20px;
+  font-family: 'Courier New', monospace;
+  font-size: 18px;
+  color: #000;
+  font-weight: bold;
+  text-align: center;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Reset button à droite */
+.resetButton {
+  background: transparent;
+  border: 2px solid #FF1744;
+  border-radius: 8px;
+  padding: 0;
+  font-size: 28px;
+  color: #FF1744;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.resetButton:hover {
+  background: rgba(255, 23, 68, 0.2);
+  transform: rotate(180deg);
+}
+
+.resetButton:active {
+  transform: rotate(180deg) scale(0.9);
+}
+
+/* ============================================ */
+/* Bouton terminal pour Team A */
+/* ============================================ */
+.terminalButton {
+  background: rgba(0, 0, 0, 0.8);
+  border: 2px solid #FF1744;
+  border-radius: 8px;
+  padding: 0 20px;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  color: #00FFFF;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.terminalButton:hover {
+  background: rgba(0, 255, 255, 0.1);
+  transform: scale(1.05);
+}
+
+.terminalButton:active {
+  transform: scale(0.95);
+}
+
+/* ============================================ */
+/* Stats pour Team A */
+/* ============================================ */
+.statsContainer {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 10px;
+}
+
+.statBox {
+  background: transparent;
+  border: 2px solid #FF1744;
+  border-radius: 8px;
+  padding: 8px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  min-width: 120px;
+  height: 50px;
+  justify-content: center;
+}
+
+.statLabel {
+  font-family: 'Courier New', monospace;
+  font-size: 9px;
+  color: #FF1744;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.statValue {
+  font-family: 'Courier New', monospace;
+  font-size: 18px;
+  color: #FF1744;
+  font-weight: bold;
+}
+.statsContainer {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+  max-width: 800px;
+  margin-bottom: 10px;
+}
+
+.statBox {
+  background: rgba(255, 48, 79, 0.1);
+  border: 2px solid #FF304F;
+  border-radius: 8px;
+  padding: 12px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  min-width: 120px;
+}
+
+.statLabel {
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  color: #FF304F;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.statValue {
+  font-family: 'Courier New', monospace;
+  font-size: 24px;
+  color: #FF304F;
+  font-weight: bold;
+}
+
+/* ============================================ */
+/* Grid du labyrinthe - CARRÉ (INCHANGÉ) */
+/* ============================================ */
 .mazeGrid {
   display: flex;
   flex-direction: column;
   gap: 0;
   background: #000;
   padding: 0;
-  border: 2px solid var(--color-red-accent);
+  border: 2px solid #FF1744;
   border-radius: 8px;
   width: 100%;
   max-width: 600px;
@@ -37,7 +242,7 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  border: 0.5px solid var(--color-red-accent);
+  border: 0.5px solid #FF1744;
 }
 
 /* Cellule minimale (Team B) - toutes identiques */
@@ -47,13 +252,18 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  border: 0.5px solid var(--color-red-accent);
-  background: #000;
+  border: 0.5px solid #FF1744;
+  background: transparent;
+}
+
+/* Murs des bords pour Team B */
+.borderWall {
+  background: #1a0d2e !important;
 }
 
 /* Mur (pour Team A) */
 .wall {
-  background: var(--color-purple-dark);
+  background: #1a0d2e;
 }
 
 /* Chemin (pour Team A) */
@@ -61,24 +271,24 @@
   background: #000;
 }
 
-/* Solution path (pour Team A avec showSolution) */
+/* Solution path (pour Team A avec showSolution) (INCHANGÉ) */
 .solution {
   background: rgba(255, 48, 79, 0.3) !important;
-  box-shadow: 0 0 10px var(--color-red-accent);
+  box-shadow: 0 0 10px #FF304F;
 }
 
-/* Sortie (pour Team B) */
+/* Sortie (pour Team B) (INCHANGÉ) */
 .exit {
-  background: var(--color-red-bright) !important;
+  background: #FF304F !important;
   animation: exitPulse 2s infinite;
 }
 
 @keyframes exitPulse {
   0%, 100% {
-    box-shadow: 0 0 10px var(--color-red-bright);
+    box-shadow: 0 0 10px #FF304F;
   }
   50% {
-    box-shadow: 0 0 20px var(--color-red-bright);
+    box-shadow: 0 0 20px #FF304F;
   }
 }
 
@@ -87,10 +297,10 @@
   color: #fff;
 }
 
-/* Curseur (joueur) pour Team B */
+/* Curseur (joueur) pour Team B (INCHANGÉ) */
 .cursor {
-  background: var(--color-cyan-bright) !important;
-  box-shadow: 0 0 15px var(--color-cyan-bright);
+  background: #00FFFF !important;
+  box-shadow: 0 0 15px #00FFFF;
   animation: cursorPulse 1s infinite;
 }
 
@@ -110,7 +320,7 @@
 }
 
 /* ============================================ */
-/* CONTRÔLES (pour Team B) */
+/* CONTROLES (pour Team B) */
 /* ============================================ */
 
 .minimalWrapper {
@@ -120,24 +330,149 @@
   gap: 20px;
   width: 100%;
   padding: 20px;
+  transition: all 0.3s ease;
 }
 
-.controlsInfo {
-  display: flex;
-  gap: 15px;
-  flex-wrap: wrap;
-  justify-content: center;
+/* ============================================ */
+/* NOUVEAU : Effet de pénalité (filtre rouge + shake) */
+/* ============================================ */
+.penaltyActive {
+  animation: penaltyShake 0.5s ease-in-out, penaltyFlash 1.5s ease-in-out;
 }
 
-.controlKey {
-  background: rgba(255, 48, 79, 0.2);
-  border: 1px solid var(--color-red-accent);
-  padding: 8px 16px;
-  border-radius: 4px;
+@keyframes penaltyShake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+  20%, 40%, 60%, 80% { transform: translateX(10px); }
+}
+
+@keyframes penaltyFlash {
+  0%, 100% { filter: none; }
+  50% { filter: brightness(0.5) sepia(1) hue-rotate(-50deg) saturate(5); }
+}
+
+/* ============================================ */
+/* NOUVEAU : Message de pénalité */
+/* ============================================ */
+.penaltyMessage {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 0, 0, 0.95);
+  border: 4px solid #FF304F;
+  border-radius: 12px;
+  padding: 30px 50px;
   font-family: 'Courier New', monospace;
-  font-size: 12px;
-  color: var(--color-red-bright);
+  font-size: 28px;
+  color: #fff;
   font-weight: bold;
+  text-align: center;
+  z-index: 9999;
+  animation: penaltyPulse 0.3s ease-in-out infinite;
+  box-shadow: 0 0 50px rgba(255, 0, 0, 0.8);
+}
+
+@keyframes penaltyPulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.1); }
+}
+
+/* ============================================ */
+/* NOUVEAU : Notification -1 vie */
+/* ============================================ */
+.lifeLostNotif {
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 48, 79, 0.9);
+  border: 2px solid #FF304F;
+  border-radius: 8px;
+  padding: 15px 30px;
+  font-family: 'Courier New', monospace;
+  font-size: 20px;
+  color: #fff;
+  font-weight: bold;
+  z-index: 9998;
+  animation: lifeLostFade 1s ease-out;
+}
+
+@keyframes lifeLostFade {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -100px) scale(0.8);
+  }
+}
+
+/* ============================================ */
+/* NOUVEAU : Affichage commande de sortie */
+/* ============================================ */
+.exitCommandDisplay {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.95);
+  border: 3px solid #00FFFF;
+  border-radius: 12px;
+  padding: 30px 40px;
+  min-width: 500px;
+  max-width: 80%;
+  z-index: 10000;
+  box-shadow: 0 0 50px rgba(0, 255, 255, 0.5);
+  animation: exitCommandAppear 0.5s ease-out;
+}
+
+@keyframes exitCommandAppear {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.exitCommandHeader {
+  font-family: 'Courier New', monospace;
+  font-size: 24px;
+  color: #00FFFF;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #00FFFF;
+}
+
+.exitCommandBody {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.exitCommandLabel {
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  color: #00FFFF;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.exitCommandCode {
+  font-family: 'Courier New', monospace;
+  font-size: 18px;
+  color: #fff;
+  background: rgba(255, 48, 79, 0.2);
+  border: 1px solid #FF304F;
+  border-radius: 6px;
+  padding: 15px 20px;
+  word-break: break-all;
 }
 
 /* Container minimal pour Team B (grillage + points) */
@@ -146,79 +481,63 @@
   max-width: 600px;
   aspect-ratio: 1 / 1;
   margin: 0 auto;
-  border: 2px solid var(--color-red-accent);
+  border: 2px solid #FF1744;
   border-radius: 8px;
   position: relative;
   overflow: hidden;
+  background: #000;
 }
 
-/* La grille dans le container minimal doit prendre tout l'espace */
-.minimalContainer .mazeGrid {
-  width: 100%;
-  height: 100%;
-  border: none;
-  border-radius: 0;
-}
+/* ============================================ */
+/* Points flottants (Team B uniquement) (INCHANGÉ) */
+/* ============================================ */
 
-/* Point du joueur en mode minimal */
-.playerDot {
+/* Sortie (point rouge flottant) */
+.exitDot {
   position: absolute;
   width: 20px;
   height: 20px;
-  background: var(--color-cyan-bright);
+  background: #FF1744;
   border-radius: 50%;
   transform: translate(-50%, -50%);
-  box-shadow: 0 0 20px var(--color-cyan-bright);
-  z-index: 10;
-  animation: playerPulse 1.5s infinite;
-}
-
-@keyframes playerPulse {
-  0%, 100% {
-    box-shadow: 0 0 20px var(--color-cyan-bright);
-    transform: translate(-50%, -50%) scale(1);
-  }
-  50% {
-    box-shadow: 0 0 30px var(--color-cyan-bright);
-    transform: translate(-50%, -50%) scale(1.2);
-  }
-}
-
-/* Sorties en mode minimal */
-.exitDot {
-  position: absolute;
-  width: 30px;
-  height: 30px;
-  background: var(--color-red-bright);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  box-shadow: 0 0 25px var(--color-red-bright);
+  box-shadow: 0 0 15px #FF1744;
   animation: exitDotPulse 2s infinite;
+  z-index: 10;
+  pointer-events: none;
 }
 
 @keyframes exitDotPulse {
   0%, 100% {
-    box-shadow: 0 0 25px var(--color-red-bright);
-    opacity: 1;
+    box-shadow: 0 0 15px #FF304F;
+    transform: translate(-50%, -50%) scale(1);
   }
   50% {
-    box-shadow: 0 0 40px var(--color-red-bright);
-    opacity: 0.7;
+    box-shadow: 0 0 25px #FF304F;
+    transform: translate(-50%, -50%) scale(1.3);
   }
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .mazeContainer {
-    padding: 10px;
-  }
+/* Joueur (point cyan flottant) */
+.playerDot {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background: #00FFFF;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 20px #00FFFF;
+  animation: playerDotPulse 1s infinite;
+  z-index: 20;
+  pointer-events: none;
+}
 
-  .mazeCell {
-    border: 0.5px solid rgba(255, 48, 79, 0.2);
+@keyframes playerDotPulse {
+  0%, 100% {
+    box-shadow: 0 0 20px #00FFFF;
+    transform: translate(-50%, -50%) scale(1);
   }
-
-  .controlKey {
-    font-size: 10px;
-    padding: 6px 12px;
+  50% {
+    box-shadow: 0 0 30px #00FFFF;
+    transform: translate(-50%, -50%) scale(1.2);
   }
 }

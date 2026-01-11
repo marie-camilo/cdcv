@@ -1,6 +1,6 @@
 .container {
   min-height: 100vh;
-  background: var(--color-purple-darker);
+  background: #1a0d2e;
   display: flex;
   align-items: center;
   justify-content: center;
