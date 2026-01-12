@@ -14,12 +14,22 @@ export default function Enigme1Page() {
     }, []);
 
     const handleSuccess = () => {
-        // Débloquer le scan
         const unlocked = JSON.parse(localStorage.getItem('unlockedApps') || '[]');
         if (!unlocked.includes('scan')) {
             unlocked.push('scan');
             localStorage.setItem('unlockedApps', JSON.stringify(unlocked));
         }
+
+        const currentCodes = JSON.parse(localStorage.getItem('game_codes') || '[]');
+
+        if (!currentCodes.find(c => c.value === "FOYER")) {
+            currentCodes.push({
+                label: "POSITION",
+                value: "FOYER"
+            });
+            localStorage.setItem('game_codes', JSON.stringify(currentCodes));
+        }
+
         setIsModalOpen(true);
     };
 
@@ -32,16 +42,12 @@ export default function Enigme1Page() {
         "> CONNEXION SÉCURISÉE ÉTABLIE...",
         "> IDENTITÉ : M. JACQUOT",
         "> STATUT : INFILTRATION EN COURS",
-        "> ",
         "> Équipe, je suis à l'intérieur de leur réseau.",
         "> Les Chemises Rouges ont sécurisé leur système avec un pare-feu complexe.",
-        "> ",
         "> J'ai besoin de votre aide pour forcer l'accès.",
         "> Devant vous, une séquence de chiffres. C'est leur premier verrou.",
-        "> ",
         "> Une fois déchiffré, entrez le mot de passe.",
         "> Cela nous donnera accès à leur SCANNER de documents.",
-        "> ",
         "> Le temps presse. Bonne chance.",
         "> — M. JACQUOT"
     ];
