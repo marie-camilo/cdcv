@@ -1,71 +1,70 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+export const dynamic = 'force-static';
 
-import { addPlayer } from "@/hooks/API/gameRequests";
+import { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+
+import { addPlayer } from '@/hooks/API/gameRequests';
 import {
   checkGameState,
   checkPlayerCookie,
   getCodeFromCookie,
-  joinGame
-} from "@/hooks/API/rules";
+  joinGame,
+} from '@/hooks/API/rules';
 
-export default function WelcomePage() {
+export default function StartPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const code = searchParams.get("code");
 
-  const [playerName, setPlayerName] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [code, setCode] = useState(null);
+  const [playerName, setPlayerName] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   /**
-   * Guard d’accès global
+   * Lecture du query param APRÈS hydration
    */
   useEffect(() => {
-    let cancelled = false;
+    const c = searchParams.get('code');
+    setCode(c);
+  }, [searchParams]);
+
+  /**
+   * Guard d’accès (client-only)
+   */
+  useEffect(() => {
+    if (!code) return;
 
     const init = async () => {
       try {
-        if (!code) {
-          router.replace("/");
-          return;
-        }
-
         const player = await checkPlayerCookie();
         const gameLog = await getCodeFromCookie().catch(() => null);
 
-        console.log(gameLog);
-
-        // Si déjà joueur + même partie → lobby direct
-        if (player.authenticated || gameLog?.game?.code === code) {
+        if (player?.authenticated || gameLog?.game?.code === code) {
           const state = await checkGameState(code);
 
-          if (state.status === "waiting") {
-            router.replace("/lobby");
+          if (state.status === 'waiting') {
+            router.replace('/lobby');
             return;
           }
 
-          if (state.status === "started") {
-            router.replace("/");
+          if (state.status === 'started') {
+            router.replace('/');
             return;
           }
         }
-
-        // Sinon on reste sur la page (nouveau joueur)
       } catch {
-        router.replace("/");
+        router.replace('/');
       }
     };
 
     init();
-
-    return () => {
-      cancelled = true;
-    };
   }, [code, router]);
 
-  if (!code) {
+  /**
+   * Protection UI si code absent
+   */
+  if (code === null) {
     return (
         <main className="min-h-screen flex items-center justify-center text-red-500 font-mono">
           &gt; ERREUR : CODE DE PARTIE MANQUANT
@@ -77,29 +76,29 @@ export default function WelcomePage() {
    * Enregistrement joueur
    */
   const handleNext = async () => {
-    setErrorMessage("");
+    setErrorMessage('');
 
     if (!playerName.trim()) {
-      setErrorMessage("⛔ IDENTITÉ REQUISE");
+      setErrorMessage('⛔ IDENTITÉ REQUISE');
       return;
     }
 
     try {
       await addPlayer(code, playerName);
       await joinGame(code);
-      router.push("/lobby");
+      router.push('/lobby');
     } catch (error) {
       const apiError = error?.data?.error;
 
       switch (apiError) {
-        case "GAME_FULL":
-          setErrorMessage("⛔ PARTIE COMPLÈTE");
+        case 'GAME_FULL':
+          setErrorMessage('⛔ PARTIE COMPLÈTE');
           break;
-        case "GAME_NOT_JOINABLE":
-          setErrorMessage("⛔ PARTIE DÉJÀ DÉMARRÉE");
+        case 'GAME_NOT_JOINABLE':
+          setErrorMessage('⛔ PARTIE DÉJÀ DÉMARRÉE');
           break;
         default:
-          setErrorMessage("⛔ ERREUR SYSTÈME");
+          setErrorMessage('⛔ ERREUR SYSTÈME');
       }
     }
   };

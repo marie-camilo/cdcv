@@ -133,7 +133,7 @@ export default function Enigme1Page() {
             <BaseModal
                 isOpen={isModalOpen}
                 title="< ACCÈS DÉBLOQUÉ />"
-                message="Excellent travail ! Nous avons forcé la première couche de sécurité. Le SCANNER est maintenant accessible depuis le menu principal. Vous pouvez désormais numériser leurs documents secrets. Retournez au menu et commencez l'infiltration. Chaque application débloquée nous rapproche de la vérité. — M. JACQUOT"
+                message="Eh ben... C'était laborieux. Rendez-vous au Foyer pour la suite des énigmes, si vous y arrivez... - LES CHEMISES ROUGES"
                 onConfirm={goToNextStep}
             />
         </section>

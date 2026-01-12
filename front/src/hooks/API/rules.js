@@ -2,12 +2,14 @@
 
 import { apiFetch } from "@/hooks/API/fetchAPI";
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || '';
+
 /**
  * Vérifie si une session de jeu est active (cookie présent et valide)
  * @returns {Promise<{ authenticated: boolean, player?: object, reason?: string }>}
  */
 export async function checkPlayerCookie() {
-    return await apiFetch("/api/v1/session", {
+    return await apiFetch(`${API_BASE_URL}/api/v1/session`, {
         method: "GET"
     });
 }
@@ -16,7 +18,7 @@ export async function checkPlayerCookie() {
  * Vérifie l'état de la partie ainsi que l'existence du cookie joueur
  */
 export async function checkGameState(code) {
-    return await apiFetch(`/api/v1/games/${code}/state`, {
+    return await apiFetch(`${API_BASE_URL}/api/v1/games/${code}/state`, {
         method: "GET"
     });
 }

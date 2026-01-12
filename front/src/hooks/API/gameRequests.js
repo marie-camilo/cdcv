@@ -2,6 +2,9 @@
 
 import {apiFetch} from "@/hooks/API/fetchAPI";
 
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || '';
+
 /**
  * Ajoute un joueur à une partie via un code QR
  * @param {string} code
@@ -17,7 +20,7 @@ export async function addPlayer(code, player) {
         throw new Error("Nom de joueur invalide");
     }
 
-    return apiFetch(`/api/v1/games/${code}/players`, {
+    return apiFetch(`${API_BASE_URL}/api/v1/games/${code}/players`, {
         method: "POST",
         body: JSON.stringify({ name: player })
     });
@@ -33,7 +36,7 @@ export async function getPlayersForGivenGame(code) {
         throw new Error("Code manquant");
     }
 
-    return apiFetch(`/api/v1/games/${code}`, {
+    return apiFetch(`${API_BASE_URL}/api/v1/games/${code}`, {
         method: "GET"
     });
 }
@@ -43,7 +46,7 @@ export async function getPlayersForGivenGame(code) {
  * @returns {Promise<{ role: string }>}
  */
 export async function getPlayerRole() {
-    return apiFetch("/api/v1/me/role", {
+    return apiFetch(`${API_BASE_URL}/api/v1/me/role`, {
         method: "GET"
     });
 }
