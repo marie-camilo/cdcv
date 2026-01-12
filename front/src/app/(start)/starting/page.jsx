@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import {checkGameState, getCodeFromCookie} from "@/hooks/API/rules";
 
 const TOTAL_DURATION = 11000;
 
@@ -11,22 +12,47 @@ export default function StartingPage() {
     const [code, setCode] = useState(null);
     const [startAt, setStartAt] = useState(null);
     const [remaining, setRemaining] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    // Lecture client-only
+    /**
+     * 1️⃣ Initialisation (cookie + localStorage)
+     */
     useEffect(() => {
-        const storedCode = localStorage.getItem("currentGameCode");
-        const storedTime = localStorage.getItem("currentGameStartingAt");
+        let cancelled = false;
 
-        if (!storedCode || !storedTime) {
-            router.replace("/");
-            return;
-        }
+        const init = async () => {
+            try {
+                const game = await getCodeFromCookie().catch(() => null);
+                const storedTime = localStorage.getItem("currentGameStartingAt");
 
-        setCode(storedCode);
-        setStartAt(Number(storedTime) * 1000);
+                const gameCode = game?.game?.code;
+
+                if (!gameCode || !storedTime) {
+                    router.replace("/log");
+                    return;
+                }
+
+                if (cancelled) return;
+
+                setCode(gameCode);
+                setStartAt(Number(storedTime) * 1000);
+            } catch {
+                router.replace("/log");
+            } finally {
+                if (!cancelled) setLoading(false);
+            }
+        };
+
+        init();
+
+        return () => {
+            cancelled = true;
+        };
     }, [router]);
 
-    // Timer
+    /**
+     * 2️⃣ Timer
+     */
     useEffect(() => {
         if (!code || !startAt) return;
 
@@ -46,7 +72,10 @@ export default function StartingPage() {
         return () => clearInterval(interval);
     }, [code, startAt, router]);
 
-    if (remaining === null) return null;
+    /**
+     * UI states
+     */
+    if (loading || remaining === null) return null;
 
     return (
         <main className="h-screen flex flex-col items-center justify-center px-8 text-white bg-[var(--color-dark)] overflow-hidden">

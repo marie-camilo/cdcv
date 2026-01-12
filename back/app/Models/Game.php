@@ -11,7 +11,10 @@ class Game extends Model
         'status',
         'step',
         'started_at',
+        'token',
     ];
+
+    protected $hidden = ['token'];
 
     protected $casts = [
         'started_at' => 'datetime',
