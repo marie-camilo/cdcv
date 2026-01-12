@@ -40,7 +40,7 @@ class GameFlowController extends Controller
                 $player->save();
             }
 
-            $game->status = 'starting';
+            $game->status = 'started';
             $game->started_at = now();
             $game->save();
         });
@@ -66,4 +66,69 @@ class GameFlowController extends Controller
         ]);
     }
 
+
+    public function log(Request $request, string $code)
+    {
+        $game = Game::where('code', $code)->first();
+
+        if (!$game) {
+            return response()->json([
+                'message' => 'GAME_NOT_FOUND'
+            ], 404);
+        }
+
+        if (!in_array($game->status, ['waiting', 'started'])) {
+            return response()->json([
+                'message' => 'GAME_NOT_ACCESSIBLE',
+                'status' => $game->status,
+            ], 403);
+        }
+
+        return response()
+            ->json([
+                'message' => 'GAME_LOGGED',
+                'game' => [
+                    'status' => $game->status,
+                ],
+            ])
+            ->cookie(
+                'game_cookie',
+                $game->token,
+                300,
+                '/',
+                null,
+                false,         // Secure (HTTPS)
+                true,         // HttpOnly
+                false,
+                'Lax'
+            );
+    }
+
+    public function getLogSession(Request $request)
+    {
+        $token = $request->cookie('game_cookie');
+
+        if (!$token) {
+            return response()->json([
+                'game' => null,
+                'reason' => 'NO_GAME_LOGGED'
+            ], 200);
+        }
+
+        $game = Game::where('token', $token)->first();
+
+        if (!$game) {
+            return response()->json([
+                'game' => null,
+                'reason' => 'GAME_NOT_FOUND'
+            ], 200);
+        }
+
+        return response()->json([
+            'game' => [
+                'code' => $game->code,
+                'status' => $game->status,
+            ],
+        ]);
+    }
 }

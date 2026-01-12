@@ -52,7 +52,7 @@ class PlayerController extends Controller
                 'success' => true
             ], 201)
             ->cookie(
-                'game_token',
+                'player_cookie',
                 $player->token,
                 60 * 24 * 7,   // 7 jours
                 '/',
@@ -66,7 +66,7 @@ class PlayerController extends Controller
 
     public function role(Request $request)
     {
-        $token = $request->cookie('game_token');
+        $token = $request->cookie('player_cookie');
 
         if (!$token) {
             return response()->json([
@@ -87,9 +87,9 @@ class PlayerController extends Controller
         ]);
     }
 
-    public function session(Request $request)
+    public function getPlayerCookie(Request $request)
     {
-        $token = $request->cookie('game_token');
+        $token = $request->cookie('player_cookie');
 
         if (!$token) {
             return response()->json([

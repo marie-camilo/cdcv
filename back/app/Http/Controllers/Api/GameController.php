@@ -20,6 +20,7 @@ class GameController extends Controller
 
         $game = Game::create([
             'code' => GameCodeGenerator::generate(),
+            'token' => Str::uuid()
         ]);
 
         return response()->json([

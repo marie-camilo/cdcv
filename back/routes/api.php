@@ -28,10 +28,15 @@ Route::middleware('api.key')
         Route::post('/games/{code}/start', [GameFlowController::class, 'start']);
 
         // Récupérer le cookie du joueur
-        Route::get('/session', [PlayerController::class, 'session']);
+        Route::get('/session', [PlayerController::class, 'getPlayerCookie']);
 
         // Récupérer l’état de la partie
         Route::get('/games/{code}/state', [GameFlowController::class, 'state']);
 
+        // Mettre le code de la partie dans un cookie
+        Route::post('/games/{code}/log', [GameFlowController::class, 'log']);
+
+        //Récupérer le code de la partie depuis le cookie
+        Route::get('/games/log/session', [GameFlowController::class, 'getLogSession']);
     });
 
