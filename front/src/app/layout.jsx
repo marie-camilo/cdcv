@@ -21,7 +21,13 @@ export default function RootLayout({ children }) {
 
     // Si l'URL a 2 segments ou plus sous /enigme-2/, c'est un jeu
     const pathSegments = pathname?.split('/').filter(Boolean);
-    const isGamePage = pathSegments?.length >= 2 && pathSegments[0] === 'enigme-2';
+    const isGamePage = pathSegments?.length >= 2
+        && pathSegments[0] === 'enigme-2'
+        && pathSegments[0] === 'starting'
+        && pathSegments[0] === 'start'
+        && pathSegments[0] === 'role'
+        && pathSegments[0] === 'log'
+        && pathSegments[0] === 'lobby';
 
     return (
         <html lang="fr" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
