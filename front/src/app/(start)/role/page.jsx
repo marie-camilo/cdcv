@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getPlayerRole } from "@/hooks/API/gameRequests";
 import SectionTitle from "@/components/molecules/SectionTitle";
+import {checkGameState, getCodeFromCookie} from "@/hooks/API/rules";
 
 const DISPLAY_DURATION = 10_000; // 10 secondes
 
@@ -18,6 +19,14 @@ export default function RolePage() {
         let timeout;
 
         const init = async () => {
+            const gameData = await getCodeFromCookie().catch(() => null);
+            const gameState = await checkGameState(gameData.game.code);
+
+            if (gameState.status !== "waiting") {
+                router.replace("/");
+                return;
+            }
+
             const data = await getPlayerRole();
             setRole(data.role);
 

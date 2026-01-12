@@ -5,7 +5,11 @@ import { useRouter } from "next/navigation";
 import Pusher from "pusher-js";
 
 import { getPlayersForGivenGame } from "@/hooks/API/gameRequests";
-import { checkGameState } from "@/hooks/API/rules";
+import {
+    checkGameState,
+    checkPlayerCookie,
+    getCodeFromCookie
+} from "@/hooks/API/rules";
 
 import SectionTitle from "@/components/molecules/SectionTitle";
 import GameCodeCard from "@/components/molecules/Lobby/GameCodeCard";
@@ -26,28 +30,25 @@ export default function LobbyPage() {
     const [authorized, setAuthorized] = useState(false);
 
     /**
-     * 1️⃣ Lecture localStorage (client-only)
+     * 1️⃣ Guard global : auth + game + état
      */
     useEffect(() => {
-        const storedCode = localStorage.getItem("currentGameCode");
+        let cancelled = false;
 
-        if (!storedCode) {
-            router.replace("/");
-            return;
-        }
-
-        setCode(storedCode);
-    }, [router]);
-
-    /**
-     * 2️⃣ Guard d’accès serveur
-     */
-    useEffect(() => {
-        if (!code) return;
-
-        const checkState = async () => {
+        const init = async () => {
             try {
-                const state = await checkGameState(code);
+                const player = await checkPlayerCookie();
+                const game = await getCodeFromCookie();
+
+                if (!player.authenticated || !game?.game?.code) {
+                    router.replace("/log");
+                    return;
+                }
+
+                const gameCode = game.game.code;
+
+                const state = await checkGameState(gameCode);
+                if (cancelled) return;
 
                 if (state.status !== "waiting") {
                     switch (state.status) {
@@ -63,17 +64,22 @@ export default function LobbyPage() {
                     return;
                 }
 
+                setCode(gameCode);
                 setAuthorized(true);
             } catch {
                 router.replace("/");
             }
         };
 
-        checkState();
-    }, [code, router]);
+        init();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [router]);
 
     /**
-     * 3️⃣ Chargement des joueurs
+     * 2️⃣ Chargement des joueurs
      */
     useEffect(() => {
         if (!authorized || !code) return;
@@ -91,7 +97,7 @@ export default function LobbyPage() {
     }, [authorized, code]);
 
     /**
-     * 4️⃣ Temps réel (Pusher)
+     * 3️⃣ Temps réel (Pusher)
      */
     useEffect(() => {
         if (!authorized || !code || pusherRef.current) return;
@@ -150,7 +156,9 @@ export default function LobbyPage() {
                 ))}
 
                 {players.length < MAX_PLAYERS &&
-                    Array.from({ length: MAX_PLAYERS - players.length }).map((_, i) => (
+                    Array.from({
+                        length: MAX_PLAYERS - players.length
+                    }).map((_, i) => (
                         <PlayerCard key={`empty-${i}`} variant="empty" />
                     ))}
             </ul>
