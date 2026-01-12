@@ -4,6 +4,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || '';
 const nextConfig = {
     basePath: '',
     assetPrefix: '',
+    trailingSlash: true,
     output: 'export',
     async rewrites() {
         return [
