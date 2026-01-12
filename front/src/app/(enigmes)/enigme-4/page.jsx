@@ -3,19 +3,18 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import TypewriterTerminal from "@/components/molecules/TypewriterTerminal/TypewriterTerminal";
 import BaseModal from "@/components/molecules/Modals/BaseModal";
-import RadarCompass from "@/components/atoms/RadarCompass/RadarCompass";
+import RadarCompass from "@/components/atoms/RadarCompass/RadarCompass"; // Assurez-vous du chemin
 import PuzzleGrid from "@/components/molecules/PuzzleGrid/PuzzleGrid";
 import QRScanner from "@/components/organisms/QRScanner/QRScanner";
 
-// config des pièces avec les codes à écrire au dos
 const PUZZLE_DATA = [
-    { id: 1, angle: 0,   distance: 100, code: "882" }, // NORD
-    { id: 2, angle: 45,  distance: 85,  code: "194" }, // NE
-    { id: 3, angle: 100, distance: 110, code: "771" }, // EST
-    { id: 4, angle: 150, distance: 90,  code: "336" }, // SE
-    { id: 5, angle: 180, distance: 105, code: "529" }, // SUD
-    { id: 6, angle: 260, distance: 100, code: "404" }, // OUEST
-    { id: 7, angle: 320, distance: 95,  code: "117" }, // NO
+    { id: 1, angle: 0,   distance: 120, code: "882" }, // NORD
+    { id: 2, angle: 45,  distance: 90,  code: "194" }, // NE
+    { id: 3, angle: 100, distance: 130, code: "771" }, // EST
+    { id: 4, angle: 150, distance: 100, code: "336" }, // SE
+    { id: 5, angle: 180, distance: 120, code: "529" }, // SUD
+    { id: 6, angle: 260, distance: 110, code: "404" }, // OUEST
+    { id: 7, angle: 320, distance: 100, code: "117" }, // NO
 ];
 
 export default function Enigme4Page() {
@@ -26,10 +25,10 @@ export default function Enigme4Page() {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const terminalMsgSearch = [
-        "> RADAR ACTIVÉ.",
-        "> PLACEZ-VOUS SUR LA CROIX AU SOL.",
-        "> 7 FRAGMENTS DÉTECTÉS.",
-        "> TROUVEZ-LES ET ENTREZ LEURS CODES."
+        "> INITIALISATION REQUISE...",
+        "> 1. PLACEZ-VOUS SUR LE MARQUAGE.",
+        "> 2. ACTIVEZ LE RADAR.",
+        "> 3. SUIVEZ LES SIGNAUX ROUGES."
     ];
 
     const terminalMsgScan = [
@@ -60,9 +59,7 @@ export default function Enigme4Page() {
 
     const handleFinalScan = (decodedText) => {
         if (decodedText.includes("MISSION_FINALE") || decodedText === "SCAN_DEBUG") {
-
             const currentCodes = JSON.parse(localStorage.getItem('game_codes') || '[]');
-
             const secretFile = "tux_secret.txt";
 
             if (!currentCodes.find(c => c.value === secretFile)) {
@@ -72,22 +69,21 @@ export default function Enigme4Page() {
                 });
                 localStorage.setItem('game_codes', JSON.stringify(currentCodes));
             }
-
             setIsModalOpen(true);
         }
     };
 
     return (
-        <section className="min-h-screen flex flex-col items-center p-6" style={{
+        <section className="min-h-screen flex flex-col items-center p-4 pb-20" style={{
             backgroundImage: "url('/background-computer.png')",
             backgroundSize: "cover",
             backgroundPosition: "center",
             width: "100vw", position: "relative", left: "50%", right: "50%", marginLeft: "-50vw", marginRight: "-50vw",
             overflowX: "hidden"
         }}>
-            <div style={{ position: "absolute", inset: 0, backgroundColor: "rgba(10, 20, 21, 0.7)", zIndex: 0 }} />
+            <div style={{ position: "absolute", inset: 0, backgroundColor: "rgba(10, 20, 21, 0.85)", zIndex: 0 }} />
 
-            <div className="z-10 w-full max-w-[450px] mb-6">
+            <div className="z-10 w-full max-w-[450px] mb-4 mt-2">
                 <TypewriterTerminal
                     textLines={step === 'SEARCH' ? terminalMsgSearch : terminalMsgScan}
                     speed={30}
@@ -95,13 +91,15 @@ export default function Enigme4Page() {
                 />
             </div>
 
-            <div className="z-10 flex-1 flex flex-col items-center justify-start gap-4 w-full">
+            <div className="z-10 flex-1 flex flex-col items-center w-full gap-6">
 
                 {step === 'SEARCH' && (
-                    <div className="flex flex-col items-center animate-in fade-in duration-500 w-full">
-                        <RadarCompass targets={PUZZLE_DATA} foundIds={foundIds} />
+                    <>
+                        <div className="my-4">
+                            <RadarCompass targets={PUZZLE_DATA} foundIds={foundIds} />
+                        </div>
 
-                        <div className="font-mono text-[var(--color-light-green)] text-xs tracking-widest mt-4 mb-2">
+                        <div className="font-mono text-[var(--color-light-green)] text-xs tracking-widest bg-black/50 px-3 py-1 rounded border border-[var(--color-light-green)]/30">
                             FRAGMENTS : {foundIds.length} / {PUZZLE_DATA.length}
                         </div>
 
@@ -110,35 +108,28 @@ export default function Enigme4Page() {
                             foundIds={foundIds}
                             onValidatePiece={handleValidatePiece}
                         />
-
-                        {/* Bouton de debug pour tout trouver d'un coup (à retirer en prod) */}
-                        <button
-                            onClick={() => setFoundIds(PUZZLE_DATA.map(p => p.id))}
-                            className="mt-8 text-[8px] uppercase text-white/20 hover:text-white"
-                        >
-                            [ Debug: Tout trouver ]
-                        </button>
-                    </div>
+                    </>
                 )}
 
                 {step === 'SCAN' && (
                     <div className="flex flex-col items-center w-full animate-in slide-in-from-bottom duration-700">
-                        <div className="w-full max-w-md">
+                        <div className="w-full max-w-md border-2 border-[var(--color-light-green)] rounded-lg overflow-hidden shadow-[0_0_20px_rgba(0,255,0,0.2)]">
                             <QRScanner
                                 onScanSuccess={handleFinalScan}
                                 label="SCANNEZ LE PUZZLE"
                             />
                         </div>
 
-                        <p className="mt-6 text-center text-white/60 italic text-sm max-w-xs">
-                            Assemblez les 7 pièces sur une table pour reformer le QR Code, puis scannez-le.
+                        <p className="mt-6 text-center text-white/80 font-mono text-sm max-w-xs border-l-2 border-[var(--color-light-green)] pl-4">
+                            Assemblez les pièces physiques.<br/>
+                            Scannez le QR Code formé.
                         </p>
 
                         <button
                             onClick={() => handleFinalScan("SCAN_DEBUG")}
-                            className="mt-8 text-[8px] uppercase text-white/20 hover:text-white"
+                            className="mt-12 text-[9px] uppercase text-white/10 hover:text-white"
                         >
-                            [ Debug: Simuler Scan Puzzle ]
+                            [ Debug: Bypass Scan ]
                         </button>
                     </div>
                 )}
@@ -147,7 +138,7 @@ export default function Enigme4Page() {
             <BaseModal
                 isOpen={isModalOpen}
                 title="< DÉCRYPTAGE RÉUSSI >"
-                message="Tiens, tiens... les enquêteurs savent donc faire un puzzle ? C'est mignon. Le scan a révélé le fichier 'tux_secret.txt'. Il est caché dans le dossier 'mission_finale'. Allez donc au terminal central dans la salle 132 qu'on vous humilie une dernière fois."
+                message="Le scan a révélé le fichier 'tux_secret.txt'. Il est caché dans le dossier 'mission_finale'. Allez au terminal central."
                 onConfirm={() => router.push('/enigme-finale')}
             />
         </section>
