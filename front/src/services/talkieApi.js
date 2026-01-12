@@ -1,5 +1,5 @@
-const API_URL = 'http://localhost:8000/api/v1/talkie';
-const API_KEY = 'ta_clé_api'; // La même que dans ton .env Laravel
+const API_URL = 'http://https://http://localhost:8000/api/v1';
+const API_KEY = 'test123456789';
 
 export const talkieApi = {
     async joinRoom(code) {

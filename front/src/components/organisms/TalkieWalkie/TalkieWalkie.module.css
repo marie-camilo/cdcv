@@ -115,26 +115,26 @@
 .speakingIndicator.speaking {
   background: var(--color-red-accent);
   border-color: var(--color-red-accent);
-  box-shadow: 
-    0 0 20px rgba(255, 48, 79, 0.8),
-    0 0 40px rgba(255, 48, 79, 0.6),
-    0 0 60px rgba(255, 48, 79, 0.4);
+  box-shadow:
+          0 0 20px rgba(255, 48, 79, 0.8),
+          0 0 40px rgba(255, 48, 79, 0.6),
+          0 0 60px rgba(255, 48, 79, 0.4);
   animation: shineRed 1s ease-in-out infinite;
 }
 
 @keyframes shineRed {
   0%, 100% {
-    box-shadow: 
-      0 0 20px rgba(255, 48, 79, 0.8),
-      0 0 40px rgba(255, 48, 79, 0.6),
-      0 0 60px rgba(255, 48, 79, 0.4);
+    box-shadow:
+            0 0 20px rgba(255, 48, 79, 0.8),
+            0 0 40px rgba(255, 48, 79, 0.6),
+            0 0 60px rgba(255, 48, 79, 0.4);
     transform: scale(1);
   }
   50% {
-    box-shadow: 
-      0 0 30px rgba(255, 48, 79, 1),
-      0 0 60px rgba(255, 48, 79, 0.8),
-      0 0 90px rgba(255, 48, 79, 0.6);
+    box-shadow:
+            0 0 30px rgba(255, 48, 79, 1),
+            0 0 60px rgba(255, 48, 79, 0.8),
+            0 0 90px rgba(255, 48, 79, 0.6);
     transform: scale(1.1);
   }
 }
@@ -155,40 +155,21 @@
   justify-content: center;
   transition: all 0.2s ease;
   box-shadow: 0 10px 40px rgba(255, 48, 79, 0.4);
-  margin-bottom: 60px;
 }
 
-.pttButton:hover:not(:disabled) {
+.pttButton:hover {
   transform: scale(1.05);
   box-shadow: 0 15px 50px rgba(255, 48, 79, 0.6);
 }
 
-.pttButton:active:not(:disabled) {
+.pttButton:active {
   transform: scale(0.95);
-}
-
-.pttButton:disabled {
-  background: #444;
-  cursor: not-allowed;
-  opacity: 0.5;
 }
 
 .micIcon {
   width: 80px;
   height: 80px;
   color: white;
-}
-
-/* ============================================ */
-/* TIMER EN BAS */
-/* ============================================ */
-.timer {
-  font-family: 'Courier New', monospace;
-  font-size: 3em;
-  color: var(--color-red-bright);
-  font-weight: bold;
-  letter-spacing: 4px;
-  text-align: center;
 }
 
 /* ============================================ */
@@ -203,10 +184,6 @@
   .micIcon {
     width: 60px;
     height: 60px;
-  }
-
-  .timer {
-    font-size: 2.5em;
   }
 
   .speakingIndicator {
@@ -226,10 +203,6 @@
   .micIcon {
     width: 50px;
     height: 50px;
-  }
-
-  .timer {
-    font-size: 2em;
   }
 
   .popupContent {
