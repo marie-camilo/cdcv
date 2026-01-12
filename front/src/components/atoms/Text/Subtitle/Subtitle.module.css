@@ -1,0 +1,7 @@
+.lobby {
+    font-size: 0.95rem;
+    font-weight: 300;
+    color: var(--color-turquoise);
+    opacity: 0.85;
+    max-width: 38ch;
+}

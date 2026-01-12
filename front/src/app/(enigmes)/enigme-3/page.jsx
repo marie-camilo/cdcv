@@ -4,14 +4,20 @@ import { useRouter } from 'next/navigation';
 import TypewriterTerminal from "@/components/molecules/TypewriterTerminal/TypewriterTerminal";
 import AnswerTerminal from "@/components/organisms/AnswerTerminal/AnswerTerminal";
 import BaseModal from "@/components/molecules/Modals/BaseModal";
+import TalkieButton from "@/components/atoms/TalkieButton/TalkieButton";
 
 export default function Enigme3Page() {
     const router = useRouter();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [logs, setLogs] = useState(["EN ATTENTE DE SIGNAL..."]);
 
     useEffect(() => {
-        document.title = "Énigme 3 | Le Labyrinthe";
+        document.title = "Énigme 3 | Talkie-Walkie";
     }, []);
+
+    const addLog = (msg) => {
+        setLogs(prev => [...prev.slice(-4), msg]);
+    };
 
     const handleSuccess = () => {
         setIsModalOpen(true);
@@ -23,7 +29,10 @@ export default function Enigme3Page() {
     };
 
     const terminalLines = [
-        "SYNCHRONISATION ÉQUIPE A (GUIDE) & B (PILOTE)...",
+        "FREQUENCE DE TRAVAIL : 443.5 MHz",
+        "CANAL : INFILTRATION",
+        "INSTRUCTION : MAINTENEZ POUR COMMUNIQUER",
+        "LE PILOTE VOUS ENTEND."
     ];
 
     return (
@@ -31,7 +40,6 @@ export default function Enigme3Page() {
             backgroundImage: "url('/background-computer.png')",
             backgroundSize: "cover",
             backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
             width: "100vw",
             position: "relative",
             left: "50%",
@@ -46,52 +54,44 @@ export default function Enigme3Page() {
             gap: "1.5rem",
             overflowX: "hidden"
         }}>
-            <div style={{
-                position: "absolute",
-                inset: 0,
-                backgroundColor: "rgba(10, 20, 21, 0.6)",
-                zIndex: 0
-            }} />
+            <div style={{ position: "absolute", inset: 0, backgroundColor: "rgba(10, 20, 21, 0.6)", zIndex: 0 }} />
 
             <div style={{ zIndex: 1, width: "100%", maxWidth: "450px" }}>
                 <TypewriterTerminal textLines={terminalLines} speed={40} />
             </div>
 
+            {/* ZONE TALKIE-WALKIE */}
             <div style={{
                 zIndex: 1,
                 width: "100%",
-                maxWidth: "450px",
-                height: "300px",
-                background: "rgba(0, 0, 0, 0.70)",
-                backdropFilter: "blur(10px)",
-                borderRadius: "16px",
-                border: "2px solid var(--color-light-green)",
+                maxWidth: "400px",
+                margin: "auto 0",
                 display: "flex",
                 flexDirection: "column",
-                justifyContent: "center",
                 alignItems: "center",
-                margin: "auto 0",
-                color: "var(--color-light-green)",
-                textAlign: "center",
-                padding: "20px"
+                gap: "2rem"
             }}>
-                <p className="font-mono text-sm">
-                    [ INTERFACE DE NAVIGATION ]
-                </p>
+                <TalkieButton onLog={addLog} />
+
+                <div className="w-full bg-black/60 backdrop-blur-sm border border-[var(--color-medium)] p-4 rounded-lg font-mono text-[10px] text-[var(--color-light-green)] min-h-[100px]">
+                    {logs.map((log, i) => (
+                        <div key={i} className="mb-1 opacity-80">{`> ${log}`}</div>
+                    ))}
+                </div>
             </div>
 
             <div className="z-10 w-full max-w-[450px] mt-auto">
                 <AnswerTerminal
-                    expectedAnswer="SORTIE"
+                    expectedAnswer="LABYRINTHE"
                     onValidate={handleSuccess}
-                    placeholder="ENTREZ LE CODE DE SORTIE"
+                    placeholder="CODE DE SORTIE DU PILOTE"
                 />
             </div>
 
             <BaseModal
                 isOpen={isModalOpen}
-                title="< LABYRINTHE FRANCHI />"
-                message="Jacquot : 'Bravo ! Vous avez réussi à communiquer malgré leurs interférences. Mais ils ont verrouillé le serveur central. Récupérez la pièce de puzzle n°2 dans la salle B. On se retrouve pour l'assemblage final. Ne traînez pas, les Chemises Rouges sont en train d'effacer les logs !'"
+                title="< TRANSMISSION FINIE />"
+                message="Jacquot : 'Vous avez réussi à les guider à travers le labyrinthe ! Mais l'ennemi approche. Récupérez la pièce de puzzle finale et rejoignez-moi pour l'ultime décodage.'"
                 onConfirm={goToNextStep}
             />
         </section>

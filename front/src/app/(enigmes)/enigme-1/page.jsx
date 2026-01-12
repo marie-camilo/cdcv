@@ -10,23 +10,40 @@ export default function Enigme1Page() {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
-        document.title = "Énigme 1 | Décodage";
+        document.title = "Énigme 1 | Infiltration";
     }, []);
 
     const handleSuccess = () => {
+        // Débloquer le scan
+        const unlocked = JSON.parse(localStorage.getItem('unlockedApps') || '[]');
+        if (!unlocked.includes('scan')) {
+            unlocked.push('scan');
+            localStorage.setItem('unlockedApps', JSON.stringify(unlocked));
+        }
         setIsModalOpen(true);
     };
 
     const goToNextStep = () => {
         setIsModalOpen(false);
-        router.push('/enigme-2');
+        router.push('/'); // Retour au menu principal
     };
 
     const terminalLines = [
-        "RECEPTION MESSAGE ENTRANT...",
-        "PROVENANCE : LES CHEMISES ROUGES",
-        "SUJET : LE DEFI COMMENCE",
-        "DECHIFFREZ LE POINT DE RENDEZ-VOUS"
+        "> CONNEXION SÉCURISÉE ÉTABLIE...",
+        "> IDENTITÉ : M. JACQUOT",
+        "> STATUT : INFILTRATION EN COURS",
+        "> ",
+        "> Équipe, je suis à l'intérieur de leur réseau.",
+        "> Les Chemises Rouges ont sécurisé leur système avec un pare-feu complexe.",
+        "> ",
+        "> J'ai besoin de votre aide pour forcer l'accès.",
+        "> Devant vous, une séquence de chiffres. C'est leur premier verrou.",
+        "> ",
+        "> Une fois déchiffré, entrez le mot de passe.",
+        "> Cela nous donnera accès à leur SCANNER de documents.",
+        "> ",
+        "> Le temps presse. Bonne chance.",
+        "> — M. JACQUOT"
     ];
 
     const numbers = [
@@ -38,26 +55,17 @@ export default function Enigme1Page() {
     ];
 
     return (
-        <section style={{
+        <section className="h-full flex flex-col overflow-hidden" style={{
             backgroundImage: "url('/background-computer.png')",
             backgroundSize: "cover",
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
-
             width: "100vw",
             position: "relative",
             left: "50%",
             right: "50%",
             marginLeft: "-50vw",
             marginRight: "-50vw",
-
-            minHeight: "100dvh",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            padding: "80px 20px 40px",
-            gap: "1.5rem",
-            overflowX: "hidden"
         }}>
 
             <div style={{
@@ -67,51 +75,59 @@ export default function Enigme1Page() {
                 zIndex: 0
             }} />
 
-            <div style={{ zIndex: 1, width: "100%", maxWidth: "450px" }}>
-                <TypewriterTerminal textLines={terminalLines} speed={40} />
+            {/* Zone de texte avec scroll - PLUS GRANDE */}
+            <div className="overflow-y-auto max-h-[45vh] p-4" style={{ zIndex: 1 }}>
+                <div style={{ width: "100%", maxWidth: "450px", margin: "0 auto" }}>
+                    <TypewriterTerminal textLines={terminalLines} speed={40} />
+                </div>
             </div>
 
-            <div style={{
-                zIndex: 1,
-                width: "100%",
-                maxWidth: "450px",
-                background: "rgba(0, 0, 0, 0.40)",
-                backdropFilter: "blur(5px)",
-                WebkitBackdropFilter: "blur(5px)",
-                borderRadius: "16px",
-                border: "1px solid rgba(255, 255, 255, 0.08)",
-                padding: "30px 20px",
-                margin: "auto 0",
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: "20px 40px",
-                justifyItems: "center"
-            }}>
-                {numbers.map((n, index) => (
-                    <div key={index} style={{
-                        fontSize: "6.5rem",
-                        fontWeight: "700",
-                        color: n.color,
-                        textAlign: "center",
-                        lineHeight: "1",
-                        filter: `drop-shadow(0 0 10px ${n.color}44)`
-                    }} >
-                        {n.val}
-                    </div>
-                ))}
+            {/* Zone des chiffres - toujours visible - PLUS PETITE */}
+            <div className="flex-1 flex items-center justify-center p-4" style={{ zIndex: 1 }}>
+                <div style={{
+                    width: "100%",
+                    maxWidth: "400px",
+                    background: "rgba(0, 0, 0, 0.40)",
+                    backdropFilter: "blur(5px)",
+                    WebkitBackdropFilter: "blur(5px)",
+                    borderRadius: "16px",
+                    border: "1px solid rgba(255, 255, 255, 0.08)",
+                    padding: "20px 15px",
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: "15px 30px",
+                    justifyItems: "center"
+                }}>
+                    {numbers.map((n, index) => (
+                        <div key={index} style={{
+                            fontSize: "4rem",
+                            fontWeight: "700",
+                            color: n.color,
+                            textAlign: "center",
+                            lineHeight: "1",
+                            filter: `drop-shadow(0 0 10px ${n.color}44)`
+                        }} >
+                            {n.val}
+                        </div>
+                    ))}
+                </div>
             </div>
 
-            <div className="z-10 w-full max-w-[450px] mt-auto">
-                <AnswerTerminal
-                    expectedAnswer="FOYER"
-                    onValidate={handleSuccess}
-                />
+            {/* Zone de réponse - toujours visible en bas */}
+            <div className="p-4 flex justify-center" style={{ zIndex: 10 }}>
+                <div className="w-full max-w-[450px]">
+                    <AnswerTerminal
+                        expectedAnswer="FOYER"
+                        onValidate={handleSuccess}
+                        placeholder="ENTREZ LE MOT DE PASSE..."
+                    />
+                </div>
             </div>
 
             <BaseModal
                 isOpen={isModalOpen}
-                title="< ACCÈS FORCÉ />"
-                message="Pff... Vous avez trouvé ? Jacquot a vraiment engagé des amateurs chanceux. Profitez-en, ça ne durera pas. Allez traîner vos pauvres carcasses au FOYER (RDC). On vous observe, et votre précieux 'Royaume Linux' commence déjà à s'effriter. Dépêchez-vous, si vous ne voulez pas qu'on brûle le reste de sa garde-robe."
+                title="< ACCÈS DÉBLOQUÉ />"
+                message="Excellent travail ! Nous avons forcé la première couche de sécurité. Le SCANNER est maintenant accessible depuis le menu principal. Vous pouvez désormais numériser leurs documents secrets. Retournez au menu et commencez l'infiltration. Chaque application débloquée nous rapproche de la vérité. — M. JACQUOT"
                 onConfirm={goToNextStep}
             />
         </section>

@@ -1,5 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "@/styles/globals.css";
+import { TimerProvider } from "@/app/context/TimerContext";
+import Navbar from "@/components/organisms/Navbar/Navbar";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -17,11 +19,14 @@ export const metadata = {
         default: 'La Click des Chemises Vertes',
     },
 };
+
 export default function RootLayout({ children }) {
     return (
         <html lang="fr" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <body className="bg-[var(--color-dark)] text-white">
-        {children}
+        <body className="bg-[var(--color-dark)] text-white h-screen overflow-hidden flex flex-col">
+        <div className="flex-1 overflow-auto">
+            {children}
+        </div>
         </body>
         </html>
     );

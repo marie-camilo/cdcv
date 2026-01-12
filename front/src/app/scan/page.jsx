@@ -1,10 +1,11 @@
 "use client";
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from "next/navigation";
 import QRScanner from "@/components/organisms/QRScanner/QRScanner";
 
 export default function ScanPage() {
     const router = useRouter();
+    const [message, setMessage] = useState("");
 
     useEffect(() => {
         document.title = "Scan QR Code | La Click";
@@ -13,61 +14,58 @@ export default function ScanPage() {
         };
     }, []);
 
-    const handleScanSuccess = async (decodedText) => {
-        console.log("Code détecté :", decodedText);
-
-        // decodedText serait l'ID de l'équipe ou l'URL scannée
-        // inscription du joueur
-        await registerPlayerToTeam(decodedText);
+    // Codes pour débloquer chaque app
+    const codes = {
+        'FOYER': 'scan',
+        'BETA5678': 'phone',
+        'GAMMA9012': 'puzzle',
+        'OMEGA7890': 'folder',
+        'DELTA3456': 'chat',
     };
 
-    const registerPlayerToTeam = async (teamId) => {
-        const playerName = localStorage.getItem('currentPlayerName');
+    const handleScanSuccess = (decodedText) => {
+        console.log("Code détecté :", decodedText);
 
-        try {
-            // Simulation : Attribution d'un rôle
-            const roles = ["Saboteur", "Civil"];
-            const randomRole = roles[Math.floor(Math.random() * roles.length)];
-            localStorage.setItem('playerRole', randomRole);
+        const appId = codes[decodedText.toUpperCase()];
 
-            console.log(`Joueur ${playerName} inscrit avec le code ${teamId}`);
+        if (appId) {
+            const unlocked = JSON.parse(localStorage.getItem('unlockedApps') || '[]');
 
-            router.push("/role");
-        } catch (error) {
-            console.error("Erreur d'inscription", error);
+            if (unlocked.includes(appId)) {
+                setMessage("⚠️ Cette application est déjà débloquée !");
+            } else {
+                unlocked.push(appId);
+                localStorage.setItem('unlockedApps', JSON.stringify(unlocked));
+                setMessage(`✅ APPLICATION "${appId.toUpperCase()}" DÉBLOQUÉE !`);
+                setTimeout(() => router.push('/'), 2000);
+            }
+        } else {
+            setMessage("❌ CODE INVALIDE. Accès refusé.");
         }
     };
 
-    const handleFakeScan = () => {
-        handleScanSuccess("DEBUG_CODE_123");
-    };
-
     return (
-        <main className="min-h-screen bg-[var(--color-dark)] flex flex-col items-center p-6">
-            <div className="w-full max-w-md self-start">
-                <h1 className="text-4xl font-bold leading-tight mt-6 text-left">
-                    Identification <br /> requise !
-                </h1>
+        <main className="min-h-screen flex flex-col items-center justify-center p-6">
+            <div className="w-full max-w-md text-center mb-8">
+                <div className="border-2 border-green-400 p-6 bg-black/80">
+                    <p className="text-green-400 font-mono text-xs uppercase tracking-widest mb-3 animate-pulse">
+                        [ SYSTÈME DE SCAN ACTIVÉ ]
+                    </p>
+                    <p className="text-green-300/70 font-mono text-sm leading-relaxed">
+                        &gt; Positionnez le code QR devant la caméra
+                        <br />
+                        &gt; Analyse automatique en cours...
+                    </p>
+                </div>
             </div>
-            <div className="mt-8 px-8 max-w-md text-center">
-                <p className="text-[var(--color-classic-red)] font-bold text-xs uppercase tracking-widest mb-2 animate-pulse">
-                    -- Signal Intercepté --
-                </p>
-                <p className="text-[var(--color-white)]/70 text-sm font-light italic leading-relaxed">
-                    Alors, on joue aux enquêteurs ? Scannez ce code si vous tenez tant à voir le royaume de Jacquot s'effondrer. On vous a déjà assigné une équipe...
-                </p>
-            </div>
-            <QRScanner
-                onScanSuccess={handleScanSuccess}
-            />
 
-            {/* BOUTON DE TEST (À supprimer pour la prod) */}
-            <button
-                onClick={handleFakeScan}
-                className="px-6 py-2 border border-dashed border-white/20 text-white/20 text-[10px] hover:text-white transition-colors tracking-widest uppercase font-mono"
-            >
-                [ Simulation Faux Scan ]
-            </button>
+            <QRScanner onScanSuccess={handleScanSuccess} />
+
+            {message && (
+                <div className="mt-6 p-4 bg-black border-2 border-green-400 rounded max-w-md w-full">
+                    <p className="text-green-400 font-mono text-sm text-center">{message}</p>
+                </div>
+            )}
         </main>
     );
 }
