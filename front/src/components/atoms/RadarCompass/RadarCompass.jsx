@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 
-// Icône Puzzle (inchangée)
 const PuzzleIcon = ({ className }) => (
     <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
         <path d="M20.5 10.5c-.83 0-1.5-.67-1.5-1.5 0-1.93-1.57-3.5-3.5-3.5h-2V3.5c0-.83-.67-1.5-1.5-1.5S10.5 2.67 10.5 3.5v2h-2c-1.93 0-3.5 1.57-3.5 3.5v2h-2c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5h2v2c0 1.93 1.57 3.5 3.5 3.5h2v2c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5v-2h2c1.93 0 3.5-1.57 3.5-3.5v-2h2c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5h-2v-2z" />
@@ -115,27 +114,19 @@ export default function RadarCompass({ targets, foundIds }) {
         );
     }
 
-    // Style pour garder les éléments droits pendant la rotation
     const counterRotateStyle = {
         transform: `rotate(${headingRender}deg)`
     };
 
     return (
         <div className="relative w-72 h-72 select-none z-20 flex items-center justify-center">
-
-            {/* --- CADRAN FIXE (HUD) --- */}
-
-            {/* Cercle extérieur décoratif avec graduations */}
             <div className="absolute inset-0 rounded-full border border-white/10 shadow-2xl bg-black/80 backdrop-blur-sm"></div>
 
-            {/* Petits traits cardinaux fixes sur le bord */}
             <div className="absolute top-0 left-1/2 w-[1px] h-3 bg-[var(--color-light-green)] -translate-x-1/2"></div>
             <div className="absolute bottom-0 left-1/2 w-[1px] h-3 bg-[var(--color-light-green)] -translate-x-1/2"></div>
             <div className="absolute left-0 top-1/2 w-3 h-[1px] bg-[var(--color-light-green)] -translate-y-1/2"></div>
             <div className="absolute right-0 top-1/2 w-3 h-[1px] bg-[var(--color-light-green)] -translate-y-1/2"></div>
 
-            {/* FLÈCHE DE DIRECTION (MODERNE) */}
-            {/* C'est l'indicateur fixe qui montre où l'utilisateur regarde */}
             <div className="absolute top-[-10px] left-1/2 -translate-x-1/2 z-40 drop-shadow-[0_0_8px_rgba(0,255,0,0.6)]">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 2L2 22H22L12 2Z" fill="var(--color-light-green)"/>
@@ -143,7 +134,6 @@ export default function RadarCompass({ targets, foundIds }) {
                 </svg>
             </div>
 
-            {/* --- CERCLE ROTATIF (LA CARTE) --- */}
             <div
                 className="absolute inset-2 rounded-full will-change-transform overflow-hidden"
                 style={{
@@ -151,15 +141,11 @@ export default function RadarCompass({ targets, foundIds }) {
                     background: "radial-gradient(circle, rgba(20, 40, 30, 0.4) 0%, rgba(0, 0, 0, 0) 70%)"
                 }}
             >
-                {/* Lignes de grille fines et modernes */}
                 <div className="absolute left-1/2 top-0 bottom-0 w-[1px] border-r border-dashed border-[var(--color-light-green)] opacity-20 -translate-x-1/2"></div>
                 <div className="absolute top-1/2 left-0 right-0 h-[1px] border-b border-dashed border-[var(--color-light-green)] opacity-20 -translate-y-1/2"></div>
 
-                {/* Cercles concentriques fins */}
                 <div className="absolute inset-[25%] rounded-full border border-[var(--color-light-green)] opacity-10"></div>
                 <div className="absolute inset-[50%] rounded-full border border-[var(--color-light-green)] opacity-10"></div>
-
-                {/* --- POINTS CARDINAUX --- */}
 
                 {/* NORD */}
                 <div className="absolute top-4 left-1/2 -translate-x-1/2 flex flex-col items-center">
@@ -181,8 +167,6 @@ export default function RadarCompass({ targets, foundIds }) {
                     <div className="text-[var(--color-light-green)] font-bold text-xs opacity-70" style={counterRotateStyle}>O</div>
                 </div>
 
-
-                {/* --- PIÈCES DE PUZZLE --- */}
                 {showDots && targets.map((target) => {
                     const isFound = foundIds.includes(target.id);
                     const transformStyle = {
@@ -195,23 +179,17 @@ export default function RadarCompass({ targets, foundIds }) {
                             className="absolute top-1/2 left-1/2 w-0 h-0 flex items-center justify-center"
                             style={transformStyle}
                         >
-                            {/* Container qui annule la rotation pour rester droit */}
                             <div style={counterRotateStyle} className="relative flex items-center justify-center">
 
                                 {isFound ? (
-                                    /* --- CAS TROUVÉ : Vert fixe --- */
                                     <div className="w-6 h-6 rounded-full bg-[var(--color-light-green)]/20 border border-[var(--color-light-green)] flex items-center justify-center shadow-[0_0_10px_var(--color-light-green)]">
                                         <PuzzleIcon className="w-3 h-3 text-[var(--color-light-green)]" />
-                                        {/* Petit badge OK */}
                                         <div className="absolute -bottom-3 text-[8px] font-mono text-[var(--color-light-green)] font-bold">OK</div>
                                     </div>
                                 ) : (
-                                    /* --- CAS NON TROUVÉ : Rouge & Moderne --- */
                                     <div className="relative">
-                                        {/* Onde radar (ping) */}
                                         <div className="absolute inset-0 bg-[var(--color-classic-red)] rounded-full animate-ping opacity-50"></div>
 
-                                        {/* Pastille solide */}
                                         <div className="w-6 h-6 rounded-full bg-red-900/80 border border-[var(--color-classic-red)] flex items-center justify-center shadow-[0_0_8px_rgba(255,0,0,0.6)]">
                                             <PuzzleIcon className="w-3 h-3 text-white" />
                                         </div>
