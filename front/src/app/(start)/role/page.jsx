@@ -6,7 +6,7 @@ import { getPlayerRole } from "@/hooks/API/gameRequests";
 import SectionTitle from "@/components/molecules/SectionTitle";
 import {checkGameState, getCodeFromCookie} from "@/hooks/API/rules";
 
-const DISPLAY_DURATION = 10_000; // 10 secondes
+const DISPLAY_DURATION = 20_000; // 20 secondes
 
 export default function RolePage() {
     const router = useRouter();
@@ -56,10 +56,10 @@ export default function RolePage() {
     const isImpostor = role === "impostor";
 
     return (
-        <main className="h-screen max-h-screen overflow-hidden flex flex-col px-8 text-white">
+        <main className="min-h-screen px-8 text-white">
             {/* Header */}
             <header className="pt-10 pb-6">
-                <SectionTitle
+            <SectionTitle
                     variant="lobby"
                     title="Ton rôle"
                     subtitle="Voici les instructions associées à ton rôle"
@@ -67,7 +67,7 @@ export default function RolePage() {
             </header>
 
             {/* Centre vertical */}
-            <section className="flex-1 flex items-center justify-center">
+            <section className="flex-1 flex items-center justify-center mt-5">
                 <div className="w-full max-w-md relative rounded-2xl border border-white/30 p-8 pt-12">
                     {/* Role label */}
                     <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-[var(--color-dark)] px-6">
@@ -83,7 +83,7 @@ export default function RolePage() {
                     </div>
 
                     {/* Role description */}
-                    <div className="space-y-6 text-lg font-light leading-relaxed">
+                    <div className="space-y-6 text-md font-light leading-relaxed">
                         {isImpostor ? (
                             <>
                                 <p>Tu es un imposteur infiltré dans l’équipe.</p>

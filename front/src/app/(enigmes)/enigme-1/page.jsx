@@ -90,7 +90,11 @@ export default function Enigme1Page() {
                 isOpen={isModalOpen}
                 title="< ACCÈS DÉBLOQUÉ />"
                 message="Eh ben... C'était laborieux. Rendez-vous au Foyer pour la suite des énigmes, si vous y arrivez... - LES CHEMISES ROUGES"
+<<<<<<< HEAD
                 onConfirm={() => { setIsModalOpen(false); router.push('/'); }}
+=======
+                onConfirm={goToNextStep}
+>>>>>>> 75854d4bf0738f640668bdccc16eca011bbb2f8f
             />
         </main>
     );

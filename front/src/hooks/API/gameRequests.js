@@ -43,7 +43,7 @@ export async function getPlayersForGivenGame(code) {
  * @returns {Promise<{ role: string }>}
  */
 export async function getPlayerRole() {
-    return apiFetch("/api/v1/me/role", {
+    return apiFetch(`/api/v1/me/role`, {
         method: "GET"
     });
 }
