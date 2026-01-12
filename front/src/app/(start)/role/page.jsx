@@ -22,7 +22,7 @@ export default function RolePage() {
             const gameData = await getCodeFromCookie().catch(() => null);
             const gameState = await checkGameState(gameData.game.code);
 
-            if (gameState.status !== "waiting") {
+            if (gameState.status !== "started") {
                 router.replace("/");
                 return;
             }
