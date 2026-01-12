@@ -1,29 +1,41 @@
 @import "tailwindcss";
 
 :root {
-  --color-dark: #193133;
-  --color-medium: #347E84;
-  --color-light-green: #D0FF71;
-  --color-lavender: #8F93FF;
-  --color-turquoise: #27EAA6;
-  --color-white: #EBFFF6;
-  --color-classic-red: #FF3333;
+    --color-dark: #193133;
+    --color-medium: #347E84;
+    --color-light-green: #D0FF71;
+    --color-lavender: #8F93FF;
+    --color-turquoise: #27EAA6;
+    --color-white: #EBFFF6;
+    --color-classic-red: #FF3333;
 
-  --space-xs: 4px;
-  --space-sm: 8px;
-  --space-md: 16px;
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
 
-  --radius-sm: 4px;
-  --radius-md: 6px;
+    --radius-sm: 4px;
+    --radius-md: 6px;
 }
 
 @theme inline {
-  --font-aeonik: "Aeonik", sans-serif;
-  --font-source: "Source Code Pro", monospace;
+    --font-aeonik: "Aeonik", sans-serif;
+    --font-source: "Source Code Pro", monospace;
 }
 
 * {
     box-sizing: border-box;
+}
+
+/* Fix pour iPhone - hauteur dynamique du viewport */
+@supports (height: 100dvh) {
+    html, body {
+        height: 100dvh;
+    }
+}
+
+html, body {
+    height: 100vh;
+    overflow: hidden;
 }
 
 body {
@@ -33,6 +45,8 @@ body {
     margin: 0;
     padding: 0;
     overflow-x: hidden;
+    /* Support pour les zones sécurisées iPhone */
+    padding-bottom: env(safe-area-inset-bottom);
 }
 
 .layout-container {
@@ -46,4 +60,9 @@ body {
 .layout-content {
     padding: var(--space-md);
     flex: 1;
+}
+
+/* Fix pour que le contenu scrollable fonctionne bien */
+.flex-1 {
+    min-height: 0;
 }

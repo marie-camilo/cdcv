@@ -73,9 +73,6 @@ export default function WelcomePage() {
 
     return (
         <main className="h-full flex flex-col md:max-w-md mx-auto">
-            <TimerProvider>
-                <Navbar />
-            </TimerProvider>
             <section className="flex flex-col h-full">
                 {/* Zone de texte avec scroll */}
                 <article className="text-(--color-turquoise) py-4 px-4 font-mono text-xs overflow-y-auto flex-shrink-0 max-h-[35vh] border-b-2 border-(--color-turquoise)">
