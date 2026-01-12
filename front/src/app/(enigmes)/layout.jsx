@@ -7,7 +7,11 @@ export default function EnigmeLayout({ children }) {
         <TimerProvider>
             <Navbar/>
             <div className="bg-dark text-light-green h-full flex flex-col overflow-hidden">
+<<<<<<< HEAD
                 <div className="pb-4 flex-1 overflow-auto">
+=======
+                <div className="p-2 flex-1 overflow-auto">
+>>>>>>> billered
                     {children}
                 </div>
                 <GameOverModal />
