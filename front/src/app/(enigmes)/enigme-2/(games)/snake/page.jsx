@@ -144,7 +144,7 @@ const SnakeFinalMobile = () => {
         <div style={styles.appContainer}>
             <div style={styles.header}>
                 <h1 style={styles.mainTitle}>SNAKE FOYER</h1>
-                <div style={styles.scoreBoard}>Chemises : {score}</div>
+                <div style={styles.scoreBoard}>Chemises ramassées : {score} /7 </div>
             </div>
 
             <canvas ref={canvasRef} width={320} height={320} style={styles.canvas} />
