@@ -32,7 +32,7 @@ export default function WelcomePage() {
         "> ",
         "> Une fois déverrouillées, ces applications vous donneront accès à leurs secrets.",
         "> ",
-        "> Rendez-vous dans la CONSOLE DE DÉBLOCAGE pour entrer les codes.",
+        "> Rendez-vous dans la CONSOLE DE DÉBLOCAGE (Case rouge) pour entrer les codes.",
         "> ",
         "> Bonne chance. Le temps presse.",
         "> ",
@@ -77,7 +77,7 @@ export default function WelcomePage() {
                 {/* Zone de texte avec scroll */}
                 <article className="text-(--color-turquoise) py-4 px-4 font-mono text-xs overflow-y-auto flex-shrink-0 max-h-[35vh] border-b-2 border-(--color-turquoise)">
                     <div style={{ width: "100%" }}>
-                        <TypewriterTerminal textLines={terminalLines} speed={40} />
+                        <TypewriterTerminal textLines={terminalLines} speed={10} />
                     </div>
                 </article>
 

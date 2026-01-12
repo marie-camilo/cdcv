@@ -14,7 +14,7 @@ const ZipCyberShielded = () => {
     const containerWidth = 300;
     const targetWidth = Math.max(70 - score * 12, 22);
     const barWidth = 6;
-    const speed = 2.5 + score;
+    const speed = 2.5 + score * 1.4;
 
     const directionRef = useRef(1);
     const posRef = useRef(0);
@@ -248,7 +248,7 @@ const styles = {
     infoBtn: {
         position: "absolute",
         top: "20px",
-        right: "20px",
+        left: "20px",
         width: "40px",
         height: "40px",
         borderRadius: "50%",
@@ -330,7 +330,6 @@ const styles = {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        zIndex: 100,
     },
     modal: {
         background: "#0a0505",

@@ -3,12 +3,24 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from 'next/navigation';
 
 const SOLUTION_WORDS = [
-    "CIBLE", "FLASH", "TRAME", "ANCRE", "INDEX",
-    "ROBOT", "ROUTE", "ANGLE", "LOCAL", "CACHE",
-    "TONAL", "STYLE", "PROXY", "PISTE", "BRUIT",
+    "PIXEL", // La base de l'image numérique
+    "ICONE", // Design d'interface (UI)
+    "MEDIA", // Media Queries / Support de com
+    "VIDEO", // Audiovisuel
+    "PHOTO", // Prise de vue
+    "STYLE", // CSS / Direction artistique
+    "ANCRE", // Liens HTML
+    "CACHE", // Performance web
+    "INDEX", // SEO / Fichier racine
+    "TRAME", // Design / Vidéo
+    "SITES", // Web (Pluriel de site)
+    "PROXY", // Réseau / Serveur
+    "LOCAL", // Localhost
+    "CIBLE", // Marketing / UX
+    "CODEC", // Compression vidéo
 ];
 const WORD_LENGTH = 5;
-const MAX_ATTEMPTS = 5;
+const MAX_ATTEMPTS = 7;
 
 const MotusCyberMission = () => {
     const router = useRouter();
@@ -214,7 +226,7 @@ const MotusCyberMission = () => {
 
 const styles = {
     container: { position: "fixed", inset: 0, backgroundColor: "#050202", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", touchAction: "none", fontFamily: "monospace" },
-    infoBtn: { position: "absolute", top: "20px", right: "20px", width: "35px", height: "35px", borderRadius: "50%", border: "1px solid #ff3333", backgroundColor: "transparent", color: "#ff3333", zIndex: 110, display: "flex", alignItems: "center", justifyContent: "center" },
+    infoBtn: { position: "absolute", top: "20px", left: "20px", width: "35px", height: "35px", borderRadius: "50%", border: "1px solid #ff3333", backgroundColor: "transparent", color: "#ff3333", zIndex: 110, display: "flex", alignItems: "center", justifyContent: "center" },
     header: { marginBottom: "30px", width: "80%", textAlign: "center" },
     title: { fontSize: "1.4rem", letterSpacing: "4px", margin: "0 0 10px 0", transition: "color 0.5s" },
     statusBar: { width: "100%" },

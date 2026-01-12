@@ -1,5 +1,5 @@
 "use client";
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import TypewriterTerminal from "@/components/molecules/TypewriterTerminal/TypewriterTerminal";
 import AnswerTerminal from "@/components/organisms/AnswerTerminal/AnswerTerminal";
@@ -21,121 +21,77 @@ export default function Enigme1Page() {
         }
 
         const currentCodes = JSON.parse(localStorage.getItem('game_codes') || '[]');
-
         if (!currentCodes.find(c => c.value === "FOYER")) {
-            currentCodes.push({
-                label: "POSITION",
-                value: "FOYER"
-            });
+            currentCodes.push({ label: "POSITION", value: "FOYER" });
             localStorage.setItem('game_codes', JSON.stringify(currentCodes));
         }
-
         setIsModalOpen(true);
-    };
-
-    const goToNextStep = () => {
-        setIsModalOpen(false);
-        router.push('/'); // Retour au menu principal
     };
 
     const terminalLines = [
         "> CONNEXION SÉCURISÉE ÉTABLIE...",
         "> IDENTITÉ : M. JACQUOT",
-        "> STATUT : INFILTRATION EN COURS",
         "> Équipe, je suis à l'intérieur de leur réseau.",
-        "> Les Chemises Rouges ont sécurisé leur système avec un pare-feu complexe.",
-        "> J'ai besoin de votre aide pour forcer l'accès.",
-        "> Devant vous, une séquence de chiffres. C'est leur premier verrou.",
-        "> Une fois déchiffré, entrez le mot de passe.",
-        "> Cela nous donnera accès à leur SCANNER de documents.",
-        "> Le temps presse. Bonne chance.",
+        "> Voici leur premier verrou numérique.",
         "> — M. JACQUOT"
     ];
 
     const numbers = [
         { val: "6", color: "#347E84" },
-        { val: "15", color: "var(--color-turquoise)" },
-        { val: "25", color: "var(--color-light-green)" },
+        { val: "15", color: "#4FD1C5" },
+        { val: "25", color: "#9AE6B4" },
         { val: "5", color: "#FFACAC" },
-        { val: "18", color: "var(--color-lavender)" }
+        { val: "18", color: "#D6BCFA" }
     ];
 
     return (
-        <section className="h-full flex flex-col overflow-hidden" style={{
+        /* On utilise h-full car le parent (RootLayout) gère déjà le 100dvh et la Navbar */
+        <main className="h-full w-full relative flex flex-col" style={{
             backgroundImage: "url('/background-computer.png')",
             backgroundSize: "cover",
             backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-            width: "100vw",
-            position: "relative",
-            left: "50%",
-            right: "50%",
-            marginLeft: "-50vw",
-            marginRight: "-50vw",
         }}>
+            <div className="absolute inset-0 bg-black/60 z-0" />
 
-            <div style={{
-                position: "absolute",
-                inset: 0,
-                backgroundColor: "rgba(10, 20, 21, 0.4)",
-                zIndex: 0
-            }} />
+            {/* Conteneur compact : pas de justify-between, juste le strict nécessaire */}
+            <section className="relative z-10 h-full flex flex-col md:max-w-md mx-auto p-4 overflow-hidden">
 
-            {/* Zone de texte avec scroll - PLUS GRANDE */}
-            <div className="overflow-y-auto max-h-[45vh] p-4" style={{ zIndex: 1 }}>
-                <div style={{ width: "100%", maxWidth: "450px", margin: "0 auto" }}>
-                    <TypewriterTerminal textLines={terminalLines} speed={40} />
-                </div>
-            </div>
+                {/* Zone 1 : Terminal - Hauteur réduite au minimum */}
+                <article className="flex-shrink-0 pt-2 pb-1 border-b-2 border-white/20 max-h-[20dvh] overflow-y-auto">
+                    <TypewriterTerminal textLines={terminalLines} speed={10} />
+                </article>
 
-            {/* Zone des chiffres - toujours visible - PLUS PETITE */}
-            <div className="flex-1 flex items-center justify-center p-4" style={{ zIndex: 1 }}>
-                <div style={{
-                    width: "100%",
-                    maxWidth: "400px",
-                    background: "rgba(0, 0, 0, 0.40)",
-                    backdropFilter: "blur(5px)",
-                    WebkitBackdropFilter: "blur(5px)",
-                    borderRadius: "16px",
-                    border: "1px solid rgba(255, 255, 255, 0.08)",
-                    padding: "20px 15px",
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr",
-                    gap: "15px 30px",
-                    justifyItems: "center"
-                }}>
-                    {numbers.map((n, index) => (
-                        <div key={index} style={{
-                            fontSize: "4rem",
-                            fontWeight: "700",
-                            color: n.color,
-                            textAlign: "center",
-                            lineHeight: "1",
-                            filter: `drop-shadow(0 0 10px ${n.color}44)`
-                        }} >
-                            {n.val}
-                        </div>
-                    ))}
-                </div>
-            </div>
+                {/* Zone 2 : Chiffres - flex-1 pour boucher le trou sans pousser l'input */}
+                <article className="flex-1 flex items-center justify-center min-h-0">
+                    <div className="w-full grid grid-cols-2 gap-2 bg-black/40 rounded-xl p-3 border border-white/10 shadow-2xl">
+                        {numbers.map((n, index) => (
+                            <div
+                                key={index}
+                                className="text-6xl font-bold text-center"
+                                style={{ color: n.color }}
+                            >
+                                {n.val}
+                            </div>
+                        ))}
+                    </div>
+                </article>
 
-            {/* Zone de réponse - toujours visible en bas */}
-            <div className="p-4 flex justify-center" style={{ zIndex: 10 }}>
-                <div className="w-full max-w-[450px]">
+                {/* Zone 3 : Input - Collé en bas, pas de pb-20 ou autre */}
+                <article className="flex-shrink-0 pt-2">
                     <AnswerTerminal
                         expectedAnswer="FOYER"
                         onValidate={handleSuccess}
                         placeholder="ENTREZ LE MOT DE PASSE..."
                     />
-                </div>
-            </div>
+                </article>
+            </section>
 
             <BaseModal
                 isOpen={isModalOpen}
                 title="< ACCÈS DÉBLOQUÉ />"
-                message="Excellent travail ! Nous avons forcé la première couche de sécurité. Le SCANNER est maintenant accessible depuis le menu principal. Vous pouvez désormais numériser leurs documents secrets. Retournez au menu et commencez l'infiltration. Chaque application débloquée nous rapproche de la vérité. — M. JACQUOT"
-                onConfirm={goToNextStep}
+                message="Eh ben... C'était laborieux. Rendez-vous au Foyer pour la suite des énigmes, si vous y arrivez... - LES CHEMISES ROUGES"
+                onConfirm={() => { setIsModalOpen(false); router.push('/'); }}
             />
-        </section>
+        </main>
     );
 }

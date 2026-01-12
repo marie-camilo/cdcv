@@ -231,7 +231,7 @@ const styles = {
     infoBtn: {
         position: "absolute",
         top: "20px",
-        right: "20px",
+        left: "20px",
         width: "35px",
         height: "35px",
         borderRadius: "50%",
