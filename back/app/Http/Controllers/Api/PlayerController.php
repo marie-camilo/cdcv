@@ -108,11 +108,15 @@ class PlayerController extends Controller
             ], 200);
         }
 
+        $player->load('game');
+
         return response()->json([
             'authenticated' => true,
             'player' => [
+                'id' => $player->id,
                 'name' => $player->name,
                 'game_id' => $player->game_id,
+                'game_code' => $player->game->code ?? null,
                 'role_assigned' => !is_null($player->role)
             ]
         ]);

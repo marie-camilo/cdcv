@@ -64,6 +64,7 @@ class GameFlowController extends Controller
             }
 
             $game->status = 'started';
+            $game->step = 1;
             $game->started_at = now();
             $game->save();
         });

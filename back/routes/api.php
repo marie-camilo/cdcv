@@ -50,7 +50,15 @@ Route::middleware('api.key')
 //            Route::post('/rooms/leave', [TalkieWalkieController::class, 'leaveRoom']);
 //        });
 
+        // récupération des messages audio
+        Route::get('/audio/messages', [AudioController::class, 'index']);
+
+        // upload d'un message audio
         Route::post('/audio', [AudioController::class, 'upload']);
+
+        // reset des messages audio
+        Route::delete('/audio/{code}', [AudioController::class, 'resetByCode']);
+
     });
 
 
