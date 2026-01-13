@@ -13,14 +13,17 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    max-width: 100%;
     padding: var(--space-md);
     box-sizing: border-box;
+    height: 80px;
 }
 
 .left {
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 2px;
 }
 
 .time {
@@ -28,16 +31,17 @@
     font-size: 1.8rem;
     font-weight: 700;
     line-height: 1;
-    letter-spacing: -1px;
     font-variant-numeric: tabular-nums;
+    color: var(--color-light-green);
 }
 
 .name {
     font-family: var(--font-source), serif;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     text-transform: capitalize;
-    margin-top: 4px;
-    cursor: pointer;
+    font-weight: 600;
+    color: var(--color-white);
+    line-height: 1;
 }
 
 .menuButton {
