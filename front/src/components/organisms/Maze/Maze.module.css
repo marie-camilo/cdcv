@@ -126,6 +126,8 @@
   pointer-events: none;
   transition: all 0.15s ease;
   animation: playerDotPulse 1.5s infinite;
+  margin-top: 1px;
+  margin-left: 1.5px;
 }
 
 @keyframes playerDotPulse {
@@ -270,4 +272,88 @@
   border-radius: 4px;
   border-left: 4px solid var(--color-cyan-bright);
   word-break: break-all;
+}
+/* Game Over Message */
+.gameOverMessage {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.95);
+  color: var(--color-red-bright);
+  padding: 40px 60px;
+  border-radius: 12px;
+  border: 4px solid var(--color-red-bright);
+  font-family: 'Courier New', monospace;
+  font-size: 32px;
+  font-weight: bold;
+  text-align: center;
+  z-index: 9999;
+  box-shadow: 0 0 50px rgba(255, 48, 79, 0.8);
+  animation: gameOverPulse 1.5s ease infinite;
+}
+
+@keyframes gameOverPulse {
+  0%, 100% {
+    box-shadow: 0 0 50px rgba(255, 48, 79, 0.8);
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    box-shadow: 0 0 80px rgba(255, 48, 79, 1);
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+}
+
+/* Exit Portal - Carrés avec bordures cyan */
+.exitPortal {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  background: rgba(0, 242, 254, 0.15);
+  border: 2px solid var(--color-cyan-bright);
+  border-radius: 2px;
+  z-index: 20;
+  animation: exitPortalPulse 2s ease-in-out infinite;
+  box-shadow:
+          0 0 15px rgba(0, 242, 254, 0.6),
+          inset 0 0 10px rgba(0, 242, 254, 0.3);
+  pointer-events: none;
+  margin-top: 1.5px;
+  margin-left: 1.5px;
+}
+
+.exitIcon {
+  /* Icône supprimée - juste le carré avec bordure */
+  display: none;
+}
+
+.exitLabel {
+  /* Label supprimé mais classe conservée pour compatibilité */
+  display: none;
+}
+
+@keyframes exitPortalPulse {
+  0%, 100% {
+    box-shadow:
+            0 0 15px rgba(0, 242, 254, 0.6),
+            inset 0 0 10px rgba(0, 242, 254, 0.3);
+    border-color: var(--color-cyan-bright);
+  }
+  50% {
+    box-shadow:
+            0 0 30px rgba(0, 242, 254, 1),
+            inset 0 0 20px rgba(0, 242, 254, 0.5);
+    border-color: rgba(0, 242, 254, 0.8);
+  }
+}
+
+@keyframes exitBounce {
+  /* Animation bounce désactivée pour les carrés */
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(0);
+  }
 }
