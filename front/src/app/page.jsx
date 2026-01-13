@@ -72,10 +72,10 @@ export default function WelcomePage() {
     };
 
     return (
-        <main className="h-full flex flex-col md:max-w-md mx-auto">
+        <main className="flex flex-col md:max-w-md mx-auto">
             <section className="flex flex-col h-full">
                 {/* Zone de texte avec scroll */}
-                <article className="text-(--color-turquoise) py-4 px-4 font-mono text-xs overflow-y-auto flex-shrink-0 max-h-[35vh] border-b-2 border-(--color-turquoise)">
+                <article className="text-(--color-turquoise) py-4 px-4 font-mono text-xs overflow-y-auto flex-shrink-0 max-h-[30vh] border-b-2 border-(--color-turquoise) overflow-scroll">
                     <div style={{ width: "100%" }}>
                         <TypewriterTerminal textLines={terminalLines} speed={10} />
                     </div>
