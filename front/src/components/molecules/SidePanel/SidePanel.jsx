@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { IoClose, IoConstruct, IoPerson } from "react-icons/io5";
-import { getPlayerRole} from "@/hooks/API/gameRequests";
+import { getPlayerRole } from "@/hooks/API/gameRequests";
 
 export default function SidePanel({ isOpen, onClose }) {
     const [codes, setCodes] = useState([]);
@@ -16,16 +16,13 @@ export default function SidePanel({ isOpen, onClose }) {
 
     useEffect(() => {
         if (isMounted && isOpen) {
-            // 1. Récupération des codes
             const storedCodes = JSON.parse(localStorage.getItem('game_codes') || '[]');
             setCodes(storedCodes);
 
-            // 2. Récupération du rôle
             setIsLoading(true);
             getPlayerRole()
                 .then((data) => {
                     if (data && data.role) {
-                        // On met en majuscules pour le style
                         setRoleLabel(data.role.toUpperCase());
                     } else {
                         setRoleLabel("INCONNU");
@@ -45,15 +42,15 @@ export default function SidePanel({ isOpen, onClose }) {
 
     return (
         <>
-            {/* Overlay */}
+            {/* Overlay : z-index augmenté à 1040 */}
             <div
-                className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-300 ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+                className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-[1040] transition-opacity duration-300 ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
                 onClick={onClose}
             />
 
-            {/* Panel */}
+            {/* Panel : z-index augmenté à 1050 */}
             <aside
-                className={`fixed top-0 right-0 h-full w-80 bg-[var(--color-dark)] border-l-2 border-[var(--color-light-green)] z-50 transform transition-transform duration-300 ease-out p-6 flex flex-col ${isOpen ? "translate-x-0" : "translate-x-full"}`}
+                className={`fixed top-0 right-0 h-full w-80 bg-[var(--color-dark)] border-l-2 border-[var(--color-light-green)] z-[1050] transform transition-transform duration-300 ease-out p-6 flex flex-col ${isOpen ? "translate-x-0" : "translate-x-full"}`}
             >
                 {/* HEADER */}
                 <div className="flex justify-between items-center mb-6 border-b border-white/10 pb-4 shrink-0">
@@ -87,8 +84,6 @@ export default function SidePanel({ isOpen, onClose }) {
 
                 {/* FOOTER */}
                 <div className="mt-6 pt-6 border-t border-white/10 shrink-0 flex flex-col gap-3">
-
-                    {/* AFFICHE LE ROLE DIRECTEMENT ICI */}
                     <div className="flex items-center justify-center gap-3 w-full py-3 bg-[var(--color-light-green)]/10 border border-[var(--color-light-green)] rounded cursor-default">
                         <IoPerson size={20} className="text-[var(--color-light-green)]" />
                         <span className={`font-mono text-sm font-bold tracking-wide text-[var(--color-light-green)] ${isLoading ? 'animate-pulse' : ''}`}>
@@ -96,7 +91,6 @@ export default function SidePanel({ isOpen, onClose }) {
                         </span>
                     </div>
 
-                    {/* BOUTON BOITE À OUTILS */}
                     <Link
                         href="/"
                         onClick={onClose}
