@@ -36,31 +36,38 @@ class GameFlowController extends Controller
 
             $players = $game->players()->get()->shuffle()->values();
 
-            // 1️⃣ Attribution des imposteurs (2 aléatoires)
-            $impostors = $players->take(2)->pluck('id')->toArray();
+            $impostors = $players->take(2);
+            $crewmates = $players->slice(2)->values();
 
-            // 2️⃣ Définition des rôles fonctionnels
-            $roles = collect([
-                'communicant', //Impostor 1
+            $impostorRoles = collect([
                 'communicant',
-                'navigateur', //Impostor 2
+                'navigateur',
+            ])->shuffle()->values();
+
+            $crewRoles = collect([
+                'communicant',
                 'developpeur',
                 'cadreur',
                 'cadreur',
             ])->shuffle()->values();
 
-            // 3️⃣ Attribution finale
-            foreach ($players as $index => $player) {
-                $player->impostor = in_array($player->id, $impostors);
-                $player->role = $roles[$index];
+            foreach ($impostors as $index => $player) {
+                $player->impostor = true;
+                $player->role = $impostorRoles[$index];
                 $player->save();
             }
 
-            // 4️⃣ Démarrage de la partie
+            foreach ($crewmates as $index => $player) {
+                $player->impostor = false;
+                $player->role = $crewRoles[$index];
+                $player->save();
+            }
+
             $game->status = 'started';
             $game->started_at = now();
             $game->save();
         });
+
 
         event(new GameStarting(
             $game->code,
