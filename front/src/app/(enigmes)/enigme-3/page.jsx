@@ -162,7 +162,7 @@ export default function Enigme3Page() {
                 {/* ✅ CONVERSATION : prend le reste + scroll */}
                 <div
                     ref={scrollRef}
-                    className="w-full max-h-[45dvh] overflow-y-auto p-4 rounded-lg border border-cyan-500/30 bg-black/40 backdrop-blur-md flex flex-col gap-4"
+                    className="w-full h-[45dvh] max-h-[45dvh] overflow-y-auto p-4 rounded-lg border border-cyan-500/30 bg-black/40 backdrop-blur-md flex flex-col gap-4"
                     style={{scrollbarWidth: "none"}}
                 >
                     {messages.length === 0 && (
