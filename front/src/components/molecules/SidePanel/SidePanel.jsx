@@ -1,10 +1,10 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { IoClose, IoConstruct, IoPerson } from "react-icons/io5";
+import { IoClose, IoConstruct, IoPerson, IoInformationCircle } from "react-icons/io5"; // Ajout de IoInformationCircle
 import { getPlayerRole } from "@/hooks/API/gameRequests";
 
-export default function SidePanel({ isOpen, onClose }) {
+export default function SidePanel({ isOpen, onClose, onOpenRole }) { // Ajout de la prop onOpenRole
     const [codes, setCodes] = useState([]);
     const [isMounted, setIsMounted] = useState(false);
     const [roleLabel, setRoleLabel] = useState("CHARGEMENT...");
@@ -42,13 +42,13 @@ export default function SidePanel({ isOpen, onClose }) {
 
     return (
         <>
-            {/* Overlay : z-index augmenté à 1040 */}
+            {/* Overlay */}
             <div
                 className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-[1040] transition-opacity duration-300 ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
                 onClick={onClose}
             />
 
-            {/* Panel : z-index augmenté à 1050 */}
+            {/* Panel */}
             <aside
                 className={`fixed top-0 right-0 h-full w-80 bg-[var(--color-dark)] border-l-2 border-[var(--color-light-green)] z-[1050] transform transition-transform duration-300 ease-out p-6 flex flex-col ${isOpen ? "translate-x-0" : "translate-x-full"}`}
             >
@@ -84,13 +84,27 @@ export default function SidePanel({ isOpen, onClose }) {
 
                 {/* FOOTER */}
                 <div className="mt-6 pt-6 border-t border-white/10 shrink-0 flex flex-col gap-3">
-                    <div className="flex items-center justify-center gap-3 w-full py-3 bg-[var(--color-light-green)]/10 border border-[var(--color-light-green)] rounded cursor-default">
-                        <IoPerson size={20} className="text-[var(--color-light-green)]" />
-                        <span className={`font-mono text-sm font-bold tracking-wide text-[var(--color-light-green)] ${isLoading ? 'animate-pulse' : ''}`}>
-                            {roleLabel}
-                        </span>
-                    </div>
 
+                    {/* BOUTON ROLE INTERACTIF */}
+                    <button
+                        onClick={onOpenRole} // Ouvre le modal via la fonction passée en prop
+                        className="group flex items-center justify-between gap-3 w-full px-4 py-3 bg-[var(--color-light-green)]/10 hover:bg-[var(--color-light-green)]/20 border border-[var(--color-light-green)] rounded transition-all duration-300"
+                    >
+                        <div className="flex items-center gap-3">
+                            <IoPerson size={20} className="text-[var(--color-light-green)]" />
+                            <span className={`font-mono text-sm font-bold tracking-wide text-[var(--color-light-green)] ${isLoading ? 'animate-pulse' : ''}`}>
+                                {roleLabel}
+                            </span>
+                        </div>
+
+                        {/* L'icône Info est maintenant ici */}
+                        <IoInformationCircle
+                            size={20}
+                            className="text-[var(--color-light-green)] opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all"
+                        />
+                    </button>
+
+                    {/* BOUTON BOITE À OUTILS */}
                     <Link
                         href="/"
                         onClick={onClose}

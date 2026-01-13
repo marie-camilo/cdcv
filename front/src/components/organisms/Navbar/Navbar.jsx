@@ -4,14 +4,13 @@ import React, { useState, useEffect } from 'react';
 import styles from "./Navbar.module.css";
 import PixelBorder from "@/components/atoms/PixelBorder";
 import { HiOutlineMenuAlt3 } from "react-icons/hi";
-import { IoInformationCircle, IoClose, IoHardwareChip, IoMap, IoScan, IoRadio } from "react-icons/io5"; // Icônes pour le modal
+import { IoClose, IoHardwareChip, IoMap, IoScan, IoRadio } from "react-icons/io5";
 import { useTimer } from "@/app/context/TimerContext";
 import TimerDisplay from "@/components/atoms/TimerDisplay/TimerDisplay";
 import SidePanel from "@/components/molecules/SidePanel/SidePanel";
 import { checkPlayerCookie } from "@/hooks/API/rules";
 import { getPlayerRole } from "@/hooks/API/gameRequests";
 
-// --- CONSTANTES DES RÔLES ---
 const ROLE_DESCRIPTIONS = {
     cadreur: {
         icon: <IoScan size={40} />,
@@ -52,15 +51,11 @@ function RoleModal({ isOpen, onClose, roleName }) {
 
     return (
         <div className="fixed inset-0 z-[1100] flex items-center justify-center px-4">
-            {/* Overlay */}
             <div
                 className="absolute inset-0 bg-black/80 backdrop-blur-sm"
                 onClick={onClose}
             />
-
-            {/* Content */}
             <div className="relative bg-[var(--color-dark)] border border-[var(--color-light-green)] w-full max-w-md p-6 shadow-[0_0_20px_rgba(0,255,0,0.1)]">
-                {/* Close Button */}
                 <button
                     onClick={onClose}
                     className="absolute top-4 right-4 text-white/50 hover:text-[var(--color-light-green)] transition-colors"
@@ -68,7 +63,6 @@ function RoleModal({ isOpen, onClose, roleName }) {
                     <IoClose size={24} />
                 </button>
 
-                {/* Header */}
                 <div className="flex flex-col items-center text-center mb-6 border-b border-white/10 pb-6">
                     <div className="text-[var(--color-light-green)] mb-3 p-3 bg-[var(--color-light-green)]/10 rounded-full border border-[var(--color-light-green)]">
                         {roleData.icon}
@@ -81,7 +75,6 @@ function RoleModal({ isOpen, onClose, roleName }) {
                     </span>
                 </div>
 
-                {/* Details */}
                 <div className="space-y-4 font-mono text-sm">
                     <div>
                         <h3 className="text-[var(--color-light-green)] text-xs uppercase tracking-wider mb-1">Mission Prioritaire</h3>
@@ -103,7 +96,6 @@ function RoleModal({ isOpen, onClose, roleName }) {
                     </div>
                 </div>
 
-                {/* Footer Action */}
                 <button
                     onClick={onClose}
                     className="w-full mt-6 py-3 bg-[var(--color-light-green)] text-black font-bold uppercase tracking-widest hover:bg-white transition-colors"
@@ -149,36 +141,31 @@ export default function Navbar() {
                 <PixelBorder>
                     <div className={styles.container}>
                         <div className={styles.left}>
+
                             <TimerDisplay className={styles.time} />
 
-                            {/* Bloc Nom + Rôle */}
-                            <div className="flex flex-col justify-center h-full ml-4 leading-tight">
-                                <span className={`${styles.name} block`}>
+                            <div className="flex items-center gap-2 mt-1">
+                                <span className={styles.name}>
                                     {playerName}
                                 </span>
 
-                                {/* Bouton Rôle Clickable */}
+                                <span className="text-white/20 font-mono text-[10px]">
+                                    //
+                                </span>
+
                                 {playerRole ? (
-                                    <button
-                                        onClick={() => setIsRoleModalOpen(true)}
-                                        className="text-left flex items-center gap-1 group"
-                                    >
-                                        <span className="text-[10px] md:text-xs font-mono font-bold text-[var(--color-light-green)] tracking-wider uppercase group-hover:underline decoration-[var(--color-light-green)] underline-offset-2">
-                                            {playerRole}
-                                        </span>
-                                        <IoInformationCircle
-                                            size={12}
-                                            className="text-[var(--color-light-green)] opacity-50 group-hover:opacity-100 transition-opacity"
-                                        />
-                                    </button>
+                                    <span className="text-[9px] font-mono font-bold text-[var(--color-light-green)] tracking-wider uppercase">
+                                        {playerRole}
+                                    </span>
                                 ) : (
-                                    <span className="text-[10px] text-white/40 font-mono tracking-wider uppercase animate-pulse">
-                                        User
+                                    <span className="text-[9px] text-white/40 font-mono tracking-wider uppercase animate-pulse">
+                                        ...
                                     </span>
                                 )}
                             </div>
                         </div>
 
+                        {/* BOUTON MENU */}
                         <button
                             className={styles.menuButton}
                             onClick={() => setIsPanelOpen(true)}
@@ -192,6 +179,7 @@ export default function Navbar() {
             <SidePanel
                 isOpen={isPanelOpen}
                 onClose={() => setIsPanelOpen(false)}
+                onOpenRole={() => setIsRoleModalOpen(true)}
             />
 
             <RoleModal
