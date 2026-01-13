@@ -12,8 +12,6 @@ export default function RadarCompass({ targets, foundIds }) {
     const [permissionGranted, setPermissionGranted] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
     const [showDots, setShowDots] = useState(false);
-
-    // --- LOGIQUE FLUIDITÉ ---
     const targetHeading = useRef(0);
     const currentHeading = useRef(0);
     const rafId = useRef(null);
@@ -30,11 +28,17 @@ export default function RadarCompass({ targets, foundIds }) {
 
     const handleOrientation = (event) => {
         let compass = 0;
-        if (event.webkitCompassHeading) {
+
+        if (event.webkitCompassHeading !== undefined && event.webkitCompassHeading !== null) {
             compass = event.webkitCompassHeading;
-        } else if (event.alpha !== null) {
-            compass = Math.abs(event.alpha - 360);
         }
+        else if (event.alpha !== null) {:
+            compass = 360 - event.alpha;
+        }
+
+        if (compass < 0) compass += 360;
+        if (compass >= 360) compass -= 360;
+
         targetHeading.current = compass;
     };
 
@@ -64,9 +68,11 @@ export default function RadarCompass({ targets, foundIds }) {
 
     const startCompass = () => {
         window.addEventListener('deviceorientation', handleOrientation);
+
         if ('ondeviceorientationabsolute' in window) {
-            window.addEventListener('deviceorientationabsolute', (e) => handleOrientation({...e, absolute: true}));
+            window.addEventListener('deviceorientationabsolute', handleOrientation);
         }
+
         updatePhysics();
     };
 
