@@ -33,7 +33,7 @@ export async function uploadAudio(audioBlob) {
 
     // On utilise apiFetch mais on doit SURCHARGER le Content-Type à undefined
     // pour que le navigateur le génère correctement avec le "boundary" du FormData
-    return apiFetch(`/api/audio-upload`, {
+    return apiFetch(`/api/v1/audio-upload`, {
         method: "POST",
         body: formData,
         headers: {

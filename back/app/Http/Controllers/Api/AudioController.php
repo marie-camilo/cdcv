@@ -1,10 +1,15 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Request;
+use function App\Http\Controllers\asset;
+use function App\Http\Controllers\response;
 
 class AudioController
 {
     public function upload(Request $request) {
+
         if ($request->hasFile('audio')) {
             // On sauvegarde dans storage/app/public/talkie
             $path = $request->file('audio')->store('talkie', 'public');
