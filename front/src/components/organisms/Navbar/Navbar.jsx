@@ -7,6 +7,7 @@ import { HiOutlineMenuAlt3 } from "react-icons/hi";
 import { useTimer } from "@/app/context/TimerContext";
 import TimerDisplay from "@/components/atoms/TimerDisplay/TimerDisplay";
 import SidePanel from "@/components/molecules/SidePanel/SidePanel";
+import {checkPlayerCookie} from "@/hooks/API/rules";
 
 export default function Navbar() {
     const { simulateEnd } = useTimer();
@@ -14,10 +15,18 @@ export default function Navbar() {
     const [isPanelOpen, setIsPanelOpen] = useState(false);
 
     useEffect(() => {
-        const storedName = localStorage.getItem('currentPlayerName');
-        if (storedName) {
-            setPlayerName(storedName);
+        const playerData = async () => {
+            try {
+                const data = await checkPlayerCookie()
+
+                if (data?.player?.name) {
+                    setPlayerName(data.player.name);
+                }
+            } catch {
+                setPlayerName("Agent");
+            }
         }
+        playerData();
     }, []);
 
     return (
