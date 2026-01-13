@@ -4,7 +4,7 @@
     align-items: center;
     justify-content: center;
     padding: 20px;
-    min-height: calc(100vh - 80px);
+    min-height: 100vh;
     background: var(--color-purple-dark);
     overflow: hidden;
     width: 100%;
