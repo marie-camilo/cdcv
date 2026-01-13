@@ -1,6 +1,4 @@
-// services/gameService.js (ou équivalent côté serveur)
-
-import {apiFetch} from "@/hooks/API/fetchAPI";
+import { apiFetch } from "@/hooks/API/fetchAPI";
 
 /**
  * Ajoute un joueur à une partie via un code QR
@@ -19,28 +17,39 @@ export async function addPlayer(code, player) {
 
     return apiFetch(`/api/v1/games/${code}/players`, {
         method: "POST",
-        body: JSON.stringify({ name: player })
+        body: JSON.stringify({ name: player }),
     });
 }
+
 /**
  * Envoie un enregistrement audio au serveur
  * @param {Blob} audioBlob
  * @returns {Promise<{url: string}>}
  */
 export async function uploadAudio(audioBlob) {
-    const formData = new FormData();
-    formData.append("audio", audioBlob, "voice.webm");
+    if (!audioBlob) {
+        throw new Error("Aucun audioBlob fourni");
+    }
 
-    // On utilise apiFetch mais on doit SURCHARGER le Content-Type à undefined
-    // pour que le navigateur le génère correctement avec le "boundary" du FormData
-    return apiFetch(`/api/v1/audio-upload`, {
+    const formData = new FormData();
+
+    // ✅ meilleur : extension cohérente avec le type réel
+    const ext = audioBlob.type.includes("ogg") ? "ogg" : "webm";
+    formData.append("audio", audioBlob, `voice.${ext}`);
+
+    return apiFetch(`/api/v1/audio`, {
         method: "POST",
         body: formData,
-        headers: {
-            "Content-Type": null, // On force à null pour annuler le défaut JSON de apiFetch
-        }
     });
 }
+
+export async function getAudioMessages() {
+    return apiFetch(`/api/v1/audio/messages`, {
+        method: "GET",
+    });
+}
+
+
 /**
  * Récupère les joueurs d’une partie
  * @param {string} code
@@ -52,7 +61,7 @@ export async function getPlayersForGivenGame(code) {
     }
 
     return apiFetch(`/api/v1/games/${code}`, {
-        method: "GET"
+        method: "GET",
     });
 }
 
@@ -65,4 +74,3 @@ export async function getPlayerRole() {
         method: "GET",
     });
 }
-
