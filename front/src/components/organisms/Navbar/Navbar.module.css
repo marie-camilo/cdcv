@@ -3,8 +3,9 @@
     top: 0;
     left: 0;
     right: 0;
-    width: 100vw;
-    z-index: 50;
+    width: 100%;
+    z-index: 1000;
+    background: var(--color-medium);
 }
 
 .container {
@@ -12,7 +13,9 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    max-width: 100%;
     padding: var(--space-md);
+    box-sizing: border-box;
 }
 
 .left {
@@ -34,6 +37,7 @@
     font-size: 0.9rem;
     text-transform: capitalize;
     margin-top: 4px;
+    cursor: pointer;
 }
 
 .menuButton {
@@ -41,4 +45,7 @@
     border: none;
     color: inherit;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }

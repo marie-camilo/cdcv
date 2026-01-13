@@ -9,6 +9,14 @@
     --color-white: #EBFFF6;
     --color-classic-red: #FF3333;
 
+    /* Team Rouge */
+    --color-purple-dark: #2B1B47;
+    --color-purple-darker: #1a0d2e;
+    --color-red-accent: #FF304F;
+    --color-red-bright: #FF1744;
+    --color-cyan-bright: #00D9FF;
+    --color-beige: #F5E6D3;
+
     --space-xs: 4px;
     --space-sm: 8px;
     --space-md: 16px;
@@ -47,6 +55,8 @@ body {
     overflow-x: hidden;
     /* Support pour les zones sécurisées iPhone */
     padding-bottom: env(safe-area-inset-bottom);
+    width: 100%;
+    min-height: 100vh;
 }
 
 .layout-container {

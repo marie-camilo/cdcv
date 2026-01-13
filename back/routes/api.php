@@ -4,6 +4,8 @@ use App\Http\Controllers\Api\GameController;
 use App\Http\Controllers\Api\PlayerController;
 use App\Http\Controllers\Api\GameFlowController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\TalkieWalkieController;
+
 
 Route::middleware('api.key')
     ->prefix('v1')
@@ -38,5 +40,13 @@ Route::middleware('api.key')
 
         //Récupérer le code de la partie depuis le cookie
         Route::get('/games/log/session', [GameFlowController::class, 'getLogSession']);
+        // Routes Talkie-Walkie
+        Route::prefix('talkie')->group(function () {
+            Route::post('/rooms/join', [TalkieWalkieController::class, 'joinRoom']);
+            Route::get('/rooms/{code}', [TalkieWalkieController::class, 'getRoom']);
+            Route::post('/rooms/update-timer', [TalkieWalkieController::class, 'updateTimer']);
+            Route::post('/rooms/speaking', [TalkieWalkieController::class, 'speaking']);
+            Route::post('/rooms/leave', [TalkieWalkieController::class, 'leaveRoom']);
+        });
     });
 
