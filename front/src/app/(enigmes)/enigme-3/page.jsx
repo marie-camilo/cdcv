@@ -7,13 +7,14 @@ import TypewriterTerminal from "@/components/molecules/TypewriterTerminal/Typewr
 import TalkieButton from "@/app/(enigmes)/enigme-3/talkieButton";
 
 import { checkPlayerCookie, getCodeFromCookie } from "@/hooks/API/rules";
-import { getAudioMessages } from "@/hooks/API/gameRequests";
+import { getAudioMessages, getPlayerRole } from "@/hooks/API/gameRequests";
 
 export default function Enigme3Page() {
     const [logs, setLogs] = useState(["EN ATTENTE DE SIGNAL..."]);
     const [messages, setMessages] = useState([]);
     const [myPlayerId, setMyPlayerId] = useState(null);
     const [gameCode, setGameCode] = useState(null);
+    const [playerRole, setPlayerRole] = useState(null);
 
     const scrollRef = useRef(null);
     const pusherRef = useRef(null);
@@ -38,7 +39,7 @@ export default function Enigme3Page() {
 
                 if (!playerRes?.authenticated || !playerRes?.player?.id || !gameRes?.game?.code) {
                     // tu peux router ailleurs si tu veux
-                    addLog("❌ SESSION INVALIDE");
+                    addLog("SESSION INVALIDE");
                     return;
                 }
 
@@ -63,8 +64,11 @@ export default function Enigme3Page() {
                 if (!cancelled) setMessages(sorted);
             } catch (e) {
                 console.error("Init enigme-3 error:", e);
-                addLog("❌ ERREUR INITIALISATION");
+                addLog("ERREUR INITIALISATION");
             }
+
+            const roleRes = await getPlayerRole();
+            setPlayerRole(roleRes?.role ?? null);
         };
 
         init();
@@ -205,11 +209,43 @@ export default function Enigme3Page() {
 
                 {/* ✅ CONTROLS : fixe */}
                 <div className="w-full flex flex-col items-center justify-center gap-4 z-100">
-                    <TalkieButton onLog={addLog} onUploadSuccess={handleUploadSuccess}/>
 
-                    <div className="font-mono text-[10px] text-cyan-400 uppercase tracking-[0.2em] h-4">
-                        {logs[logs.length - 1]}
-                    </div>
+                    {playerRole === "communicant" ? (
+                        <>
+                            <TalkieButton onLog={addLog} onUploadSuccess={handleUploadSuccess} />
+
+                            <div className="font-mono text-[10px] text-cyan-400 uppercase tracking-[0.2em] h-4">
+                                {logs[logs.length - 1]}
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            {/* Bouton désactivé "fake" pour garder la cohérence */}
+                            <div className="w-32 h-32 rounded-full border-4 flex flex-col items-center justify-center text-center font-bold text-[10px] bg-black/30 border-red-500/40 text-red-300 shadow-[0_0_14px_rgba(255,0,0,0.12)] select-none">
+                                PUSH
+                                <br />
+                                TO TALK
+                                <span className="mt-2 text-[9px] font-mono opacity-80">
+                                  LOCKED
+                                </span>
+                            </div>
+
+                            {/* Message immersif */}
+                            <div className="w-full rounded-lg border border-red-500/20 bg-black/30 p-3 text-center">
+                                <p className="text-[11px] text-red-200 font-mono uppercase tracking-[0.18em]">
+                                    ACCÈS REFUSÉ
+                                </p>
+
+                                <p className="mt-2 text-[10px] text-cyan-200/70 font-mono leading-relaxed">
+                                    Vous n’avez pas l’autorisation radio.
+                                    <br />
+                                    <span className="text-cyan-300/90">Seul le rôle</span>{" "}
+                                    <span className="text-cyan-300 font-bold">COMMUNICANT</span>{" "}
+                                    <span className="text-cyan-300/90">peut transmettre.</span>
+                                </p>
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
         </section>
