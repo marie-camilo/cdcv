@@ -22,7 +22,25 @@ export async function addPlayer(code, player) {
         body: JSON.stringify({ name: player })
     });
 }
+/**
+ * Envoie un enregistrement audio au serveur
+ * @param {Blob} audioBlob
+ * @returns {Promise<{url: string}>}
+ */
+export async function uploadAudio(audioBlob) {
+    const formData = new FormData();
+    formData.append("audio", audioBlob, "voice.webm");
 
+    // On utilise apiFetch mais on doit SURCHARGER le Content-Type à undefined
+    // pour que le navigateur le génère correctement avec le "boundary" du FormData
+    return apiFetch(`/api/audio-upload`, {
+        method: "POST",
+        body: formData,
+        headers: {
+            "Content-Type": null, // On force à null pour annuler le défaut JSON de apiFetch
+        }
+    });
+}
 /**
  * Récupère les joueurs d’une partie
  * @param {string} code

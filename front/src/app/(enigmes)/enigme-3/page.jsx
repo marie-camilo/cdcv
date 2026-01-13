@@ -1,109 +1,86 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import TypewriterTerminal from "@/components/molecules/TypewriterTerminal/TypewriterTerminal";
-import AnswerTerminal from "@/components/organisms/AnswerTerminal/AnswerTerminal";
-import BaseModal from "@/components/molecules/Modals/BaseModal";
-import TalkieButton from "@/components/atoms/TalkieButton/TalkieButton";
+import TalkieButton from "@/app/(enigmes)/enigme-3/talkieButton";
 
 export default function Enigme3Page() {
     const router = useRouter();
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const [logs, setLogs] = useState(["EN ATTENTE DE SIGNAL..."]);
+    const [messages, setMessages] = useState([]);
+    const scrollRef = useRef(null);
 
+    // Auto-scroll vers le bas pour voir le dernier message
     useEffect(() => {
-        document.title = "Énigme 3 | Talkie-Walkie";
-    }, []);
+        if (scrollRef.current) {
+            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+        }
+    }, [messages]);
 
     const addLog = (msg) => {
         setLogs(prev => [...prev.slice(-4), msg]);
     };
 
-    const handleSuccess = () => {
-        const currentCodes = JSON.parse(localStorage.getItem('game_codes') || '[]');
-
-        if (!currentCodes.find(c => c.value === "LABYRINTHE")) {
-            currentCodes.push({
-                label: "CODE SORTIE",
-                value: "LABYRINTHE"
-            });
-            localStorage.setItem('game_codes', JSON.stringify(currentCodes));
-        }
-
-        setIsModalOpen(true);
+    // Ajoute le message audio à la liste "WhatsApp"
+    const handleNewVoiceMessage = (audioUrl) => {
+        const newMsg = {
+            id: Date.now(),
+            url: audioUrl,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+        setMessages(prev => [...prev, newMsg]);
     };
-
-    const goToNextStep = () => {
-        setIsModalOpen(false);
-        router.push('/enigme-4');
-    };
-
-    const terminalLines = [
-        "FREQUENCE DE TRAVAIL : 443.5 MHz",
-        "CANAL : INFILTRATION",
-        "INSTRUCTION : MAINTENEZ POUR COMMUNIQUER",
-        "LE PILOTE VOUS ENTEND."
-    ];
 
     return (
         <section style={{
             backgroundImage: "url('/background-computer.png')",
             backgroundSize: "cover",
-            backgroundPosition: "center",
-            width: "100vw",
-            position: "relative",
-            left: "50%",
-            right: "50%",
-            marginLeft: "-50vw",
-            marginRight: "-50vw",
             minHeight: "100dvh",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            padding: "80px 20px 40px",
-            gap: "1.5rem",
-            overflowX: "hidden"
+            padding: "40px 20px"
         }}>
-            <div style={{ position: "absolute", inset: 0, backgroundColor: "rgba(10, 20, 21, 0.6)", zIndex: 0 }} />
-
-            <div style={{ zIndex: 1, width: "100%", maxWidth: "450px" }}>
-                <TypewriterTerminal textLines={terminalLines} speed={40} />
+            <div className="z-10 w-full max-w-[450px] mb-6">
+                <TypewriterTerminal textLines={["FREQUENCE : 443.5 MHz", "MAINTENEZ POUR COMMUNIQUER"]} speed={40} />
             </div>
 
-            {/* ZONE TALKIE-WALKIE */}
-            <div style={{
-                zIndex: 1,
-                width: "100%",
-                maxWidth: "400px",
-                margin: "auto 0",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "2rem"
-            }}>
-                <TalkieButton onLog={addLog} />
+            {/* ZONE DE CONVERSATION (STYLE WHATSAPP) */}
+            <div
+                ref={scrollRef}
+                className="z-10 w-full max-w-[400px] flex-1 overflow-y-auto mb-6 p-4 rounded-lg border border-cyan-500/30 bg-black/40 backdrop-blur-md flex flex-col gap-4"
+                style={{ scrollbarWidth: 'none' }}
+            >
+                {messages.length === 0 && (
+                    <p className="text-cyan-500/40 text-center text-xs italic mt-10">
+                        Aucun signal radio détecté...
+                    </p>
+                )}
 
-                <div className="w-full bg-black/60 backdrop-blur-sm border border-[var(--color-medium)] p-4 rounded-lg font-mono text-[10px] text-[var(--color-light-green)] min-h-[100px]">
-                    {logs.map((log, i) => (
-                        <div key={i} className="mb-1 opacity-80">{`> ${log}`}</div>
-                    ))}
+                {messages.map((msg) => (
+                    <div key={msg.id} className="self-end flex flex-col items-end max-w-[85%]">
+                        <div className="bg-cyan-900/20 border border-cyan-500/50 p-2 rounded-l-2xl rounded-tr-2xl shadow-[0_0_10px_rgba(0,255,255,0.1)]">
+                            <audio src={msg.url} controls className="h-9 w-44 invert grayscale brightness-200" />
+                        </div>
+                        <span className="text-[9px] text-cyan-400 mt-1 font-mono uppercase opacity-70">
+                            {msg.time} • ENREGISTRÉ
+                        </span>
+                    </div>
+                ))}
+            </div>
+
+            {/* ZONE BOUTON TALKIE */}
+            <div className="z-10 w-full max-w-[400px] flex flex-col items-center gap-4">
+
+                <TalkieButton
+                    onLog={addLog}
+                    onUploadSuccess={handleNewVoiceMessage}
+                />
+
+                <div className="font-mono text-[10px] text-cyan-400 uppercase tracking-[0.2em] h-4">
+                    {logs[logs.length - 1]}
                 </div>
             </div>
-
-            <div className="z-10 w-full max-w-[450px] mt-auto">
-                <AnswerTerminal
-                    expectedAnswer="LABYRINTHE"
-                    onValidate={handleSuccess}
-                    placeholder="CODE DE SORTIE DU PILOTE"
-                />
-            </div>
-
-            <BaseModal
-                isOpen={isModalOpen}
-                title="< TRANSMISSION INTERCEPTÉE />"
-                message="Tiens, vous avez réussi à sortir ? On pariait que vous tourneriez en rond jusqu'à demain. C'est presque... touchant. Allez, récupérez la pièce de puzzle et filez en salle 109."
-                onConfirm={goToNextStep}
-            />
         </section>
     );
 }

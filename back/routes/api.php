@@ -40,3 +40,4 @@ Route::middleware('api.key')
         Route::get('/games/log/session', [GameFlowController::class, 'getLogSession']);
     });
 
+
