@@ -1,0 +1,66 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: 580px;
+    margin-top: 70px;
+}
+
+.horizontalRow {
+    display: flex;
+    gap: 0;
+    align-items: center;
+    width: 100%;
+    height: 35px;
+    margin-bottom: 5px;
+}
+
+.corner {
+    width: 35px;
+    height: 35px;
+    flex-shrink: 0;
+}
+
+.hLabel {
+    width: 32px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-cyan-bright);
+    font-family: 'Courier New', monospace;
+    font-size: 16px;
+    font-weight: bold;
+    user-select: none;
+    pointer-events: none;
+}
+
+.body {
+    display: flex;
+    gap: 0;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.verticalColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: 35px;
+    flex-shrink: 0;
+    margin-right: 5px;
+}
+
+.vLabel {
+    height: 32px;
+    width: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-cyan-bright);
+    font-family: 'Courier New', monospace;
+    font-size: 16px;
+    font-weight: bold;
+    user-select: none;
+    pointer-events: none;
+}

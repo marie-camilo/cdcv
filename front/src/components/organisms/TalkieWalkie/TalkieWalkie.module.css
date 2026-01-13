@@ -1,0 +1,212 @@
+/* ============================================ */
+/* POPUP D'AVERTISSEMENT */
+/* ============================================ */
+.popupOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.popupContent {
+  background: var(--color-purple-dark);
+  border: 3px solid var(--color-red-accent);
+  border-radius: 12px;
+  padding: 40px;
+  max-width: 400px;
+  text-align: center;
+  animation: slideDown 0.4s ease;
+  box-shadow: 0 0 40px rgba(255, 48, 79, 0.5);
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.popupTitle {
+  font-size: 2em;
+  color: var(--color-red-bright);
+  margin: 0 0 20px 0;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.popupText {
+  color: var(--color-beige);
+  font-size: 1.1em;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+
+.popupText strong {
+  color: var(--color-red-bright);
+  font-weight: bold;
+}
+
+.popupButton {
+  background: var(--color-red-accent);
+  color: white;
+  border: none;
+  padding: 12px 40px;
+  font-size: 1em;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.popupButton:hover {
+  background: var(--color-red-bright);
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(255, 48, 79, 0.6);
+}
+
+/* ============================================ */
+/* CONTAINER PRINCIPAL - MINIMALISTE */
+/* ============================================ */
+.container {
+  background: var(--color-purple-darker);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  position: relative;
+}
+
+/* ============================================ */
+/* INDICATEUR (QUELQU'UN PARLE) */
+/* ============================================ */
+.speakingIndicator {
+  position: absolute;
+  top: 40px;
+  right: 40px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #444;
+  border: 3px solid #666;
+  transition: all 0.3s ease;
+}
+
+.speakingIndicator.speaking {
+  background: var(--color-red-accent);
+  border-color: var(--color-red-accent);
+  box-shadow:
+          0 0 20px rgba(255, 48, 79, 0.8),
+          0 0 40px rgba(255, 48, 79, 0.6),
+          0 0 60px rgba(255, 48, 79, 0.4);
+  animation: shineRed 1s ease-in-out infinite;
+}
+
+@keyframes shineRed {
+  0%, 100% {
+    box-shadow:
+            0 0 20px rgba(255, 48, 79, 0.8),
+            0 0 40px rgba(255, 48, 79, 0.6),
+            0 0 60px rgba(255, 48, 79, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow:
+            0 0 30px rgba(255, 48, 79, 1),
+            0 0 60px rgba(255, 48, 79, 0.8),
+            0 0 90px rgba(255, 48, 79, 0.6);
+    transform: scale(1.1);
+  }
+}
+
+/* ============================================ */
+/* BOUTON PRINCIPAL (PTT) */
+/* ============================================ */
+.pttButton {
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: var(--color-red-accent);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 10px 40px rgba(255, 48, 79, 0.4);
+}
+
+.pttButton:hover {
+  transform: scale(1.05);
+  box-shadow: 0 15px 50px rgba(255, 48, 79, 0.6);
+}
+
+.pttButton:active {
+  transform: scale(0.95);
+}
+
+.micIcon {
+  width: 80px;
+  height: 80px;
+  color: white;
+}
+
+/* ============================================ */
+/* RESPONSIVE */
+/* ============================================ */
+@media (max-width: 768px) {
+  .pttButton {
+    width: 250px;
+    height: 250px;
+  }
+
+  .micIcon {
+    width: 60px;
+    height: 60px;
+  }
+
+  .speakingIndicator {
+    width: 50px;
+    height: 50px;
+    top: 20px;
+    right: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pttButton {
+    width: 200px;
+    height: 200px;
+  }
+
+  .micIcon {
+    width: 50px;
+    height: 50px;
+  }
+
+  .popupContent {
+    padding: 30px 20px;
+    margin: 0 20px;
+  }
+}

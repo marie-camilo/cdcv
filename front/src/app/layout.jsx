@@ -16,20 +16,22 @@ const geistMono = Geist_Mono({
     subsets: ["latin"],
 });
 
-const GAME_ROUTES = new Set([
-    'lobby',
-    'log',
-    'start',
-    'starting',
-    'role',
-    'enigme-2',
-]);
+const GAME_ROUTES = [
+    "/lobby",
+    "/log",
+    "/start",
+    "/starting",
+    "/role",
+    "/enigme-2",
+    "/enigme-3/navigateur",
+    "/enigme-3/guideur",
+];
 
 export default function RootLayout({ children }) {
     const pathname = usePathname();
     const pathSegments = pathname?.split('/').filter(Boolean);
 
-    const isGamePage = GAME_ROUTES.has(pathSegments?.[0]);
+    const isGamePage = GAME_ROUTES.some((route) => pathname?.startsWith(route));
 
     return (
         <html lang="fr" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
