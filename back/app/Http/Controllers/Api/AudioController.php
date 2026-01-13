@@ -92,6 +92,13 @@ class AudioController extends Controller
             return response()->json(['reason' => 'PLAYER_NOT_FOUND'], 404);
         }
 
+        if ($player->role !== 'communicant') {
+            return response()->json([
+                'reason' => 'FORBIDDEN_ROLE',
+                'message' => 'Vous n’êtes pas autorisé à transmettre.'
+            ], 403);
+        }
+
         if (!$request->hasFile('audio')) {
             return response()->json(['error' => 'No audio received'], 400);
         }
