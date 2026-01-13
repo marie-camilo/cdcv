@@ -4,14 +4,48 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getPlayerRole } from "@/hooks/API/gameRequests";
 import SectionTitle from "@/components/molecules/SectionTitle";
-import {checkGameState, getCodeFromCookie} from "@/hooks/API/rules";
+import { checkGameState, getCodeFromCookie } from "@/hooks/API/rules";
+import ImpostorBanner from "@/components/molecules/Lobby/ImpostorBanner";
 
-const DISPLAY_DURATION = 20_000; // 20 secondes
+const DISPLAY_DURATION = 30_000; // temporaire
+
+// Descriptions des rôles — accès direct par clé
+const ROLE_DESCRIPTIONS = {
+    cadreur: {
+        mission:
+            "Vous êtes les yeux de l'équipe. Votre rôle est de numériser les différents QR Codes pour les déchiffrer et mener à bien votre mission.",
+        equipement: "La caméra (scanner QR)",
+        info:
+            "Dès qu'un QR Code est trouvé, c'est à vous d'agir. Stabilisez l'image. Un scan flou est un scan inutile.",
+    },
+    communicant: {
+        mission:
+            "Vous êtes le lien vital de l'équipe. L'information est votre arme principale. Vous assurez la coordination et la transmission.",
+        equipement: "Le talkie-walkie",
+        info:
+            "Parlez clairement, sans saturer le canal. Une information mal transmise est une information perdue.",
+    },
+    navigateur: {
+        mission:
+            "Vous êtes le sens de l'orientation du groupe. Vous guidez l'équipe vers les objectifs physiques.",
+        equipement: "La boussole et le radar",
+        info:
+            "Maîtrisez l'interface radar et guidez précisément l'équipe vers les coordonnées.",
+    },
+    developpeur: {
+        mission:
+            "Vous êtes le cerveau logique. Vous interagissez avec les systèmes pour décrypter et contourner les sécurités.",
+        equipement: "Les terminaux et claviers",
+        info:
+            "Analysez les énigmes et les lignes de code. Chaque détail compte.",
+    },
+};
 
 export default function RolePage() {
     const router = useRouter();
 
     const [role, setRole] = useState(null);
+    const [isImpostor, setIsImpostor] = useState(false);
     const [progress, setProgress] = useState(100);
 
     useEffect(() => {
@@ -20,15 +54,26 @@ export default function RolePage() {
 
         const init = async () => {
             const gameData = await getCodeFromCookie().catch(() => null);
-            const gameState = await checkGameState(gameData.game.code);
+            if (!gameData?.game?.code) {
+                router.replace("/");
+                return;
+            }
 
+            const gameState = await checkGameState(gameData.game.code);
             if (gameState.status !== "started") {
                 router.replace("/");
                 return;
             }
 
             const data = await getPlayerRole();
+
+            // Validation défensive (JS only)
+            if (typeof data.role !== "string" || typeof data.impostor !== "boolean") {
+                throw new Error("INVALID_ROLE_PAYLOAD");
+            }
+
             setRole(data.role);
+            setIsImpostor(data.impostor);
 
             const start = Date.now();
 
@@ -53,50 +98,56 @@ export default function RolePage() {
 
     if (!role) return null;
 
-    const isImpostor = role === "impostor";
+    const roleData = ROLE_DESCRIPTIONS[role];
+
+    if (!roleData) {
+        throw new Error(`UNKNOWN_ROLE: ${role}`);
+    }
+
+    const { mission, equipement, info } = roleData;
 
     return (
-        <main className="min-h-screen px-8 text-white">
+        <main className="min-h-screen px-8 py-10 text-white">
             {/* Header */}
-            <header className="pt-10 pb-6">
-            <SectionTitle
+            <header className="pb-6">
+                <SectionTitle
                     variant="lobby"
                     title="Ton rôle"
                     subtitle="Voici les instructions associées à ton rôle"
                 />
             </header>
 
-            {/* Centre vertical */}
-            <section className="flex-1 flex items-center justify-center mt-5">
+            <section className="flex flex-col items-center justify-center mt-5 space-y-6">
+
+                {/* Bannière imposteur */}
+                {isImpostor && (
+                    <ImpostorBanner
+                        label="Imposteur"
+                        text1="Tu es un imposteur infiltré dans l’équipe."
+                        text2="Tu auras l'occasion de saboter les efforts de l’équipe adverse."
+                        ps="PS : Tu n'es pas seul..."
+                    />
+                )}
+
                 <div className="w-full max-w-md relative rounded-2xl border border-white/30 p-8 pt-12">
                     {/* Role label */}
                     <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-[var(--color-dark)] px-6">
-                        <span
-                            className={`text-3xl font-bold uppercase tracking-widest italic ${
-                                isImpostor
-                                    ? "text-red-400"
-                                    : "text-[var(--color-light-green)]"
-                            }`}
-                        >
+                        <span className="text-3xl font-bold uppercase tracking-widest italic text-[var(--color-light-green)]">
                             {role}
                         </span>
                     </div>
 
-                    {/* Role description */}
+                    {/* Mission */}
                     <div className="space-y-6 text-md font-light leading-relaxed">
-                        {isImpostor ? (
-                            <>
-                                <p>Tu es un imposteur infiltré dans l’équipe.</p>
-                                <p>Oriente discrètement les décisions sans éveiller les soupçons.</p>
-                                <p>Ton objectif est de mener l’équipe à l’échec.</p>
-                            </>
-                        ) : (
-                            <>
-                                <p>Tu fais partie de l’équipage.</p>
-                                <p>Analyse les indices, coopère et reste attentif aux comportements suspects.</p>
-                                <p>Ton objectif est de résoudre l’énigme sans te faire manipuler.</p>
-                            </>
-                        )}
+                        <p>{mission}</p>
+                    </div>
+
+                    {/* Outils */}
+                    <div className="space-y-4 text-md font-light leading-relaxed mt-6">
+                        <h4 className="font-semibold">
+                            Tes outils : <span className="italic">{equipement}</span>
+                        </h4>
+                        <p>{info}</p>
                     </div>
 
                     <p className="mt-8 italic text-[var(--color-light-green)]">
@@ -107,7 +158,7 @@ export default function RolePage() {
                     <div className="mt-10 h-2 w-full bg-white/10 rounded-full overflow-hidden">
                         <div
                             className="h-full bg-[var(--color-light-green)] transition-all"
-                            style={{width: `${progress}%`}}
+                            style={{ width: `${progress}%` }}
                         />
                     </div>
                 </div>

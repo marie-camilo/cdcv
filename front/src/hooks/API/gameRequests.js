@@ -39,11 +39,12 @@ export async function getPlayersForGivenGame(code) {
 }
 
 /**
- * Récupère le rôle du joueur connecté dans la partie
- * @returns {Promise<{ role: string }>}
+ * Récupère le rôle et le statut imposteur du joueur connecté
+ * @returns {Promise<{ role: string, impostor: boolean }>}
  */
 export async function getPlayerRole() {
     return apiFetch(`/api/v1/me/role`, {
-        method: "GET"
+        method: "GET",
     });
 }
+

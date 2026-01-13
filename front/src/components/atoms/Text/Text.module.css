@@ -51,3 +51,25 @@
     font-weight: 500;
     color: var(--color-classic-red);
 }
+
+.imposter-banner__label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-classic-red);
+}
+.imposter-banner__text {
+    font-size: 0.95rem;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--color-classic-red);
+}
+
+.imposter-banner__text_ps {
+    font-size: 0.95rem;
+    font-style: italic;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--color-classic-red);
+}
