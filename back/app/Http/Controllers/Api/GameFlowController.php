@@ -33,13 +33,30 @@ class GameFlowController extends Controller
         // vérifier que le token correspond à un admin
 
         DB::transaction(function () use ($game) {
-            $players = $game->players()->get()->shuffle();
 
+            $players = $game->players()->get()->shuffle()->values();
+
+            // 1️⃣ Attribution des imposteurs (2 aléatoires)
+            $impostors = $players->take(2)->pluck('id')->toArray();
+
+            // 2️⃣ Définition des rôles fonctionnels
+            $roles = collect([
+                'communicant', //Impostor 1
+                'communicant',
+                'navigateur', //Impostor 2
+                'developpeur',
+                'cadreur',
+                'cadreur',
+            ])->shuffle()->values();
+
+            // 3️⃣ Attribution finale
             foreach ($players as $index => $player) {
-                $player->role = $index < 2 ? 'impostor' : 'crewmate';
+                $player->impostor = in_array($player->id, $impostors);
+                $player->role = $roles[$index];
                 $player->save();
             }
 
+            // 4️⃣ Démarrage de la partie
             $game->status = 'started';
             $game->started_at = now();
             $game->save();

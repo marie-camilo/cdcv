@@ -83,7 +83,8 @@ class PlayerController extends Controller
         }
 
         return response()->json([
-            'role' => $player->role
+            'role' => $player->role,
+            'impostor' => (bool) $player->impostor
         ]);
     }
 
