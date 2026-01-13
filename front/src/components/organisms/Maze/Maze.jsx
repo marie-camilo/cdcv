@@ -72,14 +72,14 @@ const generateRandomExits = () => {
       direction: 'NORD',
       type: 'VERTE',
       color: 'green',
-      command: 'cat /sys/kernel/security/access.log | grep VERTE'
+      command: 'TORVALDS' ///// CODE VERT
     },
     {
       x: MAZE_SIZE - 2, y: 12,
       direction: 'EST',
       type: 'VERTE',
       color: 'green',
-      command: 'grep "LIBERATION" /var/log/system.log'
+      command: 'REGISTRY' ///// CODE ROUGE
     },
     {
       x: 11, y: MAZE_SIZE - 2,
@@ -98,7 +98,13 @@ const generateRandomExits = () => {
   ];
 };
 
-const MINIMUM_MOVES = 30;
+const LIFE_PENALTIES = {
+  1: 2,      // 1ère vie perdue: -2 secondes
+  2: 30,     // 2ème vie perdue: -30 secondes
+  3: 120,    // 3ème vie perdue: -2 minutes (120 sec)
+  4: 300,    // 4ème vie perdue: -5 minutes (300 sec)
+  5: 'GAME_OVER' // 5ème vie perdue: Game Over
+};
 
 export default function Maze({
                                showSolution = false,
@@ -110,7 +116,8 @@ export default function Maze({
                                // NOUVELLES PROPS
                                onLivesChange = null,
                                onMoveCountChange = null,
-                               onReset = null
+                               onReset = null,
+                               resetTrigger = 0
                              }) {
   const [exits] = useState(generateRandomExits());
   const [startPos] = useState(generateRandomStartPos());
@@ -118,17 +125,28 @@ export default function Maze({
   const [hasReached, setHasReached] = useState({});
   const [mounted, setMounted] = useState(false);
 
-  const [lives, setLives] = useState(4);
+  const [lives, setLives] = useState(5);
   const [moveCount, setMoveCount] = useState(0);
   const [penaltyCount, setPenaltyCount] = useState(0);
   const [showPenalty, setShowPenalty] = useState(false);
   const [showLifeLost, setShowLifeLost] = useState(false);
-  const [exitCommand, setExitCommand] = useState(null);
+  const [exitCommands, setExitCommands] = useState([]); // Tableau de commandes au lieu d'une seule
+  const [gameOver, setGameOver] = useState(false);
 
   // Monter le composant côté client uniquement
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // NOUVEAU: Écouter le resetTrigger pour reset externe
+  useEffect(() => {
+    if (resetTrigger > 0) {
+      setCursorPos(startPos);
+      setMoveCount(0);
+      setHasReached({});
+      setExitCommands([]);
+    }
+  }, [resetTrigger, startPos]);
 
   // Remonter les changements de vies au parent
   useEffect(() => {
@@ -160,17 +178,13 @@ export default function Maze({
     }
   }, [showLifeLost]);
 
-  // Appliquer pénalité timer
-  const applyTimerPenalty = useCallback(async () => {
-    setShowPenalty(true);
+  // Appliquer pénalité timer selon la vie perdue
+  const applyTimerPenalty = useCallback(async (livesLost) => {
+    const penalty = LIFE_PENALTIES[livesLost];
 
-    setPenaltyCount(prev => {
-      const newPenaltyCount = prev + 1;
-      const totalPenalty = newPenaltyCount * 10;
-
-      if (onTimerPenalty) {
-        onTimerPenalty(totalPenalty);
-      }
+    if (penalty === 'GAME_OVER') {
+      setGameOver(true);
+      setShowPenalty(true);
 
       if (gameSessionId) {
         fetch('/api/timer/penalty', {
@@ -178,26 +192,47 @@ export default function Maze({
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             game_session_id: gameSessionId,
-            penalty_minutes: totalPenalty,
-            reason: 'lives_depleted'
+            penalty_seconds: 0,
+            reason: 'game_over',
+            game_over: true
           })
         })
             .then(response => response.json())
-            .then(data => console.log('Penalite appliquee:', data))
-            .catch(error => console.error('Erreur API penalite:', error));
+            .then(data => console.log('Game Over:', data))
+            .catch(error => console.error('Erreur API game over:', error));
       }
+      return;
+    }
 
-      return newPenaltyCount;
-    });
+    setShowPenalty(true);
 
-    setLives(1);
+    if (onTimerPenalty) {
+      onTimerPenalty(penalty);
+    }
+
+    if (gameSessionId) {
+      fetch('/api/timer/penalty', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          game_session_id: gameSessionId,
+          penalty_seconds: penalty,
+          reason: `life_${livesLost}_lost`
+        })
+      })
+          .then(response => response.json())
+          .then(data => console.log('Pénalité appliquée:', data))
+          .catch(error => console.error('Erreur API pénalité:', error));
+    }
   }, [onTimerPenalty, gameSessionId]);
 
-  // Reset position + coups
+  // Reset position + coups + vies
   const handleReset = () => {
     setCursorPos(startPos);
     setMoveCount(0);
     setHasReached({});
+    setLives(5);
+    setGameOver(false);
 
     if (onReset) {
       onReset();
@@ -207,12 +242,9 @@ export default function Maze({
   // Gestion des mouvements
   useEffect(() => {
     if (!isPlayable && !minimalMode) return;
+    if (gameOver) return; // Bloquer les mouvements si game over
 
     const handleKeyDown = (e) => {
-      if (moveCount >= MINIMUM_MOVES) {
-        return;
-      }
-
       let newPos = { ...cursorPos };
       let hasMoved = false;
 
@@ -239,9 +271,9 @@ export default function Maze({
         setLives(newLives);
         setShowLifeLost(true);
 
-        if (newLives <= 0) {
-          applyTimerPenalty();
-        }
+        // Calculer quelle vie a été perdue (1 = première, 2 = deuxième, etc.)
+        const livesLostCount = 5 - newLives;
+        applyTimerPenalty(livesLostCount);
 
         return;
       }
@@ -255,10 +287,12 @@ export default function Maze({
         setHasReached(prev => ({ ...prev, [reachedExit.direction]: true }));
 
         if (reachedExit.type === 'VERTE') {
-          setExitCommand({
+          // Ajouter cette commande au tableau des commandes trouvées
+          setExitCommands(prev => [...prev, {
             direction: reachedExit.direction,
             command: reachedExit.command
-          });
+          }]);
+          // Le joueur peut continuer à chercher l'autre sortie
         } else {
           setCursorPos(startPos);
           alert(`PIEGE (${reachedExit.direction}) - Vous etes teleporte au point de depart`);
@@ -268,7 +302,7 @@ export default function Maze({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [cursorPos, isPlayable, exits, hasReached, lives, minimalMode, startPos, moveCount, applyTimerPenalty]);
+  }, [cursorPos, isPlayable, exits, hasReached, lives, minimalMode, startPos, moveCount, applyTimerPenalty, gameOver]);
 
   // MODE MINIMAL (Team B)
   if (minimalMode) {
@@ -297,16 +331,17 @@ export default function Maze({
               ))}
             </div>
 
-            {/* Sorties flottantes (4 points rouges) */}
+            {/* Sorties identiques - carrés avec bordures rouges */}
             {mounted && exits.map((exit, idx) => (
                 <div
                     key={idx}
-                    className={styles.exitDot}
+                    className={styles.exitPortal}
                     style={{
                       left: `${((exit.x + 0.5) / MAZE_SIZE) * 100}%`,
                       top: `${((exit.y + 0.5) / MAZE_SIZE) * 100}%`
                     }}
-                />
+                >
+                </div>
             ))}
 
             {/* Le curseur du joueur (point cyan) */}
@@ -322,29 +357,40 @@ export default function Maze({
           </div>
 
           {/* Message de pénalité */}
-          {showPenalty && (
+          {showPenalty && !gameOver && (
               <div className={styles.penaltyMessage}>
-                0 VIE ! -{penaltyCount * 10} MINUTES
+                VIE PERDUE ! -{LIFE_PENALTIES[5 - lives]} SECONDES
+              </div>
+          )}
+
+          {/* Game Over */}
+          {gameOver && (
+              <div className={styles.gameOverMessage}>
+                GAME OVER - TOUTES VOS VIES ÉPUISÉES
               </div>
           )}
 
           {/* Notification -1 vie */}
-          {showLifeLost && lives > 0 && (
+          {showLifeLost && lives > 0 && !gameOver && (
               <div className={styles.lifeLostNotif}>
                 -1 VIE
               </div>
           )}
 
-          {/* Commande de sortie (si vraie sortie trouvée) */}
-          {exitCommand && (
-              <div className={styles.exitCommandDisplay}>
-                <div className={styles.exitCommandHeader}>
-                  SORTIE TROUVEE ({exitCommand.direction})
-                </div>
-                <div className={styles.exitCommandBody}>
-                  <div className={styles.exitCommandLabel}>Commande de liberation :</div>
-                  <div className={styles.exitCommandCode}>$ {exitCommand.command}</div>
-                </div>
+          {/* Commandes de sortie (toutes les vraies sorties trouvées) */}
+          {exitCommands.length > 0 && (
+              <div className={styles.exitCommandsContainer}>
+                {exitCommands.map((exitCmd, idx) => (
+                    <div key={idx} className={styles.exitCommandDisplay}>
+                      <div className={styles.exitCommandHeader}>
+                        SORTIE TROUVÉE ({exitCmd.direction})
+                      </div>
+                      <div className={styles.exitCommandBody}>
+                        <div className={styles.exitCommandLabel}>Commande de libération :</div>
+                        <div className={styles.exitCommandCode}>$ {exitCmd.command}</div>
+                      </div>
+                    </div>
+                ))}
               </div>
           )}
         </div>

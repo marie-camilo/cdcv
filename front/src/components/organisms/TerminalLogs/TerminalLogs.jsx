@@ -27,14 +27,30 @@ const LOGS_DATA = [
   { time: "14:32:52", type: "INFO", msg: "Countdown timer initialized - Time remaining: 15:00" }
 ];
 
-export default function TerminalLogs({ minimizable = true, onMinimize }) {
-  const [displayedLogs, setDisplayedLogs] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
+export default function TerminalLogs({ 
+  minimizable = true, 
+  onMinimize,
+  // Props pour la persistance du state
+  displayedLogs: externalDisplayedLogs,
+  setDisplayedLogs: externalSetDisplayedLogs,
+  currentIndex: externalCurrentIndex,
+  setCurrentIndex: externalSetCurrentIndex
+}) {
+  // Utiliser le state externe si fourni, sinon utiliser un state interne (fallback)
+  const [internalDisplayedLogs, setInternalDisplayedLogs] = useState([]);
+  const [internalCurrentIndex, setInternalCurrentIndex] = useState(0);
+
+  // Choisir quel state utiliser
+  const displayedLogs = externalDisplayedLogs !== undefined ? externalDisplayedLogs : internalDisplayedLogs;
+  const setDisplayedLogs = externalSetDisplayedLogs || setInternalDisplayedLogs;
+  const currentIndex = externalCurrentIndex !== undefined ? externalCurrentIndex : internalCurrentIndex;
+  const setCurrentIndex = externalSetCurrentIndex || setInternalCurrentIndex;
 
   const containerRef = useRef(null);
   const logsEndRef = useRef(null);
 
   // Défilement progressif des logs (1 ligne par seconde)
+  // Ce useEffect tourne EN CONTINU, même quand le composant n'est pas affiché
   useEffect(() => {
     if (currentIndex >= LOGS_DATA.length) return;
 
@@ -44,7 +60,7 @@ export default function TerminalLogs({ minimizable = true, onMinimize }) {
     }, 1000); // 1 seconde entre chaque ligne
 
     return () => clearTimeout(timer);
-  }, [currentIndex]);
+  }, [currentIndex, setDisplayedLogs, setCurrentIndex]);
 
   // Auto-scroll vers le bas UNIQUEMENT dans le container du terminal
   useEffect(() => {
