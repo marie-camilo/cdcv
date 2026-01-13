@@ -8,6 +8,7 @@ import TalkieButton from "@/app/(enigmes)/enigme-3/talkieButton";
 
 import { checkPlayerCookie, getCodeFromCookie } from "@/hooks/API/rules";
 import { getAudioMessages, getPlayerRole } from "@/hooks/API/gameRequests";
+import LoadingIndicator from "@/components/organisms/LoadingIndicator";
 
 export default function Enigme3Page() {
     const [logs, setLogs] = useState(["EN ATTENTE DE SIGNAL..."]);
@@ -15,6 +16,7 @@ export default function Enigme3Page() {
     const [myPlayerId, setMyPlayerId] = useState(null);
     const [gameCode, setGameCode] = useState(null);
     const [playerRole, setPlayerRole] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     const scrollRef = useRef(null);
     const pusherRef = useRef(null);
@@ -36,6 +38,8 @@ export default function Enigme3Page() {
             try {
                 const playerRes = await checkPlayerCookie();
                 const gameRes = await getCodeFromCookie();
+                const roleRes = await getPlayerRole();
+                setPlayerRole(roleRes?.role ?? null);
 
                 if (!playerRes?.authenticated || !playerRes?.player?.id || !gameRes?.game?.code) {
                     // tu peux router ailleurs si tu veux
@@ -65,10 +69,9 @@ export default function Enigme3Page() {
             } catch (e) {
                 console.error("Init enigme-3 error:", e);
                 addLog("ERREUR INITIALISATION");
+            } finally {
+                setIsLoading(false);
             }
-
-            const roleRes = await getPlayerRole();
-            setPlayerRole(roleRes?.role ?? null);
         };
 
         init();
@@ -142,6 +145,9 @@ export default function Enigme3Page() {
     };
 
     return (
+        <>
+        {isLoading && <LoadingIndicator fullscreen={true} />}
+
         <section
             className="min-h-[100dvh] w-full"
             style={{
@@ -200,8 +206,8 @@ export default function Enigme3Page() {
                                 </div>
 
                                 <span className="text-[9px] text-cyan-400 mt-1 font-mono uppercase opacity-70">
-              {formatTime(msg.createdAt)} • {isMine ? "ENVOYÉ" : "REÇU"}
-            </span>
+                                  {formatTime(msg.createdAt)} • {isMine ? "ENVOYÉ" : "REÇU"}
+                                </span>
                             </div>
                         );
                     })}
@@ -249,5 +255,6 @@ export default function Enigme3Page() {
                 </div>
             </div>
         </section>
+        </>
     );
 }
