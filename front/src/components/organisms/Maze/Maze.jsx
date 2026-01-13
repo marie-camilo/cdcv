@@ -36,7 +36,7 @@ const SOLUTION_PATH = [
   {x:15, y:10}, {x:15, y:11}, {x:15, y:12}
 ];
 
-// Génération d'une position de départ aléatoire au centre (INCHANGÉ)
+// Génération d'une position de départ aléatoire au centre
 const generateRandomStartPos = () => {
   const centerPossibleStarts = [];
   const centerStart = Math.floor(MAZE_SIZE * 0.35);
@@ -70,46 +70,47 @@ const generateRandomExits = () => {
     {
       x: 3, y: 1,
       direction: 'NORD',
-      type: 'VERTE',          // VRAIE SORTIE #1
+      type: 'VERTE',
       color: 'green',
       command: 'cat /sys/kernel/security/access.log | grep VERTE'
     },
     {
       x: MAZE_SIZE - 2, y: 12,
       direction: 'EST',
-      type: 'VERTE',          // VRAIE SORTIE #2
+      type: 'VERTE',
       color: 'green',
       command: 'grep "LIBERATION" /var/log/system.log'
     },
     {
       x: 11, y: MAZE_SIZE - 2,
       direction: 'SUD',
-      type: 'PIEGE',          // PIÈGE #1
+      type: 'PIEGE',
       color: 'red',
       command: 'rm -rf /tmp/*'
     },
     {
       x: 1, y: 5,
       direction: 'OUEST',
-      type: 'PIEGE',          // PIÈGE #2
+      type: 'PIEGE',
       color: 'red',
       command: 'cat /dev/null'
     }
   ];
 };
 
-// ============================================
-// Nombre de coups minimum pour labyrinthe 17x17
-// ============================================
-const MINIMUM_MOVES = 30; // Nombre minimum de coups pour atteindre les sorties
+const MINIMUM_MOVES = 30;
 
 export default function Maze({
                                showSolution = false,
                                isPlayable = true,
                                minimalMode = false,
-                               gameSessionId = null, // Pour API Laravel
-                               onTimerPenalty = null, // Callback quand pénalité appliquée
-                               onTerminalClick = null // Callback pour ouvrir le terminal (Team A)
+                               gameSessionId = null,
+                               onTimerPenalty = null,
+                               onTerminalClick = null,
+                               // NOUVELLES PROPS
+                               onLivesChange = null,
+                               onMoveCountChange = null,
+                               onReset = null
                              }) {
   const [exits] = useState(generateRandomExits());
   const [startPos] = useState(generateRandomStartPos());
@@ -117,20 +118,31 @@ export default function Maze({
   const [hasReached, setHasReached] = useState({});
   const [mounted, setMounted] = useState(false);
 
-  // ============================================
-  // NOUVEAUX STATES
-  // ============================================
-  const [lives, setLives] = useState(4); // 4 vies de départ
-  const [moveCount, setMoveCount] = useState(0); // Compteur de coups
-  const [penaltyCount, setPenaltyCount] = useState(0); // Nombre de fois qu'ils ont perdu toutes leurs vies
-  const [showPenalty, setShowPenalty] = useState(false); // Afficher l'effet de pénalité
-  const [showLifeLost, setShowLifeLost] = useState(false); // Notification -1 vie
-  const [exitCommand, setExitCommand] = useState(null); // Commande de sortie à afficher
+  const [lives, setLives] = useState(4);
+  const [moveCount, setMoveCount] = useState(0);
+  const [penaltyCount, setPenaltyCount] = useState(0);
+  const [showPenalty, setShowPenalty] = useState(false);
+  const [showLifeLost, setShowLifeLost] = useState(false);
+  const [exitCommand, setExitCommand] = useState(null);
 
   // Monter le composant côté client uniquement
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Remonter les changements de vies au parent
+  useEffect(() => {
+    if (onLivesChange) {
+      onLivesChange(lives);
+    }
+  }, [lives, onLivesChange]);
+
+  // Remonter les changements de coups au parent
+  useEffect(() => {
+    if (onMoveCountChange) {
+      onMoveCountChange(moveCount);
+    }
+  }, [moveCount, onMoveCountChange]);
 
   // Effet de pénalité visuel
   useEffect(() => {
@@ -148,26 +160,18 @@ export default function Maze({
     }
   }, [showLifeLost]);
 
-  // ============================================
-  // FONCTION : Appliquer pénalité timer
-  // ============================================
+  // Appliquer pénalité timer
   const applyTimerPenalty = useCallback(async () => {
-    // Effet visuel
     setShowPenalty(true);
 
-    // Incrémenter le compteur de pénalités
     setPenaltyCount(prev => {
       const newPenaltyCount = prev + 1;
-
-      // Calculer malus total stacké (10, 20, 30, 40...)
       const totalPenalty = newPenaltyCount * 10;
 
-      // Callback vers le parent
       if (onTimerPenalty) {
         onTimerPenalty(totalPenalty);
       }
 
-      // Appel API Laravel A MODIFIER
       if (gameSessionId) {
         fetch('/api/timer/penalty', {
           method: 'POST',
@@ -186,38 +190,32 @@ export default function Maze({
       return newPenaltyCount;
     });
 
-    // Redonner 1 vie après pénalité
     setLives(1);
   }, [onTimerPenalty, gameSessionId]);
 
-  // ============================================
-  // FONCTION : Reset position + coups
-  // ============================================
+  // Reset position + coups
   const handleReset = () => {
     setCursorPos(startPos);
     setMoveCount(0);
     setHasReached({});
-    // Les vies ne se reset PAS
+
+    if (onReset) {
+      onReset();
+    }
   };
 
-  // ============================================
-  // GESTION DES MOUVEMENTS
-  // ============================================
+  // Gestion des mouvements
   useEffect(() => {
     if (!isPlayable && !minimalMode) return;
 
     const handleKeyDown = (e) => {
-      // ============================================
-      // BLOQUER si nombre de mouvements dépassé
-      // ============================================
       if (moveCount >= MINIMUM_MOVES) {
-        return; // Ne plus permettre de bouger
+        return;
       }
 
       let newPos = { ...cursorPos };
       let hasMoved = false;
 
-      // Détection des touches
       if (e.key === 'z' || e.key === 'Z' || e.key === 'ArrowUp') {
         newPos.y = Math.max(0, cursorPos.y - 1);
         hasMoved = true;
@@ -234,48 +232,34 @@ export default function Maze({
 
       if (!hasMoved) return;
 
-      // ============================================
-      // Vérifier collision avec mur
-      // ============================================
       const isWall = MAZE_DATA[newPos.y][newPos.x] === 1;
 
       if (isWall) {
-        // Collision ! Perdre 1 vie
         const newLives = lives - 1;
         setLives(newLives);
-
-        // Notification -1 vie
         setShowLifeLost(true);
 
-        // Si 0 vie, appliquer pénalité
         if (newLives <= 0) {
           applyTimerPenalty();
         }
 
-        // Ne pas bouger le curseur
         return;
       }
 
-      // ============================================
-      // Mouvement valide : incrémenter compteur
-      // ============================================
       setCursorPos(newPos);
       setMoveCount(prev => prev + 1);
 
-      // Vérifier si sortie atteinte
       const reachedExit = exits.find(exit => exit.x === newPos.x && exit.y === newPos.y);
 
       if (reachedExit && !hasReached[reachedExit.direction]) {
         setHasReached(prev => ({ ...prev, [reachedExit.direction]: true }));
 
         if (reachedExit.type === 'VERTE') {
-          // Vraie sortie : afficher la commande sur la page
           setExitCommand({
             direction: reachedExit.direction,
             command: reachedExit.command
           });
         } else {
-          // Fausse sortie : respawn au point de départ
           setCursorPos(startPos);
           alert(`PIEGE (${reachedExit.direction}) - Vous etes teleporte au point de depart`);
         }
@@ -286,35 +270,10 @@ export default function Maze({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [cursorPos, isPlayable, exits, hasReached, lives, minimalMode, startPos, moveCount, applyTimerPenalty]);
 
-  // ============================================
   // MODE MINIMAL (Team B)
-  // ============================================
   if (minimalMode) {
     return (
         <div className={`${styles.minimalWrapper} ${showPenalty ? styles.penaltyActive : ''}`}>
-
-          {/* Top bar avec hearts, compteur et reset */}
-          <div className={styles.topBar}>
-            {/* Hearts à gauche */}
-            <div className={styles.heartsContainer}>
-              {[...Array(4)].map((_, i) => (
-                  <span key={i} className={i < lives ? styles.heartFull : styles.heartEmpty}>
-                ♥
-              </span>
-              ))}
-            </div>
-
-            {/* Groupe compteur + reset à droite */}
-            <div className={styles.rightGroup}>
-              <div className={styles.counterBox}>
-                {moveCount} / {MINIMUM_MOVES}
-              </div>
-              <button onClick={handleReset} className={styles.resetButton}>
-                ↻
-              </button>
-            </div>
-          </div>
-
           {/* Le labyrinthe */}
           <div className={styles.minimalContainer}>
             {/* Grillage uniforme en arrière-plan */}
@@ -325,7 +284,6 @@ export default function Maze({
                       const isWall = cell === 1;
                       const isBorderWall = (y === 0 || y === MAZE_SIZE - 1 || x === 0 || x === MAZE_SIZE - 1) && isWall;
 
-                      // Team B voit la grille uniforme + murs des bords
                       let cellClass = styles.mazeCellMinimal;
                       if (isBorderWall) {
                         cellClass += ` ${styles.borderWall}`;
@@ -393,23 +351,9 @@ export default function Maze({
     );
   }
 
-  // ============================================
   // MODE NORMAL (Team A)
-  // ============================================
   return (
       <div className={styles.mazeContainer}>
-
-        {/* Top bar avec seulement le compteur (centré à droite) */}
-        <div className={styles.topBar}>
-          {/* Espace vide à gauche */}
-          <div style={{flex: 1}}></div>
-
-          {/* Compteur à droite */}
-          <div className={styles.counterBox}>
-            {moveCount} / {MINIMUM_MOVES}
-          </div>
-        </div>
-
         <div className={styles.mazeGrid}>
           {MAZE_DATA.map((row, y) => (
               <div key={y} className={styles.mazeRow}>
@@ -421,7 +365,6 @@ export default function Maze({
 
                   let cellClass = styles.mazeCell;
                   if (isWall) {
-                    // Team A voit tous les murs
                     cellClass += ` ${styles.wall}`;
                   } else if (isSolution) {
                     cellClass += ` ${styles.solution}`;

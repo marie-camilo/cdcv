@@ -1,229 +1,25 @@
-/* ============================================ */
-/* Container principal */
-/* ============================================ */
+/* ==================== */
+/* MODE NORMAL (Team A) */
+/* ==================== */
+
 .mazeContainer {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  gap: 20px;
+  position: relative;
+  width: 544px;
+  height: 544px;
+  overflow: visible;
+  box-sizing: border-box;
 }
 
-/* ============================================ */
-/* Top bar horizontale avec hearts, compteur, reset */
-/* ============================================ */
-.topBar {
-  width: 100%;
-  max-width: 600px;
-  display: flex;
-  gap: 15px;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 15px;
-}
-
-/* Hearts à gauche */
-.heartsContainer {
-  background: transparent;
-  border: 3px solid var(--color-red-bright);
-  border-radius: 12px;
-  padding: 12px 20px;
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  height: 60px;
-}
-
-.heartFull {
-  font-size: 28px;
-  color: var(--color-red-bright);
-  animation: heartBeat 1.5s infinite;
-}
-
-.heartEmpty {
-  font-size: 28px;
-  color: rgba(255, 23, 68, 0.2);
-}
-
-@keyframes heartBeat {
-  0%, 100% { transform: scale(1); }
-  10% { transform: scale(1.1); }
-  20% { transform: scale(1); }
-}
-
-/* Groupe compteur + reset à droite */
-.rightGroup {
-  display: flex;
-  gap: 15px;
-  align-items: center;
-}
-
-/* Compteur */
-.counterBox {
-  background: var(--color-red-bright);
-  border: 3px solid var(--color-red-bright);
-  border-radius: 12px;
-  padding: 0 30px;
-  font-family: 'Courier New', monospace;
-  font-size: 22px;
-  color: #000;
-  font-weight: bold;
-  text-align: center;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 120px;
-}
-
-/* Reset button à droite */
-.resetButton {
-  background: transparent;
-  border: 3px solid var(--color-red-bright);
-  border-radius: 12px;
-  padding: 0;
-  font-size: 32px;
-  color: var(--color-red-bright);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  width: 60px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.resetButton:hover {
-  background: rgba(255, 23, 68, 0.2);
-  transform: rotate(180deg);
-}
-
-.resetButton:active {
-  transform: rotate(180deg) scale(0.9);
-}
-
-/* ============================================ */
-/* Bouton terminal pour Team A - style circulaire */
-/* ============================================ */
-.terminalButton {
-  background: transparent;
-  border: 3px solid var(--color-red-bright);
-  border-radius: 12px;
-  padding: 0;
-  font-size: 32px;
-  color: var(--color-red-bright);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  width: 60px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.terminalButton:hover {
-  background: rgba(255, 23, 68, 0.2);
-  transform: scale(1.05);
-}
-
-.terminalButton:active {
-  transform: scale(0.95);
-}
-
-/* ============================================ */
-/* Stats pour Team A */
-/* ============================================ */
-.statsContainer {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  justify-content: center;
-  width: 100%;
-  max-width: 600px;
-  margin-bottom: 10px;
-}
-
-.statBox {
-  background: transparent;
-  border: 2px solid #FF1744;
-  border-radius: 8px;
-  padding: 8px 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-  min-width: 120px;
-  height: 50px;
-  justify-content: center;
-}
-
-.statLabel {
-  font-family: 'Courier New', monospace;
-  font-size: 9px;
-  color: #FF1744;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.statValue {
-  font-family: 'Courier New', monospace;
-  font-size: 18px;
-  color: #FF1744;
-  font-weight: bold;
-}
-.statsContainer {
-  display: flex;
-  gap: 15px;
-  flex-wrap: wrap;
-  justify-content: center;
-  width: 100%;
-  max-width: 800px;
-  margin-bottom: 10px;
-}
-
-.statBox {
-  background: rgba(255, 48, 79, 0.1);
-  border: 2px solid #FF304F;
-  border-radius: 8px;
-  padding: 12px 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-  min-width: 120px;
-}
-
-.statLabel {
-  font-family: 'Courier New', monospace;
-  font-size: 11px;
-  color: #FF304F;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.statValue {
-  font-family: 'Courier New', monospace;
-  font-size: 24px;
-  color: #FF304F;
-  font-weight: bold;
-}
-
-/* ============================================ */
-/* Grid du labyrinthe - CARRÉ */
-/* ============================================ */
 .mazeGrid {
   display: flex;
   flex-direction: column;
   gap: 0;
-  background: #000;
+  background: transparent;
   padding: 0;
+  box-sizing: border-box;
+  width: 544px;
+  height: 544px;
   border: 2px solid var(--color-red-bright);
-  border-radius: 8px;
-  width: 100%;
-  max-width: 600px;
-  aspect-ratio: 1 / 1;
 }
 
 .mazeRow {
@@ -233,264 +29,67 @@
   width: 100%;
 }
 
-/* Cellule de base */
+
 .mazeCell {
   flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  border: 0.5px solid var(--color-red-bright);
+  border: 0.5px solid var(--color-red-accent);
+  background: var(--color-purple-darker);
+  box-sizing: border-box;
+  line-height: 0;
+  font-size: 0;
 }
 
-/* Cellule minimale (Team B) */
-.mazeCellMinimal {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  border: 0.5px solid var(--color-red-bright);
-  background: transparent;
-}
-
-/* Murs des bords pour Team B */
-.borderWall {
-  background: var(--color-purple-dark) !important;
-}
-
-/* Mur (pour Team A) */
 .wall {
-  background: var(--color-purple-dark);
+  background: var(--color-red-bright);
+  border: 1px solid #FFFFFF;
+  box-shadow: 0 0 8px var(--color-red-bright), inset 0 0 10px rgba(255, 48, 79, 0.6);
 }
 
-/* Chemin (pour Team A) */
-.mazeCell:not(.wall) {
-  background: #000;
-}
-
-/* Solution path (pour Team A avec showSolution) */
 .solution {
-  background: rgba(255, 48, 79, 0.3) !important;
-  box-shadow: 0 0 10px #FF304F;
+  background: rgba(0, 217, 255, 0.2);
 }
 
-/* Sortie (pour Team B) */
-.exit {
-  background: #FF304F !important;
-  animation: exitPulse 2s infinite;
-}
-
-@keyframes exitPulse {
-  0%, 100% {
-    box-shadow: 0 0 10px #FF304F;
-  }
-  50% {
-    box-shadow: 0 0 20px #FF304F;
-  }
-}
-
-.exitLabel {
-  font-size: 24px;
-  color: #fff;
-}
-
-/* Curseur (joueur) pour Team B */
-.cursor {
-  background: #00FFFF !important;
-  box-shadow: 0 0 15px #00FFFF;
-  animation: cursorPulse 1s infinite;
-}
-
-@keyframes cursorPulse {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.2);
-  }
-}
-
-.cursorLabel {
-  color: #fff;
-  font-size: 24px;
-  font-weight: bold;
-}
-
-/* ============================================ */
-/* CONTROLES (pour Team B) */
-/* ============================================ */
+/* ==================== */
+/* MODE MINIMAL (Team B) */
+/* ==================== */
 
 .minimalWrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  width: 100%;
-  padding: 20px;
-  transition: all 0.3s ease;
-}
-
-/* ============================================ */
-/* NOUVEAU : Effet de pénalité (filtre rouge + shake) */
-/* ============================================ */
-.penaltyActive {
-  animation: penaltyShake 0.5s ease-in-out, penaltyFlash 1.5s ease-in-out;
-}
-
-@keyframes penaltyShake {
-  0%, 100% { transform: translateX(0); }
-  10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
-  20%, 40%, 60%, 80% { transform: translateX(10px); }
-}
-
-@keyframes penaltyFlash {
-  0%, 100% { filter: none; }
-  50% { filter: brightness(0.5) sepia(1) hue-rotate(-50deg) saturate(5); }
-}
-
-/* ============================================ */
-/* NOUVEAU : Message de pénalité */
-/* ============================================ */
-.penaltyMessage {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(255, 0, 0, 0.95);
-  border: 4px solid #FF304F;
-  border-radius: 12px;
-  padding: 30px 50px;
-  font-family: 'Courier New', monospace;
-  font-size: 28px;
-  color: #fff;
-  font-weight: bold;
-  text-align: center;
-  z-index: 9999;
-  animation: penaltyPulse 0.3s ease-in-out infinite;
-  box-shadow: 0 0 50px rgba(255, 0, 0, 0.8);
-}
-
-@keyframes penaltyPulse {
-  0%, 100% { transform: translate(-50%, -50%) scale(1); }
-  50% { transform: translate(-50%, -50%) scale(1.1); }
-}
-
-/* ============================================ */
-/* NOUVEAU : Notification -1 vie */
-/* ============================================ */
-.lifeLostNotif {
-  position: fixed;
-  top: 20%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(255, 48, 79, 0.9);
-  border: 2px solid #FF304F;
-  border-radius: 8px;
-  padding: 15px 30px;
-  font-family: 'Courier New', monospace;
-  font-size: 20px;
-  color: #fff;
-  font-weight: bold;
-  z-index: 9998;
-  animation: lifeLostFade 1s ease-out;
-}
-
-@keyframes lifeLostFade {
-  0% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1.2);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -100px) scale(0.8);
-  }
-}
-
-/* ============================================ */
-/* NOUVEAU : Affichage commande de sortie */
-/* ============================================ */
-.exitCommandDisplay {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(0, 0, 0, 0.95);
-  border: 3px solid #00FFFF;
-  border-radius: 12px;
-  padding: 30px 40px;
-  min-width: 500px;
-  max-width: 80%;
-  z-index: 10000;
-  box-shadow: 0 0 50px rgba(0, 255, 255, 0.5);
-  animation: exitCommandAppear 0.5s ease-out;
-}
-
-@keyframes exitCommandAppear {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.8);
-  }
-  100% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
-}
-
-.exitCommandHeader {
-  font-family: 'Courier New', monospace;
-  font-size: 24px;
-  color: #00FFFF;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 20px;
-  padding-bottom: 15px;
-  border-bottom: 2px solid #00FFFF;
-}
-
-.exitCommandBody {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.exitCommandLabel {
-  font-family: 'Courier New', monospace;
-  font-size: 14px;
-  color: #00FFFF;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.exitCommandCode {
-  font-family: 'Courier New', monospace;
-  font-size: 18px;
-  color: #fff;
-  background: rgba(255, 48, 79, 0.2);
-  border: 1px solid #FF304F;
-  border-radius: 6px;
-  padding: 15px 20px;
-  word-break: break-all;
-}
-
-/* Container minimal pour Team B (grillage + points) */
-.minimalContainer {
-  width: 100%;
-  max-width: 600px;
-  aspect-ratio: 1 / 1;
-  margin: 0 auto;
-  border: 2px solid var(--color-red-bright);
-  border-radius: 8px;
   position: relative;
-  overflow: hidden;
-  background: #000;
+  width: 544px;
+  height: 544px;
+  overflow: visible;
+  box-sizing: border-box;
 }
 
-/* ============================================ */
-/* Points flottants (Team B uniquement) */
-/* ============================================ */
+.minimalContainer {
+  position: relative;
+  width: 544px;
+  height: 544px;
+  background: transparent;
+  border: 2px solid var(--color-red-bright);
+}
 
-/* Sortie (point rouge flottant) */
+
+.mazeCellMinimal {
+  flex: 1;
+  border: 0.5px solid var(--color-red-accent);
+  background: var(--color-purple-darker);
+  box-sizing: border-box;
+  line-height: 0;
+  font-size: 0;
+}
+
+.borderWall {
+  background: var(--color-red-bright);
+  border: 1px solid #FFFFFF;
+  box-shadow: 0 0 8px var(--color-red-bright), inset 0 0 10px rgba(255, 48, 79, 0.6);
+}
+
+
+/* ==================== */
+/* DOTS (Exits & Player) */
+/* ==================== */
+
 .exitDot {
   position: absolute;
   width: 20px;
@@ -499,43 +98,176 @@
   border-radius: 50%;
   transform: translate(-50%, -50%);
   box-shadow: 0 0 15px var(--color-red-bright);
-  animation: exitDotPulse 2s infinite;
   z-index: 10;
   pointer-events: none;
+  animation: exitDotPulse 2s infinite;
 }
 
 @keyframes exitDotPulse {
   0%, 100% {
-    box-shadow: 0 0 15px #FF304F;
+    box-shadow: 0 0 15px var(--color-red-bright);
     transform: translate(-50%, -50%) scale(1);
   }
   50% {
-    box-shadow: 0 0 25px #FF304F;
+    box-shadow: 0 0 25px var(--color-red-bright);
     transform: translate(-50%, -50%) scale(1.3);
   }
 }
 
-/* Joueur (point cyan flottant) */
 .playerDot {
   position: absolute;
   width: 24px;
   height: 24px;
-  background: #00FFFF;
+  background: var(--color-cyan-bright);
   border-radius: 50%;
   transform: translate(-50%, -50%);
-  box-shadow: 0 0 20px #00FFFF;
-  animation: playerDotPulse 1s infinite;
+  box-shadow: 0 0 20px var(--color-cyan-bright);
   z-index: 20;
   pointer-events: none;
+  transition: all 0.15s ease;
+  animation: playerDotPulse 1.5s infinite;
 }
 
 @keyframes playerDotPulse {
   0%, 100% {
-    box-shadow: 0 0 20px #00FFFF;
+    box-shadow: 0 0 20px var(--color-cyan-bright);
     transform: translate(-50%, -50%) scale(1);
   }
   50% {
-    box-shadow: 0 0 30px #00FFFF;
+    box-shadow: 0 0 30px var(--color-cyan-bright);
     transform: translate(-50%, -50%) scale(1.2);
   }
+}
+
+/* ==================== */
+/* PENALTY EFFECTS */
+/* ==================== */
+
+.penaltyActive {
+  animation: penaltyShake 0.5s ease;
+}
+
+@keyframes penaltyShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+
+.penaltyMessage {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--color-red-bright);
+  color: var(--color-beige);
+  padding: 24px 48px;
+  border-radius: 12px;
+  font-family: 'Courier New', monospace;
+  font-size: 32px;
+  font-weight: bold;
+  z-index: 1000;
+  box-shadow: 0 0 40px var(--color-red-bright);
+  animation: penaltyPulse 1.5s ease;
+}
+
+@keyframes penaltyPulse {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+    opacity: 1;
+  }
+}
+
+.lifeLostNotif {
+  position: fixed;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 23, 68, 0.95);
+  color: var(--color-beige);
+  padding: 16px 32px;
+  border-radius: 8px;
+  font-family: 'Courier New', monospace;
+  font-size: 24px;
+  font-weight: bold;
+  z-index: 999;
+  animation: lifeLostFade 1s ease;
+}
+
+@keyframes lifeLostFade {
+  0% {
+    transform: translate(-50%, -50%) translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) translateY(-20px);
+    opacity: 0;
+  }
+}
+
+/* ==================== */
+/* EXIT COMMAND DISPLAY */
+/* ==================== */
+
+.exitCommandDisplay {
+  position: fixed;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-purple-darker);
+  border: 3px solid var(--color-cyan-bright);
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 600px;
+  z-index: 1000;
+  box-shadow: 0 0 30px rgba(0, 217, 255, 0.4);
+  animation: exitCommandAppear 0.5s ease-out;
+}
+
+@keyframes exitCommandAppear {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+}
+
+.exitCommandHeader {
+  color: var(--color-cyan-bright);
+  font-family: 'Courier New', monospace;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.exitCommandBody {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.exitCommandLabel {
+  color: var(--color-beige);
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.exitCommandCode {
+  color: var(--color-cyan-bright);
+  font-family: 'Courier New', monospace;
+  font-size: 16px;
+  background: rgba(0, 217, 255, 0.1);
+  padding: 12px;
+  border-radius: 4px;
+  border-left: 4px solid var(--color-cyan-bright);
+  word-break: break-all;
 }

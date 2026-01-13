@@ -1,7 +1,6 @@
 @import "tailwindcss";
 
 :root {
-
     /* Team Verte */
     --color-dark: #193133;
     --color-medium: #347E84;
@@ -28,12 +27,21 @@
 }
 
 @theme inline {
-  --font-aeonik: "Aeonik", sans-serif;
-  --font-source: "Source Code Pro", monospace;
+    --font-aeonik: "Aeonik", sans-serif;
+    --font-source: "Source Code Pro", monospace;
 }
 
 * {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    width: 100%;
+    height: 100%;
 }
 
 body {
@@ -43,6 +51,8 @@ body {
     margin: 0;
     padding: 0;
     overflow-x: hidden;
+    width: 100%;
+    min-height: 100vh;
 }
 
 .layout-container {
@@ -51,9 +61,15 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
 }
 
 .layout-content {
-    padding: var(--space-md);
+    padding: 0;
     flex: 1;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
 }

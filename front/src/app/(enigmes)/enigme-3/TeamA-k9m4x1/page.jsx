@@ -1,46 +1,37 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
+import MazeLayoutWithLabels from '@/components/layouts/MazeLayoutWithLabels';
 import Maze from '@/components/organisms/Maze';
-import TerminalLogs from '@/components/organisms/TerminalLogs';
 import styles from './page.module.css';
 
 export default function TeamAPage() {
-    const [showLogs, setShowLogs] = useState(true);
+    const [lives, setLives] = useState(4);
+    const [moveCount, setMoveCount] = useState(0);
 
     useEffect(() => {
         document.title = "Énigme 3 - Équipe A | La Click";
     }, []);
 
+    const handleReset = () => {
+        // Reset géré par le composant Maze
+    };
+
     return (
-        <section className={styles.container}>
-            {/* Bouton pour réouvrir les logs (toujours présent) */}
-            {!showLogs && (
-                <button
-                    onClick={() => setShowLogs(true)}
-                    className={styles.reopenLogsButton}
-                >
-                    [+] Ouvrir Terminal
-                </button>
-            )}
+        <section className={styles.pageContainer}>
+            <div className={styles.mazeWrapper}>
 
-            {/* Les logs sont TOUJOURS montés (même quand cachés) */}
-            <div className={showLogs ? styles.fullscreenLogs : styles.hiddenLogs}>
-                <TerminalLogs
-                    minimizable={true}
-                    onMinimize={() => setShowLogs(false)}
-                />
-            </div>
-
-            {/* Le labyrinthe s'affiche quand les logs sont cachés */}
-            {!showLogs && (
-                <div className={styles.fullscreenMaze}>
+                {/* Maze avec labels */}
+                <MazeLayoutWithLabels>
                     <Maze
                         showSolution={false}
-                        isPlayable={false}
+                        isPlayable={true}
                         minimalMode={false}
+                        onLivesChange={setLives}
+                        onMoveCountChange={setMoveCount}
+                        onReset={handleReset}
                     />
-                </div>
-            )}
+                </MazeLayoutWithLabels>
+            </div>
         </section>
     );
 }
