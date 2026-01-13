@@ -223,7 +223,7 @@
   border: 3px solid var(--color-cyan-bright);
   border-radius: 12px;
   padding: 24px;
-  max-width: 600px;
+  width: 600px;
   z-index: 1000;
   box-shadow: 0 0 30px rgba(0, 217, 255, 0.4);
   animation: exitCommandAppear 0.5s ease-out;
