@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "tunnel": "npx ngrok http 3000"
   },
   "dependencies": {
     "clsx": "^2.1.1",
