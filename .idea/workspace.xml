@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="093ef52b-a12e-4b25-bd90-7fac44d39d4f" name="Changes" comment="(fix)[Laby]Btn Log">
+    <list default="true" id="093ef52b-a12e-4b25-bd90-7fac44d39d4f" name="Changes" comment="(fix)[Laby]Retours après beta test, modif des malus et apparence des sorties + ajout btn log">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/front/src/app/(enigmes)/enigme-3/TeamA-k9m4x1/page.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/front/src/app/(enigmes)/enigme-3/TeamA-k9m4x1/page.module.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/front/src/app/(enigmes)/enigme-3/TeamB-a7f3b2/page.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/front/src/app/(enigmes)/enigme-3/TeamB-a7f3b2/page.module.css" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/front/src/components/organisms/Maze/Maze.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/front/src/components/organisms/Maze/Maze.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/front/src/components/organisms/Maze/Maze.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/front/src/components/organisms/Maze/Maze.module.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/front/src/components/organisms/TerminalLogs/TerminalLogs.jsx" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -236,7 +231,15 @@
       <option name="project" value="LOCAL" />
       <updated>1768312736482</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="(fix)[Laby]Retours après beta test, modif des malus et apparence des sorties + ajout btn log">
+      <option name="closed" value="true" />
+      <created>1768320721325</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1768320721325</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -255,6 +258,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="(fix)[Laby]Btn Log" />
-    <option name="LAST_COMMIT_MESSAGE" value="(fix)[Laby]Btn Log" />
+    <MESSAGE value="(fix)[Laby]Retours après beta test, modif des malus et apparence des sorties + ajout btn log" />
+    <option name="LAST_COMMIT_MESSAGE" value="(fix)[Laby]Retours après beta test, modif des malus et apparence des sorties + ajout btn log" />
   </component>
 </project>

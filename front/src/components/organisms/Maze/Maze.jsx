@@ -72,14 +72,14 @@ const generateRandomExits = () => {
       direction: 'NORD',
       type: 'VERTE',
       color: 'green',
-      command: 'cat /sys/kernel/security/access.log | grep VERTE'
+      command: 'TORVALDS' ///// CODE VERT
     },
     {
       x: MAZE_SIZE - 2, y: 12,
       direction: 'EST',
       type: 'VERTE',
       color: 'green',
-      command: 'grep "LIBERATION" /var/log/system.log'
+      command: 'REGISTRY' ///// CODE ROUGE
     },
     {
       x: 11, y: MAZE_SIZE - 2,
@@ -130,7 +130,7 @@ export default function Maze({
   const [penaltyCount, setPenaltyCount] = useState(0);
   const [showPenalty, setShowPenalty] = useState(false);
   const [showLifeLost, setShowLifeLost] = useState(false);
-  const [exitCommand, setExitCommand] = useState(null);
+  const [exitCommands, setExitCommands] = useState([]); // Tableau de commandes au lieu d'une seule
   const [gameOver, setGameOver] = useState(false);
 
   // Monter le composant côté client uniquement
@@ -144,7 +144,7 @@ export default function Maze({
       setCursorPos(startPos);
       setMoveCount(0);
       setHasReached({});
-      setExitCommand(null);
+      setExitCommands([]);
     }
   }, [resetTrigger, startPos]);
 
@@ -287,10 +287,12 @@ export default function Maze({
         setHasReached(prev => ({ ...prev, [reachedExit.direction]: true }));
 
         if (reachedExit.type === 'VERTE') {
-          setExitCommand({
+          // Ajouter cette commande au tableau des commandes trouvées
+          setExitCommands(prev => [...prev, {
             direction: reachedExit.direction,
             command: reachedExit.command
-          });
+          }]);
+          // Le joueur peut continuer à chercher l'autre sortie
         } else {
           setCursorPos(startPos);
           alert(`PIEGE (${reachedExit.direction}) - Vous etes teleporte au point de depart`);
@@ -375,16 +377,20 @@ export default function Maze({
               </div>
           )}
 
-          {/* Commande de sortie (si vraie sortie trouvée) */}
-          {exitCommand && (
-              <div className={styles.exitCommandDisplay}>
-                <div className={styles.exitCommandHeader}>
-                  SORTIE TROUVEE ({exitCommand.direction})
-                </div>
-                <div className={styles.exitCommandBody}>
-                  <div className={styles.exitCommandLabel}>Commande de liberation :</div>
-                  <div className={styles.exitCommandCode}>$ {exitCommand.command}</div>
-                </div>
+          {/* Commandes de sortie (toutes les vraies sorties trouvées) */}
+          {exitCommands.length > 0 && (
+              <div className={styles.exitCommandsContainer}>
+                {exitCommands.map((exitCmd, idx) => (
+                    <div key={idx} className={styles.exitCommandDisplay}>
+                      <div className={styles.exitCommandHeader}>
+                        SORTIE TROUVÉE ({exitCmd.direction})
+                      </div>
+                      <div className={styles.exitCommandBody}>
+                        <div className={styles.exitCommandLabel}>Commande de libération :</div>
+                        <div className={styles.exitCommandCode}>$ {exitCmd.command}</div>
+                      </div>
+                    </div>
+                ))}
               </div>
           )}
         </div>
