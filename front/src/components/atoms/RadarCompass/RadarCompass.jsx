@@ -32,7 +32,7 @@ export default function RadarCompass({ targets, foundIds }) {
         if (event.webkitCompassHeading !== undefined && event.webkitCompassHeading !== null) {
             compass = event.webkitCompassHeading;
         }
-        else if (event.alpha !== null) {:
+        else if (event.alpha !== null) {
             compass = 360 - event.alpha;
         }
 
