@@ -31,4 +31,4 @@ export default function VictoryPopup({ isOpen, codeDigits, correctLockerSide, on
             </div>
         </div>
     );
-}
+} 
