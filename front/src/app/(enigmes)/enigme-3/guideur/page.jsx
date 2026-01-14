@@ -3,6 +3,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import MazeLayoutWithLabels from '@/components/layouts/MazeLayoutWithLabels';
 import Maze from '@/components/organisms/Maze';
 import styles from './page.module.css';
+import {checkPlayerCookie, getCodeFromCookie} from "@/hooks/API/rules";
+import {getAudioMessages, getPlayerRole} from "@/hooks/API/gameRequests";
+import {useRouter} from "next/navigation";
 
 // Logs à afficher progressivement
 const LOGS_DATA = [
@@ -39,6 +42,21 @@ export default function TeamAPage() {
 
     const containerRef = useRef(null);
     const logsEndRef = useRef(null);
+
+    const router = useRouter();
+
+    useEffect(() => {
+
+        const init = async () => {
+            if (!localStorage.getItem("page459")) {
+                localStorage.setItem('page459', 'guideur990');
+            } else if (localStorage.getItem("page459") !== 'guideur990') {
+                router.replace('/enigme-3/navigateur')
+            }
+        };
+
+        init();
+    }, []);
 
     useEffect(() => {
         document.title = "Énigme 3 - Équipe A | La Click";

@@ -3,12 +3,28 @@ import React, { useState, useEffect } from "react";
 import Maze from "@/components/organisms/Maze";
 import MazeLayoutWithLabels from "@/components/layouts/MazeLayoutWithLabels";
 import styles from "./page.module.css";
+import {useRouter} from "next/navigation";
 
 export default function TeamBPage() {
     const [lives, setLives] = useState(5);
     const [moveCount, setMoveCount] = useState(0);
     const [showWarning, setShowWarning] = useState(true);
     const [resetTrigger, setResetTrigger] = useState(0); // Trigger pour reset
+    const router = useRouter();
+
+    useEffect(() => {
+
+        const init = async () => {
+            if (!localStorage.getItem("page459")) {
+                localStorage.setItem('page459', 'navigateur394');
+            } else if (localStorage.getItem("page459") !== 'navigateur394') {
+                router.replace('/enigme-3/guideur')
+            }
+
+        };
+
+        init();
+    }, []);
 
     useEffect(() => {
         document.title = "Énigme 3 - Équipe B | La Click";
