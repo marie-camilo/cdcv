@@ -22,9 +22,13 @@ const GAME_ROUTES = [
     "/start",
     "/starting",
     "/role",
-    "/enigme-2",
     "/enigme-3/navigateur",
     "/enigme-3/guideur",
+    "/enigme-2/motus",
+    "/enigme-2/zip",
+    "/enigme-2/simon",
+    "/enigme-2/tuile",
+    "/enigme-2/fleche",
 ];
 
 export default function RootLayout({ children }) {

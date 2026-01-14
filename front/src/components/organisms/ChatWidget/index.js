@@ -6,19 +6,16 @@ import ChatMessage from "@/components/organisms/ChatWidget/ChatMessage";
 import ChatInput from "@/components/organisms/ChatWidget/ChatInput";
 
 export default function ChatWidget({ isOpen, onClose, playerName, playerRole }) {
-    // --- GESTION DU MONTAGE/DÉMONTAGE (Pour animation + suppression du DOM) ---
     const [shouldRender, setShouldRender] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
             setShouldRender(true);
         } else {
-            // On attend 300ms (durée de la transition) avant de retirer le composant du DOM
             const timer = setTimeout(() => setShouldRender(false), 300);
             return () => clearTimeout(timer);
         }
     }, [isOpen]);
-    // -------------------------------------------------------------------------
 
     // États du tchat
     const [activeChannel, setActiveChannel] = useState('general');
@@ -80,20 +77,16 @@ export default function ChatWidget({ isOpen, onClose, playerName, playerRole }) 
     const headerBg = activeChannel === 'saboteur' ? 'bg-red-500/10' : 'bg-[var(--color-light-green)]/10';
     const headerText = activeChannel === 'saboteur' ? 'text-red-500' : 'text-[var(--color-light-green)]';
     const dotColor = activeChannel === 'saboteur' ? 'bg-red-500' : 'bg-[var(--color-light-green)]';
-
-    // SI LE COMPOSANT NE DOIT PLUS ÊTRE LÀ, ON NE REND RIEN DU TOUT
     if (!shouldRender) return null;
 
     return (
         <>
-            {/* 1. OVERLAY */}
             <div
                 className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-[1190] transition-opacity duration-300 
                 ${isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
                 onClick={onClose}
             />
-
-            {/* 2. CONTENEUR DU WIDGET */}
+            
             <div className={`fixed bottom-0 right-0 md:bottom-4 md:right-4 w-full md:w-96 h-[80vh] md:h-[600px] z-[1200] flex flex-col pointer-events-none transition-all duration-300 transform 
                 ${isOpen ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}>
 
