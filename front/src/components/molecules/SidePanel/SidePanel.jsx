@@ -1,10 +1,10 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { IoClose, IoConstruct, IoPerson, IoInformationCircle } from "react-icons/io5"; // Ajout de IoInformationCircle
+import { IoClose, IoConstruct, IoPerson, IoInformationCircle } from "react-icons/io5";
 import { getPlayerRole } from "@/hooks/API/gameRequests";
 
-export default function SidePanel({ isOpen, onClose, onOpenRole }) { // Ajout de la prop onOpenRole
+export default function SidePanel({ isOpen, onClose, onOpenRole }) {
     const [codes, setCodes] = useState([]);
     const [isMounted, setIsMounted] = useState(false);
     const [roleLabel, setRoleLabel] = useState("CHARGEMENT...");
@@ -42,15 +42,13 @@ export default function SidePanel({ isOpen, onClose, onOpenRole }) { // Ajout de
 
     return (
         <>
-            {/* Overlay */}
             <div
-                className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-[1040] transition-opacity duration-300 ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+                className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-[2040] transition-opacity duration-300 ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
                 onClick={onClose}
             />
 
-            {/* Panel */}
             <aside
-                className={`fixed top-0 right-0 h-full w-80 bg-[var(--color-dark)] border-l-2 border-[var(--color-light-green)] z-[1050] transform transition-transform duration-300 ease-out p-6 flex flex-col ${isOpen ? "translate-x-0" : "translate-x-full"}`}
+                className={`fixed top-0 right-0 h-full w-80 bg-[var(--color-dark)] border-l-2 border-[var(--color-light-green)] z-[2050] transform transition-transform duration-300 ease-out p-6 flex flex-col ${isOpen ? "translate-x-0" : "translate-x-full"}`}
             >
                 {/* HEADER */}
                 <div className="flex justify-between items-center mb-6 border-b border-white/10 pb-4 shrink-0">
@@ -87,7 +85,7 @@ export default function SidePanel({ isOpen, onClose, onOpenRole }) { // Ajout de
 
                     {/* BOUTON ROLE INTERACTIF */}
                     <button
-                        onClick={onOpenRole} // Ouvre le modal via la fonction passée en prop
+                        onClick={onOpenRole}
                         className="group flex items-center justify-between gap-3 w-full px-4 py-3 bg-[var(--color-light-green)]/10 hover:bg-[var(--color-light-green)]/20 border border-[var(--color-light-green)] rounded transition-all duration-300"
                     >
                         <div className="flex items-center gap-3">
@@ -97,7 +95,6 @@ export default function SidePanel({ isOpen, onClose, onOpenRole }) { // Ajout de
                             </span>
                         </div>
 
-                        {/* L'icône Info est maintenant ici */}
                         <IoInformationCircle
                             size={20}
                             className="text-[var(--color-light-green)] opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all"
