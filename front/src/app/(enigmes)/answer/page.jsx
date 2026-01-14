@@ -13,8 +13,8 @@ export default function AnswerPage() {
         'FOYER': 'scan',
         'BETA5678': 'phone',
         'GAMMA9012': 'puzzle',
-        'OMEGA7890': 'folder',
-        'DELTA3456': 'chat',
+        'OMEGA7890': 'compass',
+        'DELTA3456': 'final',
     };
 
     const handleSubmit = (e) => {
