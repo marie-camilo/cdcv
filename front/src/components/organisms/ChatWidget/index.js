@@ -6,33 +6,46 @@ import ChatMessage from "@/components/organisms/ChatWidget/ChatMessage";
 import ChatInput from "@/components/organisms/ChatWidget/ChatInput";
 
 export default function ChatWidget({ isOpen, onClose, playerName, playerRole }) {
-    // États
+    // --- GESTION DU MONTAGE/DÉMONTAGE (Pour animation + suppression du DOM) ---
+    const [shouldRender, setShouldRender] = useState(false);
+
+    useEffect(() => {
+        if (isOpen) {
+            setShouldRender(true);
+        } else {
+            // On attend 300ms (durée de la transition) avant de retirer le composant du DOM
+            const timer = setTimeout(() => setShouldRender(false), 300);
+            return () => clearTimeout(timer);
+        }
+    }, [isOpen]);
+    // -------------------------------------------------------------------------
+
+    // États du tchat
     const [activeChannel, setActiveChannel] = useState('general');
     const [messages, setMessages] = useState([
-        { id: 1, sender: "System", text: "Connexion établie avec le QG des Chemises Vertes. Utilisez ce canal sécurisé pour solliciter une assistance tactique ou des indices en cas de blocage critique.", isSystem: true, channel: 'general' },
+        {
+            id: 1,
+            sender: "System",
+            text: "Connexion établie avec le QG des Chemises Vertes. Utilisez ce canal sécurisé pour solliciter une assistance tactique ou des indices en cas de blocage critique.",
+            isSystem: true,
+            channel: 'general'
+        },
         { id: 2, sender: "Admin", text: "En attente de rapport, Agent.", isUser: false, channel: 'general' },
     ]);
 
     const messagesEndRef = useRef(null);
-
-    // Vérifie si le joueur est un saboteur
     const isSaboteur = playerRole?.toLowerCase() === 'saboteur';
 
-    // Auto-scroll
     useEffect(() => {
         if (isOpen && messagesEndRef.current) {
             messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
         }
     }, [messages, isOpen, activeChannel]);
 
-    // Reset du canal si le rôle change
     useEffect(() => {
         if (!isSaboteur) setActiveChannel('general');
     }, [isSaboteur]);
 
-    // NOTE : On a retiré le "if (!isOpen) return null" pour permettre l'animation de fermeture
-
-    // Filtrage des messages
     const currentMessages = messages.filter(m => m.channel === activeChannel);
 
     const handleSend = (text) => {
@@ -68,14 +81,19 @@ export default function ChatWidget({ isOpen, onClose, playerName, playerRole }) 
     const headerText = activeChannel === 'saboteur' ? 'text-red-500' : 'text-[var(--color-light-green)]';
     const dotColor = activeChannel === 'saboteur' ? 'bg-red-500' : 'bg-[var(--color-light-green)]';
 
+    // SI LE COMPOSANT NE DOIT PLUS ÊTRE LÀ, ON NE REND RIEN DU TOUT
+    if (!shouldRender) return null;
+
     return (
         <>
+            {/* 1. OVERLAY */}
             <div
                 className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-[1190] transition-opacity duration-300 
                 ${isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
                 onClick={onClose}
             />
 
+            {/* 2. CONTENEUR DU WIDGET */}
             <div className={`fixed bottom-0 right-0 md:bottom-4 md:right-4 w-full md:w-96 h-[80vh] md:h-[600px] z-[1200] flex flex-col pointer-events-none transition-all duration-300 transform 
                 ${isOpen ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}>
 
@@ -84,8 +102,9 @@ export default function ChatWidget({ isOpen, onClose, playerName, playerRole }) 
                     {/* HEADER */}
                     <div className={`flex items-center justify-between p-3 border-b border-white/10 ${headerBg}`}>
                         <div className="flex items-center gap-2">
+                            <div className={`w-2 h-2 rounded-full animate-pulse ${dotColor}`} />
                             <span className={`font-mono font-bold text-sm tracking-widest uppercase ${headerText}`}>
-                                {activeChannel === 'saboteur' ? 'MESSAGERIE SABOTEUR' : 'MESSAGERIE'}
+                                {activeChannel === 'saboteur' ? 'CANAL ROUGE // RESTRICTED' : 'UPLINK // ADMIN'}
                             </span>
                         </div>
                         <button onClick={onClose} className="text-white/50 hover:text-white transition-colors">
