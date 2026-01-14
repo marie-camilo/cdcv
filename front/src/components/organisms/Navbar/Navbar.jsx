@@ -58,7 +58,7 @@ function RoleModal({ isOpen, onClose, roleName }) {
     };
 
     return (
-        <div className="fixed inset-0 z-[1100] flex items-center justify-center px-4">
+        <div className="fixed inset-0 z-[3000] flex items-center justify-center px-4">
             <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
             <div className="relative bg-[var(--color-dark)] border border-[var(--color-light-green)] w-full max-w-md p-6 shadow-[0_0_20px_rgba(0,255,0,0.1)]">
                 <button onClick={onClose} className="absolute top-4 right-4 text-white/50 hover:text-[var(--color-light-green)] transition-colors">
