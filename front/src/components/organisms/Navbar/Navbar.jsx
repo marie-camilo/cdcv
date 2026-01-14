@@ -4,12 +4,13 @@ import React, { useState, useEffect } from 'react';
 import styles from "./Navbar.module.css";
 import PixelBorder from "@/components/atoms/PixelBorder";
 import { HiOutlineMenuAlt3 } from "react-icons/hi";
-import { IoClose, IoHardwareChip, IoMap, IoScan, IoRadio } from "react-icons/io5";
+import { IoClose, IoHardwareChip, IoMap, IoScan, IoRadio, IoChatbubblesOutline } from "react-icons/io5";
 import { useTimer } from "@/app/context/TimerContext";
 import TimerDisplay from "@/components/atoms/TimerDisplay/TimerDisplay";
 import SidePanel from "@/components/molecules/SidePanel/SidePanel";
 import { checkPlayerCookie } from "@/hooks/API/rules";
 import { getPlayerRole } from "@/hooks/API/gameRequests";
+import ChatWidget from "@/components/organisms/ChatWidget";
 
 const ROLE_DESCRIPTIONS = {
     cadreur: {
@@ -36,6 +37,13 @@ const ROLE_DESCRIPTIONS = {
         equipement: "Les terminaux et claviers",
         info: "Analysez les énigmes et les lignes de code. Chaque détail compte.",
     },
+    // Ajout d'un fallback pour le saboteur au cas où il clique sur son rôle
+    saboteur: {
+        icon: <IoHardwareChip size={40} className="text-red-500" />,
+        mission: "Infiltrez l'équipe. Ralentissez la progression sans vous faire repérer.",
+        equipement: "Accès Canal Rouge",
+        info: "Agissez dans l'ombre. La confiance est votre meilleure couverture.",
+    }
 };
 
 function RoleModal({ isOpen, onClose, roleName }) {
@@ -43,23 +51,17 @@ function RoleModal({ isOpen, onClose, roleName }) {
 
     const roleKey = roleName?.toLowerCase();
     const roleData = ROLE_DESCRIPTIONS[roleKey] || {
-        mission: "Rôle non identifié dans la base de données.",
+        mission: "Rôle non identifié.",
         equipement: "Inconnu",
-        info: "Aucune donnée disponible.",
+        info: "Aucune donnée.",
         icon: <IoHardwareChip size={40} />
     };
 
     return (
         <div className="fixed inset-0 z-[1100] flex items-center justify-center px-4">
-            <div
-                className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-                onClick={onClose}
-            />
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
             <div className="relative bg-[var(--color-dark)] border border-[var(--color-light-green)] w-full max-w-md p-6 shadow-[0_0_20px_rgba(0,255,0,0.1)]">
-                <button
-                    onClick={onClose}
-                    className="absolute top-4 right-4 text-white/50 hover:text-[var(--color-light-green)] transition-colors"
-                >
+                <button onClick={onClose} className="absolute top-4 right-4 text-white/50 hover:text-[var(--color-light-green)] transition-colors">
                     <IoClose size={24} />
                 </button>
 
@@ -80,26 +82,17 @@ function RoleModal({ isOpen, onClose, roleName }) {
                         <h3 className="text-[var(--color-light-green)] text-xs uppercase tracking-wider mb-1">Mission Prioritaire</h3>
                         <p className="text-white/80 leading-relaxed">{roleData.mission}</p>
                     </div>
-
-                    <div className="grid grid-cols-1 gap-4 pt-2">
-                        <div className="bg-white/5 p-3 border-l-2 border-[var(--color-light-green)]">
-                            <h3 className="text-[var(--color-light-green)] text-xs uppercase tracking-wider mb-1">Équipement</h3>
-                            <p className="text-white font-bold">{roleData.equipement}</p>
-                        </div>
+                    <div className="bg-white/5 p-3 border-l-2 border-[var(--color-light-green)] mt-2">
+                        <h3 className="text-[var(--color-light-green)] text-xs uppercase tracking-wider mb-1">Équipement</h3>
+                        <p className="text-white font-bold">{roleData.equipement}</p>
                     </div>
-
-                    <div className="pt-2">
+                    <div className="pt-2 mt-2">
                         <h3 className="text-[var(--color-light-green)] text-xs uppercase tracking-wider mb-1">Instruction Tactique</h3>
-                        <p className="text-white/60 italic text-xs border-t border-white/10 pt-2">
-                            "{roleData.info}"
-                        </p>
+                        <p className="text-white/60 italic text-xs border-t border-white/10 pt-2">"{roleData.info}"</p>
                     </div>
                 </div>
 
-                <button
-                    onClick={onClose}
-                    className="w-full mt-6 py-3 bg-[var(--color-light-green)] text-black font-bold uppercase tracking-widest hover:bg-white transition-colors"
-                >
+                <button onClick={onClose} className="w-full mt-6 py-3 bg-[var(--color-light-green)] text-black font-bold uppercase tracking-widest hover:bg-white transition-colors">
                     Compris
                 </button>
             </div>
@@ -114,6 +107,7 @@ export default function Navbar() {
 
     const [isPanelOpen, setIsPanelOpen] = useState(false);
     const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
+    const [isChatOpen, setIsChatOpen] = useState(false);
 
     useEffect(() => {
         const initData = async () => {
@@ -126,6 +120,7 @@ export default function Navbar() {
                 const roleData = await getPlayerRole();
                 if (roleData?.role) {
                     setPlayerRole(roleData.role);
+                    // setPlayerRole("saboteur");
                 }
             } catch (err) {
                 console.error("Erreur chargement navbar:", err);
@@ -141,20 +136,12 @@ export default function Navbar() {
                 <PixelBorder>
                     <div className={styles.container}>
                         <div className={styles.left}>
-
                             <TimerDisplay className={styles.time} />
-
                             <div className="flex items-center gap-2 mt-1">
-                                <span className={styles.name}>
-                                    {playerName}
-                                </span>
-
-                                <span className="text-white/20 font-mono text-[10px]">
-                                    //
-                                </span>
-
+                                <span className={styles.name}>{playerName}</span>
+                                <span className="text-white/20 font-mono text-[10px]">//</span>
                                 {playerRole ? (
-                                    <span className="text-[9px] font-mono font-bold text-[var(--color-light-green)] tracking-wider uppercase">
+                                    <span className={`text-[9px] font-mono font-bold tracking-wider uppercase ${playerRole.toLowerCase() === 'saboteur' ? 'text-red-500' : 'text-[var(--color-light-green)]'}`}>
                                         {playerRole}
                                     </span>
                                 ) : (
@@ -165,13 +152,23 @@ export default function Navbar() {
                             </div>
                         </div>
 
-                        {/* BOUTON MENU */}
-                        <button
-                            className={styles.menuButton}
-                            onClick={() => setIsPanelOpen(true)}
-                        >
-                            <HiOutlineMenuAlt3 size={32} color="var(--color-white)" />
-                        </button>
+                        <div className="flex items-center gap-4 md:gap-6">
+                            <button
+                                onClick={() => setIsChatOpen(true)}
+                                className="relative group text-white hover:text-[var(--color-light-green)] transition-colors flex items-center justify-center"
+                                aria-label="Ouvrir le canal de communication"
+                            >
+                                <IoChatbubblesOutline size={26} />
+                                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-[var(--color-light-green)] rounded-full animate-pulse border border-black"></span>
+                            </button>
+
+                            <button
+                                className={styles.menuButton}
+                                onClick={() => setIsPanelOpen(true)}
+                            >
+                                <HiOutlineMenuAlt3 size={32} color="var(--color-white)" />
+                            </button>
+                        </div>
                     </div>
                 </PixelBorder>
             </nav>
@@ -186,6 +183,13 @@ export default function Navbar() {
                 isOpen={isRoleModalOpen}
                 onClose={() => setIsRoleModalOpen(false)}
                 roleName={playerRole}
+            />
+
+            <ChatWidget
+                isOpen={isChatOpen}
+                onClose={() => setIsChatOpen(false)}
+                playerName={playerName}
+                playerRole={playerRole}
             />
         </>
     );
