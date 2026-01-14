@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Game;
+use App\Models\Labyrinth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Events\GameStarting;
@@ -154,6 +155,29 @@ class GameFlowController extends Controller
                 'code' => $game->code,
                 'status' => $game->status,
             ],
+        ]);
+    }
+
+    public function postGameCodeForLabyrinth(string $code)
+    {
+        $labyrinth = Labyrinth::findOrFail(1);
+
+        $labyrinth->update([
+            'code' => $code
+        ]);
+
+        return response()->json([
+            'code' => $labyrinth->code
+        ]);
+    }
+
+    public function getGameCodeForLabyrinth()
+    {
+        $labyrinth = Labyrinth::findOrFail(1);
+
+
+        return response()->json([
+            'code' => $labyrinth->code
         ]);
     }
 }

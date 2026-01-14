@@ -59,6 +59,8 @@ Route::middleware('api.key')
         // reset des messages audio
         Route::delete('/audio/{code}', [AudioController::class, 'resetByCode']);
 
+        Route::post('/enigme3/{code}', [GameFlowController::class, 'postGameCodeForLabyrinth']);
+        Route::get('/enigme3/', [GameFlowController::class, 'getGameCodeForLabyrinth']);
     });
 
 
