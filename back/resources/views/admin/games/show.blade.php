@@ -243,7 +243,7 @@
 
                             <div class="flex items-center gap-2 shrink-0">
                                 <span style="color: color-mix(in srgb, var(--color-white), transparent 45%);">
-                                    <img src="{{ asset('icons/arrow_down.svg') }}"
+                                    <img src="{{ asset('back/public/icons/arrow_down.svg') }}"
                                          alt="Ouvrir"
                                          class="w-4 h-4"
                                          style="filter: brightness(0) invert(1);">

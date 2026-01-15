@@ -30,7 +30,7 @@
                        aria-label="Accéder à l'accueil"
                        title="Home"
                     >
-                        <img src="{{ asset('icons/home.svg') }}"
+                        <img src="{{ asset('back/public/icons/home.svg') }}"
                              alt="Chat"
                              class="w-5 h-5"
                              style="filter: brightness(0) invert(1);"
@@ -50,7 +50,7 @@
                        aria-label="Accéder aux parties"
                        title="Games"
                     >
-                        <img src="{{ asset('icons/tv-minimal-play.svg') }}"
+                        <img src="{{ asset('back/public/icons/tv-minimal-play.svg') }}"
                              alt="Chat"
                              class="w-5 h-5"
                              style="filter: brightness(0) invert(1);"
@@ -70,7 +70,7 @@
                                    aria-label="Accéder au chat"
                                    title="Chat"
                                 >
-                        <img src="{{ asset('icons/chat.svg') }}"
+                        <img src="{{ asset('back/public/icons/chat.svg') }}"
                              alt="Chat"
                              class="w-5 h-5"
                              style="filter: brightness(0) invert(1);"
