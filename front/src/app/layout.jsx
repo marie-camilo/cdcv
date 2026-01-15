@@ -1,6 +1,6 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
+import { usePathname } from 'next/navigation'; // Important
 import { Geist, Geist_Mono } from "next/font/google";
 import "@/styles/globals.css";
 import { TimerProvider } from "@/app/context/TimerContext";
@@ -18,23 +18,11 @@ const geistMono = Geist_Mono({
 });
 
 const GAME_ROUTES = [
-    "/lobby",
-    "/log",
-    "/start",
-    "/starting",
-    "/role",
-    "/enigme-3/navigateur",
-    "/enigme-3/guideur",
-    "/enigme-2/motus",
-    "/enigme-2/zip",
-    "/enigme-2/simon",
-    "/enigme-2/tuile",
-    "/enigme-2/fleche",
+    // ... tes routes ...
 ];
 
 export default function RootLayout({ children }) {
     const pathname = usePathname();
-    const pathSegments = pathname?.split('/').filter(Boolean);
 
     const isGamePage = GAME_ROUTES.some((route) => pathname?.startsWith(route));
 
@@ -46,8 +34,11 @@ export default function RootLayout({ children }) {
         </head>
         <body className="bg-[var(--color-dark)] text-white min-h-[100dvh] flex flex-col pb-[env(safe-area-inset-bottom)]">
         <TimerProvider>
-            <SplashScreen />
+
+            <SplashScreen key={pathname} />
+
             {!isGamePage && <Navbar />}
+
         </TimerProvider>
         <div className="flex-1 overflow-y-auto overflow-x-hidden">
             {children}

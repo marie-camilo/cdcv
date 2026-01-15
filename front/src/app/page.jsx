@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { RiDoorLockBoxLine, RiCellphoneFill, RiChat4Line, RiPuzzleLine, RiCameraLine, RiFolder6Line, RiLockLine } from 'react-icons/ri';
 import TypewriterTerminal from "@/components/molecules/TypewriterTerminal/TypewriterTerminal";
-import SplashScreen from "@/components/organisms/LoadingIndicator/SplashScreen";
 
 export default function WelcomePage() {
     const [unlockedApps, setUnlockedApps] = useState([]);
@@ -71,9 +70,6 @@ export default function WelcomePage() {
 
     return (
         <main className="flex flex-col md:max-w-md mx-auto min-h-screen">
-
-            {/* 3. Le Loader se lance à chaque visite sur cette page */}
-            <SplashScreen />
 
             <section className="flex flex-col h-full flex-1">
                 {/* Zone de texte avec scroll */}
