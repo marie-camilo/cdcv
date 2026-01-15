@@ -7,19 +7,19 @@ import RadarCompass from "@/components/atoms/RadarCompass/RadarCompass";
 import PuzzleGrid from "@/components/molecules/PuzzleGrid/PuzzleGrid";
 import QRScanner from "@/components/organisms/QRScanner/QRScanner";
 
-// 11 pièces au total éparpillées
 const ALL_PIECES_IN_ROOM = [
     { id: 1, angle: 0,   distance: 120, code: "882", type: "normal" },
     { id: 2, angle: 45,  distance: 90,  code: "194", type: "normal" },
     { id: 3, angle: 100, distance: 130, code: "771", type: "normal" },
-    { id: 4, angle: 150, distance: 100, code: "336", type: "normal" },
+    { id: 4, angle: 150, distance: 100, code: "331", type: "normal" },
     { id: 5, angle: 180, distance: 120, code: "529", type: "normal" },
     { id: 6, angle: 260, distance: 110, code: "404", type: "normal" },
     { id: 7, angle: 320, distance: 100, code: "117", type: "normal" },
-    { id: 101, angle: 25,  distance: 110, code: "661", type: "sabotaged" },
-    { id: 102, angle: 130, distance: 80,  code: "902", type: "sabotaged" },
-    { id: 103, angle: 210, distance: 135, code: "448", type: "sabotaged" },
-    { id: 104, angle: 290, distance: 125, code: "312", type: "sabotaged" },
+    { id: 7, angle: 320, distance: 100, code: "999", type: "normal" },
+    { id: 101, angle: 25,  distance: 110, code: "124", type: "sabotaged" },
+    { id: 102, angle: 130, distance: 80,  code: "937", type: "sabotaged" },
+    { id: 103, angle: 210, distance: 135, code: "224", type: "sabotaged" },
+    { id: 104, angle: 290, distance: 125, code: "638", type: "sabotaged" },
 ];
 
 const GRID_SLOTS = [
