@@ -109,7 +109,7 @@ export default function SidePanel({ isOpen, onClose, onOpenRole }) {
                     >
                         <IoConstruct size={20} className="text-white group-hover:text-[var(--color-light-green)] transition-colors" />
                         <span className="text-white font-mono text-sm font-bold tracking-wide group-hover:text-[var(--color-light-green)] transition-colors">
-                            BOÎTE À OUTILS
+                            PARE-FEU
                         </span>
                     </Link>
 
