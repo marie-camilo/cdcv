@@ -59,5 +59,5 @@ Route::prefix('admin')
 
         Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
         Route::get('/chat/{game}', [ChatController::class, 'show'])->name('chat.show');
-        Route::post('/chat/{game}', [ChatController::class, 'store'])->name('chat.store');
+        Route::post('/chat/{game}', [ChatController::class, 'storeAdmin'])->name('chat.store');
     });

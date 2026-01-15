@@ -31,7 +31,7 @@
                        title="Home"
                     >
                         <img src="{{ asset('back/public/icons/home.svg') }}"
-                             alt="Chat"
+                             alt="Home"
                              class="w-5 h-5"
                              style="filter: brightness(0) invert(1);"
                         >
@@ -51,7 +51,7 @@
                        title="Games"
                     >
                         <img src="{{ asset('back/public/icons/tv-minimal-play.svg') }}"
-                             alt="Chat"
+                             alt="Games"
                              class="w-5 h-5"
                              style="filter: brightness(0) invert(1);"
                         >

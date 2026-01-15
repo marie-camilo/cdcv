@@ -88,3 +88,33 @@ export async function validateGameStep(code) {
         method: "POST",
     });
 }
+
+export async function getChatMessages(gameId, channel = null) {
+    if (!gameId) throw new Error("gameId manquant");
+
+    const url = channel
+        ? `/api/v1/chat/${gameId}?channel=${encodeURIComponent(channel)}`
+        : `/api/v1/chat/${gameId}`;
+
+    return apiFetch(url, { method: "GET" });
+}
+
+export async function sendChatMessage(gameId, content) {
+    if (!gameId) throw new Error("gameId manquant");
+    if (!content || typeof content !== "string") throw new Error("Message invalide");
+
+    return apiFetch(`/api/v1/chat/${gameId}`, {
+        method: "POST",
+        body: JSON.stringify({ content }),
+    });
+}
+
+export async function sendImpostorChatMessage(gameId, content) {
+    if (!gameId) throw new Error("gameId manquant");
+    if (!content || typeof content !== "string") throw new Error("Message invalide");
+
+    return apiFetch(`/api/v1/chat/impostor/${gameId}`, {
+        method: "POST",
+        body: JSON.stringify({ content }),
+    });
+}

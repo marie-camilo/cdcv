@@ -4,7 +4,7 @@ export default function ChatMessage({ message }) {
     const { sender, text, isUser, isSystem, channel } = message;
 
     // Définition des couleurs selon le canal
-    const isSaboteurChannel = channel === 'saboteur';
+    const isSaboteurChannel = channel === 'impostor';
     const themeColor = isSaboteurChannel ? 'text-red-500 border-red-500' : 'text-[var(--color-light-green)] border-[var(--color-light-green)]';
     const bgColor = isSaboteurChannel ? 'bg-red-500/20' : 'bg-[var(--color-light-green)]/20';
 

@@ -14,9 +14,9 @@ export default function ChannelTabs({ activeChannel, onSwitch }) {
                 Général
             </button>
             <button
-                onClick={() => onSwitch('saboteur')}
+                onClick={() => onSwitch('impostor')}
                 className={`flex-1 py-2 text-[10px] font-mono font-bold uppercase tracking-widest transition-colors
-                    ${activeChannel === 'saboteur'
+                    ${activeChannel === 'impostor'
                     ? 'bg-red-500/20 text-red-500 border-b-2 border-red-500'
                     : 'text-white/30 hover:text-red-400 hover:bg-red-500/5'}
                 `}

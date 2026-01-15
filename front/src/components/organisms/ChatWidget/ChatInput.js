@@ -3,7 +3,7 @@ import { IoSend } from "react-icons/io5";
 
 export default function ChatInput({ onSend, channel }) {
     const [value, setValue] = useState("");
-    const isSaboteur = channel === 'saboteur';
+    const isSaboteur = channel === 'impostor';
 
     const handleSubmit = (e) => {
         e.preventDefault();

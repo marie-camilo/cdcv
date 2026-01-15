@@ -9,6 +9,7 @@ class ChatMessage extends Model
     protected $fillable = [
         'game_id',
         'sender',
+        'channel',
         'content',
     ];
 

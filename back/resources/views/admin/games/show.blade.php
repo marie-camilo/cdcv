@@ -50,8 +50,16 @@
                 border: 1px solid color-mix(in srgb, var(--color-medium), transparent 30%);
                 color: var(--color-white);
                 border-radius: var(--radius-md);
+                display: flex;
+                align-content: center;
            ">
-            ← Retour
+
+            <img src="{{ asset('icons/Arrow_alt_left_alt.svg') }}"
+                 alt="close_chat"
+                 class="w-5 h-5"
+                 style="filter: brightness(0) invert(1);"
+            >
+            Retour
         </a>
     </section>
 

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\EnigmeController;
+use App\Http\Controllers\Admin\ChatController;
 use App\Http\Controllers\Api\GameController;
 use App\Http\Controllers\Api\PlayerController;
 use App\Http\Controllers\Api\GameFlowController;
@@ -66,6 +67,10 @@ Route::middleware('api.key')
         // Route pour valider une étape de jeu
         Route::post('/game/{code}/validate-step', [GameFlowController::class, 'validateStep']);
         Route::post('/game/{code}/update-enigma', [GameFlowController::class, 'updateEnigmaState']);
+
+        Route::post('/chat/{game}', [ChatController::class, 'storePlayer']);
+        Route::post('/chat/impostor/{game}', [ChatController::class, 'storeImpostor']);
+        Route::get('/chat/{game}', [ChatController::class, 'getGameMessages']);
     });
 
 
