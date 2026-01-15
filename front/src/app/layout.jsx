@@ -1,6 +1,6 @@
 'use client';
 
-import { usePathname } from 'next/navigation'; // Important
+import { usePathname } from 'next/navigation';
 import { Geist, Geist_Mono } from "next/font/google";
 import "@/styles/globals.css";
 import { TimerProvider } from "@/app/context/TimerContext";
@@ -18,7 +18,18 @@ const geistMono = Geist_Mono({
 });
 
 const GAME_ROUTES = [
-    // ... tes routes ...
+    "/lobby",
+    "/log",
+    "/start",
+    "/starting",
+    "/role",
+    "/enigme-3/navigateur",
+    "/enigme-3/guideur",
+    "/enigme-2/motus",
+    "/enigme-2/zip",
+    "/enigme-2/simon",
+    "/enigme-2/tuile",
+    "/enigme-2/fleche",
 ];
 
 export default function RootLayout({ children }) {
