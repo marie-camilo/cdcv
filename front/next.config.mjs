@@ -6,6 +6,9 @@ const nextConfig = {
     assetPrefix: '',
     trailingSlash: true,
     output: 'export',
+    images: {
+        unoptimized: true,
+    },
     async rewrites() {
         return [
             {
