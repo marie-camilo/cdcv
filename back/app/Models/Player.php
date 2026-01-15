@@ -26,4 +26,14 @@ class Player extends Model
     {
         return $this->belongsTo(Game::class);
     }
+
+    public function scopeForGame($query, int $gameId)
+    {
+        return $query->where('game_id', $gameId);
+    }
+
+    public function canBeEdited(): bool
+    {
+        return $this->game?->status === 'waiting';
+    }
 }

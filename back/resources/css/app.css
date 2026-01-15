@@ -1,3 +1,81 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+    --color-dark: #193133;
+    --color-medium: #347E84;
+    --color-light-green: #D0FF71;
+    --color-lavender: #8F93FF;
+    --color-turquoise: #27EAA6;
+    --color-white: #EBFFF6;
+    --color-classic-red: #FF3333;
+
+    /* Team Rouge */
+    --color-purple-dark: #2B1B47;
+    --color-purple-darker: #1a0d2e;
+    --color-red-accent: #FF304F;
+    --color-red-bright: #FF1744;
+    --color-cyan-bright: #00D9FF;
+    --color-beige: #F5E6D3;
+
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+
+    --radius-sm: 4px;
+    --radius-md: 6px;
+}
+
+/* optionnel */
+@theme inline {
+    --font-aeonik: "Aeonik", sans-serif;
+    --font-source: "Source Code Pro", monospace;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+/* Fix pour iPhone - hauteur dynamique du viewport */
+@supports (height: 100dvh) {
+    html, body {
+        height: 100dvh;
+    }
+}
+
+html, body {
+    min-height: 100vh;
+    height: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+body {
+    background: var(--color-dark);
+    color: var(--color-white);
+    font-family: var(--font-source), serif;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    padding-bottom: env(safe-area-inset-bottom);
+    width: 100%;
+    min-height: 100vh;
+}
+
+.layout-container {
+    background-color: var(--color-dark);
+    color: var(--color-light-green);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.layout-content {
+    padding: var(--space-md);
+    flex: 1;
+}
+
+.flex-1 {
+    min-height: 0;
+}

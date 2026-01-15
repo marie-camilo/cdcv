@@ -4,33 +4,32 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Game;
+use App\Models\Labyrinth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Events\GameStarting;
 
 class GameFlowController extends Controller
 {
-    public function start(Request $request, string $code)
+    public function start(string $code)
     {
-//        $token = $request->cookie('game_token');
-//
-//        if (!$token) {
-//            return response()->json(['error' => 'UNAUTHORIZED'], 401);
-//        }
+        abort_unless(Auth::check() && Auth::user()->isAdmin(), 403);
 
         $game = Game::where('code', $code)->firstOrFail();
 
         // 🔒 Sécurité
         if ($game->status !== 'waiting') {
-            return response()->json(['error' => 'GAME_ALREADY_STARTED'], 403);
+            return redirect()
+                ->route('admin.games.show', $game)
+                ->with('error', "Impossible : la partie est déjà démarrée.");
         }
 
         if ($game->players()->count() !== 6) {
-            return response()->json(['error' => 'INVALID_PLAYER_COUNT'], 403);
+            return redirect()
+                ->route('admin.games.show', $game)
+                ->with('error', "Impossible : il faut exactement 6 joueurs.");
         }
-
-        // (Optionnel mais recommandé)
-        // vérifier que le token correspond à un admin
 
         DB::transaction(function () use ($game) {
 
@@ -63,22 +62,26 @@ class GameFlowController extends Controller
                 $player->save();
             }
 
+            $now = now();
+
             $game->status = 'started';
             $game->step = 1;
-            $game->started_at = now();
+            $game->started_at = $now;
+            $game->ending_at = $now->copy()->addHour();
+
             $game->save();
         });
-
 
         event(new GameStarting(
             $game->code,
             now()->timestamp
         ));
 
-        return response()->json([
-            'success' => true
-        ]);
+        return redirect()
+            ->route('admin.games.show', $game)
+            ->with('success', "Partie démarrée.");
     }
+
 
     public function state(string $code)
     {
@@ -154,6 +157,29 @@ class GameFlowController extends Controller
                 'code' => $game->code,
                 'status' => $game->status,
             ],
+        ]);
+    }
+
+    public function postGameCodeForLabyrinth(string $code)
+    {
+        $labyrinth = Labyrinth::findOrFail(1);
+
+        $labyrinth->update([
+            'code' => $code
+        ]);
+
+        return response()->json([
+            'code' => $labyrinth->code
+        ]);
+    }
+
+    public function getGameCodeForLabyrinth()
+    {
+        $labyrinth = Labyrinth::findOrFail(1);
+
+
+        return response()->json([
+            'code' => $labyrinth->code
         ]);
     }
 }

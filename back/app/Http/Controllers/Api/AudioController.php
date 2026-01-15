@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\Game;
 use App\Models\Player;
 use App\Models\AudioMessage;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class AudioController extends Controller
@@ -152,6 +153,8 @@ class AudioController extends Controller
 
     public function resetByCode(string $code)
     {
+        abort_unless(Auth::check() && Auth::user()->isAdmin(), 403);
+
         $game = Game::where('code', $code)->first();
 
         if (!$game) {
@@ -179,10 +182,8 @@ class AudioController extends Controller
             Storage::disk('public')->deleteDirectory($folderName);
         }
 
-        return response()->json([
-            'status' => 'success',
-            'deleted' => $messages->count(),
-            'game_code' => $game->code
-        ]);
+        return redirect()
+            ->route('admin.games.show', $game)
+            ->with('success', "Messages audios réinitialisés.");
     }
 }
