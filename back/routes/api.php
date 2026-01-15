@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\EnigmeController;
 use App\Http\Controllers\Api\GameController;
 use App\Http\Controllers\Api\PlayerController;
 use App\Http\Controllers\Api\GameFlowController;
@@ -61,6 +62,10 @@ Route::middleware('api.key')
 
         Route::post('/enigme3/{code}', [GameFlowController::class, 'postGameCodeForLabyrinth']);
         Route::get('/enigme3/', [GameFlowController::class, 'getGameCodeForLabyrinth']);
+
+        // Route pour valider une étape de jeu
+        Route::post('/game/{code}/validate-step', [GameFlowController::class, 'validateStep']);
+        Route::post('/game/{code}/update-enigma', [GameFlowController::class, 'updateEnigmaState']);
     });
 
 

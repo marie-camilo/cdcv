@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from 'next/navigation';
+import { apiFetch } from "@/hooks/API/fetchAPI"; // Import de l'utilitaire API
 
 const SnakeFinalMobile = () => {
     const router = useRouter();
@@ -26,6 +27,32 @@ const SnakeFinalMobile = () => {
     const foodRef = useRef({ x: 5, y: 5 });
     const dirRef = useRef({ x: 0, y: 0 });
     const gameLoopRef = useRef(null);
+
+    // Fonction pour synchroniser le résultat avec le groupe via Pusher
+    const handleWinSync = async (finalStatus) => {
+        const gameCode = localStorage.getItem('currentGameCode');
+
+        // 1. Sauvegarde locale pour persistance immédiate
+        if (locker && caseIndex !== null) {
+            const storageKey = `snake_${locker}_${caseIndex}`;
+            localStorage.setItem(storageKey, finalStatus);
+        }
+
+        // 2. Diffusion Pusher via Laravel
+        try {
+            await apiFetch(`/api/v1/game/${gameCode}/update-enigma`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    type: 'case_update',
+                    side: locker,
+                    index: parseInt(caseIndex),
+                    status: finalStatus
+                })
+            });
+        } catch (e) {
+            console.error("Erreur de synchronisation Snake:", e);
+        }
+    };
 
     const spawnFood = () => {
         let newFood;
@@ -88,16 +115,12 @@ const SnakeFinalMobile = () => {
 
                 if (newScore >= targetScore) {
                     setGameState("won");
-                    // Déterminer si c'est le bon ou mauvais casier
                     const isCorrectLocker = locker === CORRECT_LOCKER;
                     const isCorrectCase = caseIndex === CORRECT_CASE;
                     const result = isCorrectLocker && isCorrectCase ? 'success' : 'fail';
 
-                    // Sauvegarder le résultat du Snake
-                    if (locker && caseIndex !== null) {
-                        const storageKey = `snake_${locker}_${caseIndex}`;
-                        localStorage.setItem(storageKey, result);
-                    }
+                    // Synchronisation du résultat
+                    handleWinSync(result);
                     return;
                 }
                 spawnFood();
@@ -222,116 +245,22 @@ const SnakeFinalMobile = () => {
 };
 
 const styles = {
-    appContainer: {
-        position: "fixed",
-        inset: 0,
-        backgroundColor: "#1a0a0a",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        touchAction: "none",
-        fontFamily: "system-ui, -apple-system, sans-serif",
-    },
+    appContainer: { position: "fixed", inset: 0, backgroundColor: "#1a0a0a", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", touchAction: "none", fontFamily: "system-ui, -apple-system, sans-serif" },
     header: { marginBottom: "15px", textAlign: "center" },
-    mainTitle: {
-        color: "#ff3333",
-        margin: 0,
-        fontSize: "1.6rem",
-        letterSpacing: "1px",
-    },
+    mainTitle: { color: "#ff3333", margin: 0, fontSize: "1.6rem", letterSpacing: "1px" },
     scoreBoard: { color: "#ff9999", fontSize: "1.2rem", fontWeight: "bold" },
-    canvas: {
-        border: "3px solid #ff3333",
-        borderRadius: "12px",
-        background: "#000",
-        boxShadow: "0 0 20px rgba(255, 51, 51, 0.3)",
-    },
-    dpad: {
-        display: "grid",
-        gridTemplateColumns: "repeat(3, 80px)",
-        gridTemplateRows: "repeat(3, 80px)",
-        gap: "12px",
-        marginTop: "25px",
-    },
-    btn: {
-        backgroundColor: "#2a1010",
-        border: "2px solid #ff3333",
-        color: "#ff3333",
-        borderRadius: "20px",
-        fontSize: "1.8rem",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        WebkitTapHighlightColor: "transparent",
-        outline: "none",
-    },
-    overlay: {
-        position: "absolute",
-        inset: 0,
-        backgroundColor: "rgba(0,0,0,0.92)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 100,
-    },
-    modal: {
-        background: "#1a0a0a",
-        border: "3px solid #ff3333",
-        borderRadius: "25px",
-        padding: "30px",
-        textAlign: "center",
-        width: "85%",
-        color: "#fff",
-    },
+    canvas: { border: "3px solid #ff3333", borderRadius: "12px", background: "#000", boxShadow: "0 0 20px rgba(255, 51, 51, 0.3)" },
+    dpad: { display: "grid", gridTemplateColumns: "repeat(3, 80px)", gridTemplateRows: "repeat(3, 80px)", gap: "12px", marginTop: "25px" },
+    btn: { backgroundColor: "#2a1010", border: "2px solid #ff3333", color: "#ff3333", borderRadius: "20px", fontSize: "1.8rem", display: "flex", alignItems: "center", justifyContent: "center", WebkitTapHighlightColor: "transparent", outline: "none" },
+    overlay: { position: "absolute", inset: 0, backgroundColor: "rgba(0,0,0,0.92)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100 },
+    modal: { background: "#1a0a0a", border: "3px solid #ff3333", borderRadius: "25px", padding: "30px", textAlign: "center", width: "85%", color: "#fff" },
     winContent: { margin: "20px 0" },
-    resultBox: {
-        backgroundColor: "#0d0505",
-        border: "2px solid #ff3333",
-        borderRadius: "15px",
-        padding: "20px",
-        margin: "15px 0",
-    },
-    casierLabel: {
-        color: "#ff9999",
-        fontSize: "0.9rem",
-        letterSpacing: "2px",
-        marginBottom: "5px",
-    },
-    bigNumber: {
-        fontSize: "4.5rem",
-        fontWeight: "bold",
-        color: "#ff3333",
-        textShadow: "0 0 20px rgba(255, 51, 51, 0.6)",
-        margin: "10px 0",
-    },
-    colorIndicator: {
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: "10px",
-        marginTop: "15px",
-        color: "#00ff88",
-        fontSize: "0.9rem",
-        fontWeight: "bold",
-    },
-    colorDot: {
-        width: "20px",
-        height: "20px",
-        borderRadius: "50%",
-        backgroundColor: "#00ff88",
-        boxShadow: "0 0 15px rgba(0, 255, 136, 0.6)",
-    },
-    restartBtn: {
-        padding: "15px 35px",
-        backgroundColor: "#ff3333",
-        color: "#1a0a0a",
-        border: "none",
-        borderRadius: "12px",
-        fontWeight: "bold",
-        fontSize: "1.1rem",
-        cursor: "pointer",
-    },
+    resultBox: { backgroundColor: "#0d0505", border: "2px solid #ff3333", borderRadius: "15px", padding: "20px", margin: "15px 0" },
+    casierLabel: { color: "#ff9999", fontSize: "0.9rem", letterSpacing: "2px", marginBottom: "5px" },
+    bigNumber: { fontSize: "4.5rem", fontWeight: "bold", color: "#ff3333", textShadow: "0 0 20px rgba(255, 51, 51, 0.6)", margin: "10px 0" },
+    colorIndicator: { display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", marginTop: "15px", color: "#00ff88", fontSize: "0.9rem", fontWeight: "bold" },
+    colorDot: { width: "20px", height: "20px", borderRadius: "50%", backgroundColor: "#00ff88", boxShadow: "0 0 15px rgba(0, 255, 136, 0.6)" },
+    restartBtn: { padding: "15px 35px", backgroundColor: "#ff3333", color: "#1a0a0a", border: "none", borderRadius: "12px", fontWeight: "bold", fontSize: "1.1rem", cursor: "pointer" },
 };
 
 export default SnakeFinalMobile;

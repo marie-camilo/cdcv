@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from 'next/navigation';
+import { apiFetch } from "@/hooks/API/fetchAPI"; // Import de l'utilitaire de fetch
 
 const ZipCyberShielded = () => {
     const router = useRouter();
@@ -19,6 +20,26 @@ const ZipCyberShielded = () => {
     const directionRef = useRef(1);
     const posRef = useRef(0);
     const isLocked = useRef(false);
+
+    // Fonction de synchronisation pour mettre à jour les autres joueurs via Pusher
+    const syncDigit = async (digit, storageKey) => {
+        const gameCode = localStorage.getItem('currentGameCode');
+        localStorage.setItem(storageKey, digit);
+
+        try {
+            await apiFetch(`/api/v1/game/${gameCode}/update-enigma`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    type: 'digit_update',
+                    side: storageKey, // ex: 'zip_digit'
+                    index: 99, // Identifiant spécial pour les chiffres globaux
+                    status: digit
+                })
+            });
+        } catch (e) {
+            console.error("Erreur de synchronisation Pusher:", e);
+        }
+    };
 
     const resetSystem = () => {
         cancelAnimationFrame(requestRef.current);
@@ -75,8 +96,8 @@ const ZipCyberShielded = () => {
 
         if (barCenter >= targetStart && barCenter <= targetEnd) {
             if (score + 1 === targetCount) {
-                // Sauvegarder le chiffre
-                localStorage.setItem('zip_digit', '3');
+                // Synchronisation et sauvegarde
+                syncDigit('3', 'zip_digit');
                 setTimeout(() => setGameState("won"), 400);
             } else {
                 setTimeout(() => {
@@ -233,151 +254,26 @@ const ZipCyberShielded = () => {
 };
 
 const styles = {
-    container: {
-        position: "fixed",
-        inset: 0,
-        backgroundColor: "#050202",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        touchAction: "none",
-        fontFamily: '"Courier New", Courier, monospace',
-        overflow: "hidden",
-    },
-    infoBtn: {
-        position: "absolute",
-        top: "20px",
-        left: "20px",
-        width: "40px",
-        height: "40px",
-        borderRadius: "50%",
-        border: "1px solid #ff3333",
-        backgroundColor: "transparent",
-        color: "#ff3333",
-        fontSize: "20px",
-        zIndex: 110,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-    },
+    container: { position: "fixed", inset: 0, backgroundColor: "#050202", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", touchAction: "none", fontFamily: '"Courier New", Courier, monospace', overflow: "hidden" },
+    infoBtn: { position: "absolute", top: "20px", left: "20px", width: "40px", height: "40px", borderRadius: "50%", border: "1px solid #ff3333", backgroundColor: "transparent", color: "#ff3333", fontSize: "20px", zIndex: 110, display: "flex", alignItems: "center", justifyContent: "center" },
     header: { marginBottom: "80px", width: "85%", textAlign: "center" },
-    title: {
-        color: "#ff3333",
-        fontSize: "1.6rem",
-        letterSpacing: "6px",
-        margin: "0 0 15px 0",
-        fontWeight: "bold",
-    },
+    title: { color: "#ff3333", fontSize: "1.6rem", letterSpacing: "6px", margin: "0 0 15px 0", fontWeight: "bold" },
     statusBar: { width: "100%" },
-    levelIndicator: {
-        color: "#ff9999",
-        fontSize: "0.7rem",
-        marginBottom: "8px",
-        textAlign: "center",
-        letterSpacing: "1px",
-    },
-    progressTrack: {
-        height: "3px",
-        backgroundColor: "#331111",
-        borderRadius: "2px",
-    },
-    progressFill: {
-        height: "100%",
-        backgroundColor: "#ff3333",
-        boxShadow: "0 0 15px #ff3333",
-        transition: "width 0.3s ease",
-    },
-    gameArea: {
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        width: "100%",
-    },
-    track: {
-        position: "relative",
-        width: "300px",
-        height: "50px",
-        backgroundColor: "#000",
-        border: "1px solid #ff3333",
-        borderRadius: "4px",
-    },
-    targetZone: {
-        position: "absolute",
-        top: 0,
-        bottom: 0,
-        borderLeft: "1px solid #00ff88",
-        borderRight: "1px solid #00ff88",
-    },
-    movingBar: {
-        position: "absolute",
-        top: "2px",
-        bottom: "2px",
-        transition: "background-color 0.1s",
-    },
-    hintText: {
-        marginTop: "30px",
-        color: "#ff3333",
-        fontSize: "0.7rem",
-        letterSpacing: "3px",
-        fontWeight: "bold",
-        opacity: 0.5,
-    },
-    overlay: {
-        position: "absolute",
-        inset: 0,
-        backgroundColor: "rgba(0,0,0,0.98)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    modal: {
-        background: "#0a0505",
-        border: "1px solid #ff3333",
-        padding: "30px",
-        borderRadius: "4px",
-        textAlign: "center",
-        width: "85%",
-    },
-    cyberText: {
-        color: "#ff3333",
-        fontSize: "1.4rem",
-        marginBottom: "20px",
-        letterSpacing: "2px",
-    },
-    descText: {
-        color: "#ccc",
-        fontSize: "0.9rem",
-        marginBottom: "30px",
-        lineHeight: "1.6",
-    },
-    resultNum: {
-        fontSize: "6rem",
-        color: "#ff3333",
-        fontWeight: "bold",
-        textShadow: "0 0 30px #ff3333",
-        margin: "15px 0",
-    },
-    mainBtn: {
-        padding: "14px 30px",
-        backgroundColor: "#ff3333",
-        color: "#000",
-        border: "none",
-        borderRadius: "2px",
-        fontWeight: "bold",
-        fontSize: "0.9rem",
-        letterSpacing: "2px",
-        cursor: "pointer",
-    },
-    secondaryBtn: {
-        background: "none",
-        border: "1px solid #333",
-        color: "#555",
-        padding: "10px 20px",
-        borderRadius: "2px",
-        fontSize: "0.7rem",
-        marginTop: "10px",
-    },
+    levelIndicator: { color: "#ff9999", fontSize: "0.7rem", marginBottom: "8px", textAlign: "center", letterSpacing: "1px" },
+    progressTrack: { height: "3px", backgroundColor: "#331111", borderRadius: "2px" },
+    progressFill: { height: "100%", backgroundColor: "#ff3333", boxShadow: "0 0 15px #ff3333", transition: "width 0.3s ease" },
+    gameArea: { display: "flex", flexDirection: "column", alignItems: "center", width: "100%" },
+    track: { position: "relative", width: "300px", height: "50px", backgroundColor: "#000", border: "1px solid #ff3333", borderRadius: "4px" },
+    targetZone: { position: "absolute", top: 0, bottom: 0, borderLeft: "1px solid #00ff88", borderRight: "1px solid #00ff88" },
+    movingBar: { position: "absolute", top: "2px", bottom: "2px", transition: "background-color 0.1s" },
+    hintText: { marginTop: "30px", color: "#ff3333", fontSize: "0.7rem", letterSpacing: "3px", fontWeight: "bold", opacity: 0.5 },
+    overlay: { position: "absolute", inset: 0, backgroundColor: "rgba(0,0,0,0.98)", display: "flex", alignItems: "center", justifyContent: "center" },
+    modal: { background: "#0a0505", border: "1px solid #ff3333", padding: "30px", borderRadius: "4px", textAlign: "center", width: "85%" },
+    cyberText: { color: "#ff3333", fontSize: "1.4rem", marginBottom: "20px", letterSpacing: "2px" },
+    descText: { color: "#ccc", fontSize: "0.9rem", marginBottom: "30px", lineHeight: "1.6" },
+    resultNum: { fontSize: "6rem", color: "#ff3333", fontWeight: "bold", textShadow: "0 0 30px #ff3333", margin: "15px 0" },
+    mainBtn: { padding: "14px 30px", backgroundColor: "#ff3333", color: "#000", border: "none", borderRadius: "2px", fontWeight: "bold", fontSize: "0.9rem", letterSpacing: "2px", cursor: "pointer" },
+    secondaryBtn: { background: "none", border: "1px solid #333", color: "#555", padding: "10px 20px", borderRadius: "2px", fontSize: "0.7rem", marginTop: "10px" },
 };
 
 export default ZipCyberShielded;

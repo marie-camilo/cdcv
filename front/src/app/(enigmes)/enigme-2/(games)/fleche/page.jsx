@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from 'next/navigation';
+import { apiFetch } from "@/hooks/API/fetchAPI"; // Import de l'utilitaire API
 
 export default function ArrowMazeCyberStyle() {
     const router = useRouter();
@@ -12,17 +13,10 @@ export default function ArrowMazeCyberStyle() {
     const [showResult, setShowResult] = useState(false);
     const [result, setResult] = useState("");
 
-    // Récupérer le paramètre target (left ou right)
     const target = searchParams.get('target');
 
     const playerRef = useRef({
-        x: 30,
-        y: 300,
-        width: 22,
-        height: 22,
-        vx: 0,
-        vy: 0,
-        jumping: false,
+        x: 30, y: 300, width: 22, height: 22, vx: 0, vy: 0, jumping: false,
     });
     const controlsRef = useRef({ left: false, right: false, jump: false });
     const arrowsRef = useRef([]);
@@ -81,8 +75,7 @@ export default function ArrowMazeCyberStyle() {
             player.x += player.vx;
 
             if (player.x < 0) player.x = 0;
-            if (player.x + player.width > canvasWidth)
-                player.x = canvasWidth - player.width;
+            if (player.x + player.width > canvasWidth) player.x = canvasWidth - player.width;
 
             platformsRef.current.forEach((p) => {
                 if (
@@ -100,9 +93,7 @@ export default function ArrowMazeCyberStyle() {
             });
 
             if (player.y > canvasHeight) {
-                player.y = 350;
-                player.x = 30;
-                player.vy = 0;
+                player.y = 350; player.x = 30; player.vy = 0;
             }
 
             arrowsRef.current.forEach((arrow) => {
@@ -117,8 +108,7 @@ export default function ArrowMazeCyberStyle() {
                         const next = prev + 1;
                         if (next === arrowsRef.current.length) {
                             const finalL = arrow.dir === "left" ? leftArrows + 1 : leftArrows;
-                            const finalR =
-                                arrow.dir === "right" ? rightArrows + 1 : rightArrows;
+                            const finalR = arrow.dir === "right" ? rightArrows + 1 : rightArrows;
                             setResult(finalL > finalR ? "GAUCHE" : "DROITE");
                             setTimeout(() => setShowResult(true), 300);
                         }
@@ -129,32 +119,24 @@ export default function ArrowMazeCyberStyle() {
 
             ctx.fillStyle = "#0d0505";
             ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-
             ctx.fillStyle = "#00ff88";
-            platformsRef.current.forEach((p) => {
-                ctx.fillRect(p.x, p.y, p.width, p.height);
-            });
+            platformsRef.current.forEach((p) => { ctx.fillRect(p.x, p.y, p.width, p.height); });
 
             arrowsRef.current.forEach((a) => {
                 if (collectedRef.current.has(a.id)) return;
                 ctx.fillStyle = a.dir === "left" ? "#ff3333" : "#3366ff";
                 ctx.beginPath();
                 if (a.dir === "left") {
-                    ctx.moveTo(a.x + 8, a.y - 6);
-                    ctx.lineTo(a.x - 8, a.y);
-                    ctx.lineTo(a.x + 8, a.y + 6);
+                    ctx.moveTo(a.x + 8, a.y - 6); ctx.lineTo(a.x - 8, a.y); ctx.lineTo(a.x + 8, a.y + 6);
                 } else {
-                    ctx.moveTo(a.x - 8, a.y - 6);
-                    ctx.lineTo(a.x + 8, a.y);
-                    ctx.lineTo(a.x - 8, a.y + 6);
+                    ctx.moveTo(a.x - 8, a.y - 6); ctx.lineTo(a.x + 8, a.y); ctx.lineTo(a.x - 8, a.y + 6);
                 }
                 ctx.fill();
             });
 
             ctx.fillStyle = "#ff3333";
             ctx.fillRect(player.x, player.y, player.width, player.height);
-            ctx.strokeStyle = "#fff";
-            ctx.lineWidth = 1;
+            ctx.strokeStyle = "#fff"; ctx.lineWidth = 1;
             ctx.strokeRect(player.x, player.y, player.width, player.height);
 
             animationId = requestAnimationFrame(gameLoop);
@@ -164,11 +146,28 @@ export default function ArrowMazeCyberStyle() {
         return () => cancelAnimationFrame(animationId);
     }, [leftArrows, rightArrows, showResult]);
 
-    const handleReturn = () => {
-        // Sauvegarder le déverrouillage du casier
-        if (target) {
-            localStorage.setItem(`locker_${target}`, 'unlocked');
+    // Fonction de retour avec synchronisation Pusher
+    const handleReturn = async () => {
+        const gameCode = localStorage.getItem('currentGameCode');
+
+        // 1. Sauvegarde locale
+        if (target) localStorage.setItem(`locker_${target}`, 'unlocked');
+
+        // 2. Notification au serveur pour synchroniser le groupe
+        try {
+            await apiFetch(`/api/v1/game/${gameCode}/update-enigma`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    type: 'case_update',
+                    side: target,
+                    index: -1, // Indique le déverrouillage du cadenas global
+                    status: 'unlocked'
+                })
+            });
+        } catch (e) {
+            console.error("Erreur synchronisation labyrinthe:", e);
         }
+
         router.push('/enigme-2');
     };
 
@@ -178,47 +177,22 @@ export default function ArrowMazeCyberStyle() {
                 <h1 style={styles.title}>EXPLORATION MISSION</h1>
                 <div style={styles.statsRow}>
                     <div style={styles.arrowsIndicator}>
-                        <span style={{ color: "#ff3333", marginRight: "10px" }}>
-                            ← {leftArrows}
-                        </span>
+                        <span style={{ color: "#ff3333", marginRight: "10px" }}>← {leftArrows}</span>
                         <span style={{ color: "#3366ff" }}>→ {rightArrows}</span>
                     </div>
                 </div>
             </div>
 
             <div style={styles.canvasWrapper}>
-                <canvas
-                    ref={canvasRef}
-                    width={canvasWidth}
-                    height={canvasHeight}
-                    style={styles.canvas}
-                />
+                <canvas ref={canvasRef} width={canvasWidth} height={canvasHeight} style={styles.canvas} />
             </div>
 
             <div style={styles.controls}>
                 <div style={styles.dPad}>
-                    <button
-                        onTouchStart={() => (controlsRef.current.left = true)}
-                        onTouchEnd={() => (controlsRef.current.left = false)}
-                        style={styles.btnMove}
-                    >
-                        ◄
-                    </button>
-                    <button
-                        onTouchStart={() => (controlsRef.current.right = true)}
-                        onTouchEnd={() => (controlsRef.current.right = false)}
-                        style={styles.btnMove}
-                    >
-                        ►
-                    </button>
+                    <button onTouchStart={() => (controlsRef.current.left = true)} onTouchEnd={() => (controlsRef.current.left = false)} style={styles.btnMove}>◄</button>
+                    <button onTouchStart={() => (controlsRef.current.right = true)} onTouchEnd={() => (controlsRef.current.right = false)} style={styles.btnMove}>►</button>
                 </div>
-                <button
-                    onTouchStart={() => (controlsRef.current.jump = true)}
-                    onTouchEnd={() => (controlsRef.current.jump = false)}
-                    style={styles.btnJump}
-                >
-                    SAUT
-                </button>
+                <button onTouchStart={() => (controlsRef.current.jump = true)} onTouchEnd={() => (controlsRef.current.jump = false)} style={styles.btnJump}>SAUT</button>
             </div>
 
             {showResult && (
@@ -232,12 +206,7 @@ export default function ArrowMazeCyberStyle() {
                         <p style={styles.modalHint}>
                             Protocole de sécurité neutralisé. Le casier {target === 'left' ? 'GAUCHE' : 'DROITE'} est maintenant accessible.
                         </p>
-                        <button
-                            onClick={handleReturn}
-                            style={styles.restartBtn}
-                        >
-                            RETOUR AU TERMINAL
-                        </button>
+                        <button onClick={handleReturn} style={styles.restartBtn}>RETOUR AU TERMINAL</button>
                     </div>
                 </div>
             )}
@@ -246,138 +215,23 @@ export default function ArrowMazeCyberStyle() {
 }
 
 const styles = {
-    container: {
-        position: "fixed",
-        inset: 0,
-        backgroundColor: "#1a0a0a",
-        display: "flex",
-        flexDirection: "column",
-        touchAction: "none",
-        fontFamily: "sans-serif",
-    },
-    header: {
-        padding: "15px",
-        textAlign: "center",
-        borderBottom: "2px solid #ff3333",
-    },
-    title: {
-        color: "#ff3333",
-        margin: "0 0 5px",
-        fontSize: "1.2rem",
-        letterSpacing: "2px",
-        fontWeight: "bold",
-    },
-    statsRow: {
-        display: "flex",
-        justifyContent: "space-between",
-        fontSize: "0.9rem",
-        fontWeight: "bold",
-    },
-    arrowsIndicator: {
-        backgroundColor: "#2a1010",
-        padding: "2px 10px",
-        borderRadius: "5px",
-    },
-    canvasWrapper: {
-        flex: 1,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "#000",
-        padding: "10px",
-    },
-    canvas: {
-        border: "3px solid #ff3333",
-        borderRadius: "10px",
-        maxWidth: "100%",
-        maxHeight: "100%",
-    },
-    controls: {
-        height: "150px",
-        backgroundColor: "#1a0a0a",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        padding: "0 25px",
-        borderTop: "2px solid #ff3333",
-    },
+    container: { position: "fixed", inset: 0, backgroundColor: "#1a0a0a", display: "flex", flexDirection: "column", touchAction: "none", fontFamily: "sans-serif" },
+    header: { padding: "15px", textAlign: "center", borderBottom: "2px solid #ff3333" },
+    title: { color: "#ff3333", margin: "0 0 5px", fontSize: "1.2rem", letterSpacing: "2px", fontWeight: "bold" },
+    statsRow: { display: "flex", justifyContent: "space-between", fontSize: "0.9rem", fontWeight: "bold" },
+    arrowsIndicator: { backgroundColor: "#2a1010", padding: "2px 10px", borderRadius: "5px" },
+    canvasWrapper: { flex: 1, display: "flex", alignItems: "center", justifyItems: "center", backgroundColor: "#000", padding: "10px" },
+    canvas: { border: "3px solid #ff3333", borderRadius: "10px", maxWidth: "100%", maxHeight: "100%" },
+    controls: { height: "150px", backgroundColor: "#1a0a0a", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 25px", borderTop: "2px solid #ff3333" },
     dPad: { display: "flex", gap: "15px" },
-    btnMove: {
-        width: "70px",
-        height: "70px",
-        backgroundColor: "#2a1010",
-        border: "2px solid #ff3333",
-        color: "#ff3333",
-        borderRadius: "15px",
-        fontSize: "24px",
-        outline: "none",
-        WebkitTapHighlightColor: "transparent",
-    },
-    btnJump: {
-        width: "85px",
-        height: "85px",
-        backgroundColor: "#ff3333",
-        border: "none",
-        borderRadius: "50%",
-        color: "#000",
-        fontWeight: "bold",
-        fontSize: "14px",
-        boxShadow: "0 0 15px rgba(255,51,51,0.4)",
-        outline: "none",
-        WebkitTapHighlightColor: "transparent",
-    },
-    overlay: {
-        position: "absolute",
-        inset: 0,
-        backgroundColor: "rgba(0,0,0,0.9)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 100,
-        padding: "20px",
-    },
-    modal: {
-        background: "#1a0a0a",
-        border: "2px solid #ff3333",
-        borderRadius: "20px",
-        padding: "30px",
-        textAlign: "center",
-        width: "85%",
-    },
-    modalTitle: {
-        color: "#ff3333",
-        fontSize: "1.8rem",
-        margin: "0 0 20px",
-        fontWeight: "bold",
-    },
+    btnMove: { width: "70px", height: "70px", backgroundColor: "#2a1010", border: "2px solid #ff3333", color: "#ff3333", borderRadius: "15px", fontSize: "24px", outline: "none", WebkitTapHighlightColor: "transparent" },
+    btnJump: { width: "85px", height: "85px", backgroundColor: "#ff3333", border: "none", borderRadius: "50%", color: "#000", fontWeight: "bold", fontSize: "14px", boxShadow: "0 0 15px rgba(255,51,51,0.4)", outline: "none", WebkitTapHighlightColor: "transparent" },
+    overlay: { position: "absolute", inset: 0, backgroundColor: "rgba(0,0,0,0.9)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, padding: "20px" },
+    modal: { background: "#1a0a0a", border: "2px solid #ff3333", borderRadius: "20px", padding: "30px", textAlign: "center", width: "85%" },
+    modalTitle: { color: "#ff3333", fontSize: "1.8rem", margin: "0 0 20px", fontWeight: "bold" },
     resultContainer: { margin: "20px 0" },
-    resultLabel: { color: "#ff9999", fontSize: "0.8rem", letterSpacing: "1px" },
-    resultValue: {
-        color: "#ff3333",
-        fontSize: "3.5rem",
-        fontWeight: "bold",
-        textShadow: "0 0 15px rgba(255,51,51,0.5)",
-    },
-    hackIcon: {
-        fontSize: "5rem",
-        margin: "10px 0",
-    },
-    successMsg: {
-        color: "#00ff88",
-        fontSize: "1.8rem",
-        fontWeight: "bold",
-        letterSpacing: "3px",
-        textShadow: "0 0 20px rgba(0,255,136,0.5)",
-    },
+    hackIcon: { fontSize: "5rem", margin: "10px 0" },
+    successMsg: { color: "#00ff88", fontSize: "1.8rem", fontWeight: "bold", letterSpacing: "3px", textShadow: "0 0 20px rgba(0,255,136,0.5)" },
     modalHint: { color: "#fff", fontSize: "0.9rem", marginBottom: "25px" },
-    restartBtn: {
-        padding: "15px 30px",
-        background: "#ff3333",
-        color: "#000",
-        border: "none",
-        borderRadius: "10px",
-        fontWeight: "bold",
-        width: "100%",
-        fontSize: "1rem",
-    },
+    restartBtn: { padding: "15px 30px", background: "#ff3333", color: "#000", border: "none", borderRadius: "10px", fontWeight: "bold", width: "100%", fontSize: "1rem" },
 };

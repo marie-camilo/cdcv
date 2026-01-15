@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from 'next/navigation';
+import { apiFetch } from "@/hooks/API/fetchAPI"; // Import de l'utilitaire API
 
 const SimonFastCyber = () => {
     const router = useRouter();
@@ -17,6 +18,26 @@ const SimonFastCyber = () => {
 
     const SPEED_INTERVAL = 400;
     const LIGHT_DURATION = 350;
+
+    // Fonction de synchronisation pour mettre à jour les autres joueurs via Pusher
+    const syncDigit = async (digit, storageKey) => {
+        const gameCode = localStorage.getItem('currentGameCode');
+        localStorage.setItem(storageKey, digit);
+
+        try {
+            await apiFetch(`/api/v1/game/${gameCode}/update-enigma`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    type: 'digit_update',
+                    side: storageKey, // 'simon_digit'
+                    index: 99,
+                    status: digit
+                })
+            });
+        } catch (e) {
+            console.error("Erreur de synchronisation Simon:", e);
+        }
+    };
 
     const resetSystem = () => {
         if (intervalRef.current) clearInterval(intervalRef.current);
@@ -81,8 +102,10 @@ const SimonFastCyber = () => {
         if (newUserSequence.length === sequence.length) {
             if (sequence.length === targetLength) {
                 setGameState("solved");
-                // Sauvegarder le chiffre
-                localStorage.setItem('simon_digit', '8');
+
+                // Synchronisation et sauvegarde
+                syncDigit('8', 'simon_digit');
+
                 setTimeout(() => setGameState("won"), 1200);
             } else {
                 setIsDisplaying(true);
@@ -217,124 +240,25 @@ const SimonFastCyber = () => {
 };
 
 const styles = {
-    container: {
-        position: "fixed",
-        inset: 0,
-        backgroundColor: "#050202",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        touchAction: "none",
-        fontFamily: "sans-serif",
-    },
-    infoBtn: {
-        position: "absolute",
-        top: "20px",
-        left: "20px",
-        width: "35px",
-        height: "35px",
-        borderRadius: "50%",
-        border: "2px solid #ff3333",
-        backgroundColor: "transparent",
-        color: "#ff3333",
-        zIndex: 110,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontWeight: "bold",
-    },
+    container: { position: "fixed", inset: 0, backgroundColor: "#050202", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", touchAction: "none", fontFamily: "sans-serif" },
+    infoBtn: { position: "absolute", top: "20px", left: "20px", width: "35px", height: "35px", borderRadius: "50%", border: "2px solid #ff3333", backgroundColor: "transparent", color: "#ff3333", zIndex: 110, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold" },
     header: { marginBottom: "40px", width: "80%", textAlign: "center" },
-    title: {
-        color: "#ff3333",
-        fontSize: "1.4rem",
-        letterSpacing: "5px",
-        margin: "0 0 15px 0",
-        fontWeight: "900",
-    },
+    title: { color: "#ff3333", fontSize: "1.4rem", letterSpacing: "5px", margin: "0 0 15px 0", fontWeight: "900" },
     statusBar: { width: "100%" },
-    levelIndicator: {
-        color: "#ff3333",
-        fontSize: "0.7rem",
-        marginBottom: "8px",
-        textAlign: "center",
-    },
+    levelIndicator: { color: "#ff3333", fontSize: "0.7rem", marginBottom: "8px", textAlign: "center" },
     progressTrack: { height: "3px", backgroundColor: "#220000" },
-    progressFill: {
-        height: "100%",
-        backgroundColor: "#ff3333",
-        transition: "width 0.4s ease",
-    },
-    gameBoard: {
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr",
-        gap: "20px",
-        width: "300px",
-        height: "300px",
-    },
-    pad: {
-        borderRadius: "25px",
-        border: "none",
-        transition: "all 0.15s",
-        outline: "none",
-        WebkitTapHighlightColor: "transparent",
-    },
-    statusText: {
-        marginTop: "50px",
-        color: "#ff3333",
-        fontWeight: "bold",
-        fontSize: "0.8rem",
-        letterSpacing: "3px",
-    },
-    overlay: {
-        position: "absolute",
-        inset: 0,
-        backgroundColor: "rgba(0,0,0,0.96)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 100,
-    },
-    modal: {
-        background: "#0a0505",
-        border: "2px solid #ff3333",
-        padding: "30px",
-        borderRadius: "20px",
-        textAlign: "center",
-        width: "85%",
-    },
+    progressFill: { height: "100%", backgroundColor: "#ff3333", transition: "width 0.4s ease" },
+    gameBoard: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", width: "300px", height: "300px" },
+    pad: { borderRadius: "25px", border: "none", transition: "all 0.15s", outline: "none", WebkitTapHighlightColor: "transparent" },
+    statusText: { marginTop: "50px", color: "#ff3333", fontWeight: "bold", fontSize: "0.8rem", letterSpacing: "3px" },
+    overlay: { position: "absolute", inset: 0, backgroundColor: "rgba(0,0,0,0.96)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100 },
+    modal: { background: "#0a0505", border: "2px solid #ff3333", padding: "30px", borderRadius: "20px", textAlign: "center", width: "85%" },
     cyberText: { color: "#ff3333", fontSize: "1.4rem", marginBottom: "15px" },
     descText: { color: "#fff", fontSize: "0.9rem", marginBottom: "25px" },
-    resultNum: {
-        fontSize: "7rem",
-        color: "#ff3333",
-        fontWeight: "900",
-        textShadow: "0 0 30px #ff3333",
-        margin: "10px 0",
-    },
-    mainBtn: {
-        padding: "16px 40px",
-        backgroundColor: "#ff3333",
-        color: "#000",
-        border: "none",
-        borderRadius: "8px",
-        fontWeight: "bold",
-        letterSpacing: "2px",
-    },
-    secondaryBtn: {
-        background: "none",
-        border: "1px solid #333",
-        color: "#666",
-        padding: "10px 20px",
-        borderRadius: "8px",
-        fontSize: "0.8rem",
-    },
-    colorMap: {
-        green: { bg: "#00ff88", glow: "#00ff88" },
-        red: { bg: "#ff3333", glow: "#ff3333" },
-        yellow: { bg: "#ffcc00", glow: "#ffcc00" },
-        blue: { bg: "#3366ff", glow: "#3366ff" },
-    },
+    resultNum: { fontSize: "7rem", color: "#ff3333", fontWeight: "900", textShadow: "0 0 30px #ff3333", margin: "10px 0" },
+    mainBtn: { padding: "16px 40px", backgroundColor: "#ff3333", color: "#000", border: "none", borderRadius: "8px", fontWeight: "bold", letterSpacing: "2px" },
+    secondaryBtn: { background: "none", border: "1px solid #333", color: "#666", padding: "10px 20px", borderRadius: "8px", fontSize: "0.8rem" },
+    colorMap: { green: { bg: "#00ff88", glow: "#00ff88" }, red: { bg: "#ff3333", glow: "#ff3333" }, yellow: { bg: "#ffcc00", glow: "#ffcc00" }, blue: { bg: "#3366ff", glow: "#3366ff" } },
 };
 
 export default SimonFastCyber;

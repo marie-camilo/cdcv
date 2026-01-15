@@ -1,7 +1,8 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import Pusher from "pusher-js";
 import {
     RiDoorLockBoxLine,
     RiCellphoneFill,
@@ -11,11 +12,13 @@ import {
     RiTerminalBoxLine,
     RiLockLine,
     RiArrowRightLine,
-    RiInformationLine,
     RiErrorWarningLine
 } from 'react-icons/ri';
 import TypewriterTerminal from "@/components/molecules/TypewriterTerminal/TypewriterTerminal";
 import clsx from "clsx";
+
+import {getPlayerRole} from "@/hooks/API/gameRequests";
+import {checkPlayerCookie, getCodeFromCookie} from "@/hooks/API/rules";
 
 const TOOLS_DATA = {
     console: {
@@ -166,44 +169,110 @@ const AppIcon = ({ id, unlockedApps, seenApps, onOpen }) => {
                     <tool.fallbackIcon className={clsx("text-4xl", tool.color)} />
                 )}
             </div>
-
-            {shouldPulse && (
-                <div className="absolute top-2 right-2 w-3 h-3 bg-red-500 rounded-full animate-pulse border-2 border-black z-20 shadow-[0_0_8px_red]" />
-            )}
-
-            {!shouldPulse && (
-                <div className="absolute -top-2 -right-2 bg-green-900/80 text-green-400 border border-green-700 text-[10px] rounded-full w-5 h-5 flex items-center justify-center shadow-sm">✓</div>
-            )}
-
-            <div className={`absolute bottom-2 text-[8px] font-mono font-bold tracking-tighter uppercase opacity-60 ${tool.color}`}>
-                {id}
-            </div>
+            {shouldPulse && <div className="absolute top-2 right-2 w-3 h-3 bg-red-500 rounded-full animate-pulse border-2 border-black z-20 shadow-[0_0_8px_red]" />}
+            {!shouldPulse && <div className="absolute -top-2 -right-2 bg-green-900/80 text-green-400 border border-green-700 text-[10px] rounded-full w-5 h-5 flex items-center justify-center shadow-sm">✓</div>}
+            <div className={`absolute bottom-2 text-[8px] font-mono font-bold tracking-tighter uppercase opacity-60 ${tool.color}`}>{id}</div>
         </button>
     );
 };
 
 export default function InfiltrationHub() {
     const router = useRouter();
+    const pusherRef = useRef(null);
+
     const [unlockedApps, setUnlockedApps] = useState([]);
     const [seenApps, setSeenApps] = useState([]);
     const [userRole, setUserRole] = useState(null);
     const [selectedTool, setSelectedTool] = useState(null);
     const [startTyping, setStartTyping] = useState(false);
+    const [code, setCode] = useState(null);
+    const [authorized, setAuthorized] = useState(false);
 
+    // ✅ 1) LOGIQUE DE GARDE / SESSION
     useEffect(() => {
-        const role = localStorage.getItem('userRole') || 'inconnu';
-        const storedApps = JSON.parse(localStorage.getItem('unlockedApps') || '[]');
-        const storedSeen = JSON.parse(localStorage.getItem('seenApps') || '[]');
+        const init = async () => {
+            try {
+                const player = await checkPlayerCookie();
+                const game = await getCodeFromCookie();
 
-        setUserRole(role);
-        setSeenApps(storedSeen);
-        setUnlockedApps(storedApps);
+                if (!player.authenticated || !game?.game?.code) {
+                    router.replace("/log");
+                    return;
+                }
 
-        setTimeout(() => setStartTyping(true), 1500);
+                const roleRes = await getPlayerRole();
+                setUserRole(roleRes?.role?.toLowerCase() || localStorage.getItem('userRole'));
+
+                // ✅ Chargement initial depuis localStorage
+                const storedUnlocked = JSON.parse(localStorage.getItem('unlockedApps') || '[]');
+                const storedSeen = JSON.parse(localStorage.getItem('seenApps') || '[]');
+
+                setUnlockedApps(storedUnlocked);
+                setSeenApps(storedSeen);
+
+                setCode(game.game.code);
+                setAuthorized(true);
+            } catch (e) {
+                console.error("Erreur initialisation:", e);
+                router.replace("/");
+            }
+        };
+        init();
+    }, [router]);
+
+    // ✅ 2) LOGIQUE PUSHER - Synchronisation temps réel
+    useEffect(() => {
+        if (!authorized || !code || pusherRef.current) return;
+
+        const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_APP_KEY, {
+            cluster: "eu",
+            forceTLS: true,
+        });
+
+        pusherRef.current = pusher;
+        const channel = pusher.subscribe(`game.${code}`);
+
+        // 🔥 ÉCOUTE DU DÉBLOCAGE D'APPLICATIONS
+        channel.bind('AppUnlocked', (data) => {
+            console.log("🔓 NOUVEL OUTIL DÉBLOQUÉ:", data.appId);
+
+            setUnlockedApps((prev) => {
+                // Protection anti-doublon
+                if (!prev.includes(data.appId)) {
+                    const newApps = [...prev, data.appId];
+                    localStorage.setItem('unlockedApps', JSON.stringify(newApps));
+                    console.log("✅ Apps débloquées:", newApps);
+                    return newApps;
+                }
+                return prev;
+            });
+
+            // ✅ Retirer l'app de "seenApps" pour qu'elle pulse
+            setSeenApps((prev) => {
+                const filtered = prev.filter(id => id !== data.appId);
+                localStorage.setItem('seenApps', JSON.stringify(filtered));
+                return filtered;
+            });
+        });
+
+        return () => {
+            channel.unbind_all();
+            pusher.unsubscribe(`game.${code}`);
+            pusher.disconnect();
+            pusherRef.current = null;
+        };
+    }, [authorized, code]);
+
+    // ✅ 3) TIMER TERMINAL
+    useEffect(() => {
+        const typingTimer = setTimeout(() => setStartTyping(true), 1000);
+        return () => clearTimeout(typingTimer);
     }, []);
 
     const handleOpenTool = (id) => {
         setSelectedTool(TOOLS_DATA[id]);
+
+        // Marquer comme vu pour arrêter le pulse
         if (!seenApps.includes(id)) {
             const newSeen = [...seenApps, id];
             setSeenApps(newSeen);
@@ -221,16 +290,14 @@ export default function InfiltrationHub() {
         "> Cliquez dessus pour l'activer et voir ce qu'il contient.",
         "> Attention, les Chemises Rouges ont blindé la sécurité :",
         "> Chaque outil ne répond qu'à un profil précis",
-        "> Si l'accès est refusé, laissez faire l'agent avec le bon rôle : Cadreur, Navigateur, Communicant...",
-        "> On n'a pas beaucoup de temps, ils finiront par me repérer.",
-        "> Ma chemise compte sur vous !",
+        "> Si l'accès est refusé, laissez faire l'agent avec le bon rôle.",
         "> — M. JACQUOT",
     ];
 
     const isRoleMismatch = selectedTool && selectedTool.roleKey !== 'all' && selectedTool.roleKey !== userRole;
 
     return (
-        <main className="flex flex-col md:max-w-md mx-auto min-h-screen bg-[var(--color-dark)]">
+        <main className="flex flex-col md:max-w-md mx-auto min-h-screen bg-[var(--color-dark)] pt-12">
             {selectedTool && (
                 <DidacticModal
                     tool={selectedTool}
@@ -241,21 +308,15 @@ export default function InfiltrationHub() {
             )}
 
             <section className="flex flex-col h-full flex-1">
-                <article className="text-[var(--color-light-green)] py-4 px-4 font-mono text-xs overflow-y-auto flex-shrink-0 max-h-[30vh] border-b border-[var(--color-light-green)]/30 bg-black/40 backdrop-blur-sm">
-                    <div className="flex flex-col gap-1 mt-5">
+                <article className="text-[var(--color-light-green)] py-4 px-4 font-mono text-xs overflow-y-auto flex-shrink-0 min-h-[150px] max-h-[30vh] border-b border-[var(--color-light-green)]/30 bg-black/40 backdrop-blur-sm relative z-50">
+                    <div className="flex flex-col gap-1 mt-2">
                         {startTyping && <TypewriterTerminal textLines={terminalLines} speed={15} />}
                     </div>
                 </article>
 
                 <div className="flex-1 p-6 flex flex-col gap-6">
-                    <div className="p-3 rounded-lg border border-[var(--color-turquoise)]/20 bg-[var(--color-turquoise)]/5 flex gap-3 items-start animate-in fade-in slide-in-from-top-2 duration-700">
-                        <RiInformationLine className="text-[var(--color-turquoise)] text-xl shrink-0 mt-0.5" />
-                        <p className="text-[13px] text-gray-400 font-mono leading-tight italic">
-                            Vous pouvez revenir sur cette interface à tout moment via le <span className="text-[var(--color-turquoise)] font-bold">Side Panel</span>. Votre rôle et vos objectifs y sont également disponibles en toute confidentialité.                        </p>
-                    </div>
-
                     <div className="text-center">
-                        <h2 className="text-[var(--color-light-green)] font-mono text-2xl font-black">PARE-FEU</h2>
+                        <h2 className="text-[var(--color-light-green)] font-mono text-2xl font-black uppercase tracking-widest">Pare-Feu</h2>
                         <p className="text-[13px] font-mono text-white/40 uppercase tracking-widest mt-1">Applications actives : {unlockedApps.length} / 5</p>
                     </div>
 
@@ -266,12 +327,6 @@ export default function InfiltrationHub() {
                         <AppIcon id="phone" unlockedApps={unlockedApps} seenApps={seenApps} onOpen={handleOpenTool} />
                         <AppIcon id="boussole" unlockedApps={unlockedApps} seenApps={seenApps} onOpen={handleOpenTool} />
                         <AppIcon id="terminal" unlockedApps={unlockedApps} seenApps={seenApps} onOpen={handleOpenTool} />
-                    </div>
-
-                    <div className="mt-auto mb-2 text-center border-t border-white/5 pt-4">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20">
-                            <span className="text-[11px] text-red-400 font-mono font-bold tracking-widest uppercase">Système sous surveillance</span>
-                        </div>
                     </div>
                 </div>
             </section>

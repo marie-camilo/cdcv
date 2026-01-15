@@ -74,3 +74,17 @@ export async function getPlayerRole() {
         method: "GET",
     });
 }
+
+/**
+ * Valide une étape de jeu et débloque l'application suivante pour tout le groupe
+ * @param {string} code - Le code de la partie
+ * @returns {Promise<any>}
+ */
+export async function validateGameStep(code) {
+    if (!code) throw new Error("Code de partie manquant");
+
+    // On change /games/ par /game/
+    return apiFetch(`/api/v1/game/${code}/validate-step`, {
+        method: "POST",
+    });
+}

@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from 'next/navigation';
+import { apiFetch } from "@/hooks/API/fetchAPI"; // Import de l'utilitaire de fetch
 
 const CipherPuzzleDelayed = () => {
     const router = useRouter();
@@ -10,6 +11,26 @@ const CipherPuzzleDelayed = () => {
     const [showRules, setShowRules] = useState(false);
     const [gameState, setGameState] = useState("start");
     const isLocked = useRef(false);
+
+    // Fonction de synchronisation pour mettre à jour les autres joueurs via Pusher
+    const syncDigit = async (digit, storageKey) => {
+        const gameCode = localStorage.getItem('currentGameCode');
+        localStorage.setItem(storageKey, digit);
+
+        try {
+            await apiFetch(`/api/v1/game/${gameCode}/update-enigma`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    type: 'digit_update',
+                    side: storageKey, // ex: 'tuile_digit'
+                    index: 99, // Identifiant spécial pour les chiffres globaux
+                    status: digit
+                })
+            });
+        } catch (e) {
+            console.error("Erreur de synchronisation Pusher:", e);
+        }
+    };
 
     const createBoard = useCallback(() => {
         return Array.from({ length: gridSize * gridSize }, (_, i) => ({
@@ -66,8 +87,10 @@ const CipherPuzzleDelayed = () => {
             if (newTiles.every((tile, index) => tile.originalPos === index)) {
                 isLocked.current = true;
                 setGameState("solved");
-                // Sauvegarder le chiffre
-                localStorage.setItem('tuile_digit', '9');
+
+                // Synchronisation Pusher et sauvegarde locale
+                syncDigit('9', 'tuile_digit');
+
                 setTimeout(() => {
                     setGameState("won");
                 }, 1200);
@@ -181,110 +204,21 @@ const CipherPuzzleDelayed = () => {
 };
 
 const styles = {
-    container: {
-        position: "fixed",
-        inset: 0,
-        backgroundColor: "#050202",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        touchAction: "none",
-        fontFamily: "monospace",
-    },
-    infoBtn: {
-        position: "absolute",
-        top: "20px",
-        left: "20px",
-        width: "35px",
-        height: "35px",
-        borderRadius: "50%",
-        border: "1px solid #ff3333",
-        backgroundColor: "transparent",
-        color: "#ff3333",
-        zIndex: 110,
-    },
+    container: { position: "fixed", inset: 0, backgroundColor: "#050202", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", touchAction: "none", fontFamily: "monospace" },
+    infoBtn: { position: "absolute", top: "20px", left: "20px", width: "35px", height: "35px", borderRadius: "50%", border: "1px solid #ff3333", backgroundColor: "transparent", color: "#ff3333", zIndex: 110 },
     header: { marginBottom: "40px", textAlign: "center" },
-    title: {
-        color: "#ff3333",
-        fontSize: "1.5rem",
-        letterSpacing: "4px",
-        margin: 0,
-    },
-    levelIndicator: {
-        fontSize: "0.7rem",
-        marginTop: "5px",
-        transition: "color 0.5s",
-    },
-    board: {
-        position: "relative",
-        width: "270px",
-        height: "270px",
-        backgroundColor: "#000",
-        border: "2px solid #ff3333",
-    },
-    tile: {
-        position: "absolute",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontSize: "1.5rem",
-        fontWeight: "bold",
-        userSelect: "none",
-    },
-    hint: {
-        marginTop: "30px",
-        color: "#ff3333",
-        fontSize: "0.6rem",
-        opacity: 0.5,
-        letterSpacing: "1px",
-    },
-    overlay: {
-        position: "absolute",
-        inset: 0,
-        backgroundColor: "rgba(0,0,0,0.95)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 100,
-    },
-    modal: {
-        background: "#0a0505",
-        border: "1px solid #ff3333",
-        padding: "30px",
-        borderRadius: "15px",
-        textAlign: "center",
-        width: "80%",
-    },
+    title: { color: "#ff3333", fontSize: "1.5rem", letterSpacing: "4px", margin: 0 },
+    levelIndicator: { fontSize: "0.7rem", marginTop: "5px", transition: "color 0.5s" },
+    board: { position: "relative", width: "270px", height: "270px", backgroundColor: "#000", border: "2px solid #ff3333" },
+    tile: { position: "absolute", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.5rem", fontWeight: "bold", userSelect: "none" },
+    hint: { marginTop: "30px", color: "#ff3333", fontSize: "0.6rem", opacity: 0.5, letterSpacing: "1px" },
+    overlay: { position: "absolute", inset: 0, backgroundColor: "rgba(0,0,0,0.95)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100 },
+    modal: { background: "#0a0505", border: "1px solid #ff3333", padding: "30px", borderRadius: "15px", textAlign: "center", width: "80%" },
     cyberText: { color: "#ff3333", fontSize: "1.2rem", marginBottom: "15px" },
-    descText: {
-        color: "#ccc",
-        fontSize: "0.8rem",
-        marginBottom: "25px",
-        lineHeight: "1.5",
-    },
-    resultNum: {
-        fontSize: "6rem",
-        color: "#ff3333",
-        fontWeight: "bold",
-        textShadow: "0 0 20px #ff3333",
-        margin: "10px 0",
-    },
-    mainBtn: {
-        padding: "12px 25px",
-        backgroundColor: "#ff3333",
-        color: "#000",
-        border: "none",
-        fontWeight: "bold",
-        letterSpacing: "1px",
-    },
-    secondaryBtn: {
-        background: "none",
-        border: "1px solid #333",
-        color: "#555",
-        padding: "10px 20px",
-        fontSize: "0.7rem",
-    },
+    descText: { color: "#ccc", fontSize: "0.8rem", marginBottom: "25px", lineHeight: "1.5" },
+    resultNum: { fontSize: "6rem", color: "#ff3333", fontWeight: "bold", textShadow: "0 0 20px #ff3333", margin: "10px 0" },
+    mainBtn: { padding: "12px 25px", backgroundColor: "#ff3333", color: "#000", border: "none", fontWeight: "bold", letterSpacing: "1px" },
+    secondaryBtn: { background: "none", border: "1px solid #333", color: "#555", padding: "10px 20px", fontSize: "0.7rem" },
 };
 
 export default CipherPuzzleDelayed;

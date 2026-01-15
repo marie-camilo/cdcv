@@ -1,23 +1,12 @@
 "use client";
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from 'next/navigation';
+import { apiFetch } from "@/hooks/API/fetchAPI"; // Import de l'utilitaire API
 
 const SOLUTION_WORDS = [
-    "PIXEL", // La base de l'image numérique
-    "ICONE", // Design d'interface (UI)
-    "MEDIA", // Media Queries / Support de com
-    "VIDEO", // Audiovisuel
-    "PHOTO", // Prise de vue
-    "STYLE", // CSS / Direction artistique
-    "ANCRE", // Liens HTML
-    "CACHE", // Performance web
-    "INDEX", // SEO / Fichier racine
-    "TRAME", // Design / Vidéo
-    "SITES", // Web (Pluriel de site)
-    "PROXY", // Réseau / Serveur
-    "LOCAL", // Localhost
-    "CIBLE", // Marketing / UX
-    "CODEC", // Compression vidéo
+    "PIXEL", "ICONE", "MEDIA", "VIDEO", "PHOTO", "STYLE",
+    "ANCRE", "CACHE", "INDEX", "TRAME", "SITES", "PROXY",
+    "LOCAL", "CIBLE", "CODEC",
 ];
 const WORD_LENGTH = 5;
 const MAX_ATTEMPTS = 7;
@@ -31,6 +20,26 @@ const MotusCyberMission = () => {
     const [currentSolution, setCurrentSolution] = useState("");
     const [isValidating, setIsValidating] = useState(false);
     const [showRules, setShowRules] = useState(false);
+
+    // Fonction de synchronisation pour mettre à jour les autres joueurs via Pusher
+    const syncDigit = async (digit, storageKey) => {
+        const gameCode = localStorage.getItem('currentGameCode');
+        localStorage.setItem(storageKey, digit);
+
+        try {
+            await apiFetch(`/api/v1/game/${gameCode}/update-enigma`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    type: 'digit_update',
+                    side: storageKey, // 'motus_digit'
+                    index: 99,
+                    status: digit
+                })
+            });
+        } catch (e) {
+            console.error("Erreur de synchronisation Motus:", e);
+        }
+    };
 
     const initializeGame = useCallback(() => {
         const word = SOLUTION_WORDS[Math.floor(Math.random() * SOLUTION_WORDS.length)];
@@ -101,8 +110,10 @@ const MotusCyberMission = () => {
         if (formattedGuess === currentSolution) {
             setGameState("solved");
             setMessage("ACCÈS ACCORDÉ - SYNCHRONISATION...");
-            // Sauvegarder le chiffre
-            localStorage.setItem('motus_digit', '4');
+
+            // Synchronisation et sauvegarde
+            syncDigit('4', 'motus_digit');
+
             setTimeout(() => {
                 setGameState("won");
             }, 1500);
