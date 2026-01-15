@@ -5,6 +5,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "@/styles/globals.css";
 import { TimerProvider } from "@/app/context/TimerContext";
 import Navbar from "@/components/organisms/Navbar/Navbar";
+import SplashScreen from "@/components/organisms/LoadingIndicator/SplashScreen";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -45,6 +46,7 @@ export default function RootLayout({ children }) {
         </head>
         <body className="bg-[var(--color-dark)] text-white min-h-[100dvh] flex flex-col pb-[env(safe-area-inset-bottom)]">
         <TimerProvider>
+            <SplashScreen />
             {!isGamePage && <Navbar />}
         </TimerProvider>
         <div className="flex-1 overflow-y-auto overflow-x-hidden">

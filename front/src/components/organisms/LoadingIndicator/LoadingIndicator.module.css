@@ -1,27 +1,130 @@
 .root {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
+    background-color: transparent;
+    z-index: 9999;
+    pointer-events: none;
 }
 
 .fullscreen {
     position: fixed;
     inset: 0;
-    background: var(--color-dark);
+    height: 100dvh;
+    width: 100vw;
+    background: transparent;
+    pointer-events: all;
     z-index: 9999;
 }
 
-.spinner {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    border: 3px solid rgba(208, 255, 113, 0.25);
-    border-top-color: var(--color-light-green);
-    animation: spin 0.9s linear infinite;
+.shutterTop,
+.shutterBottom {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 50.5%;
+    background: linear-gradient(180deg, #2b0505 0%, #5c0e0e 100%);
+    z-index: 1;
 }
 
-@keyframes spin {
+.shutterTop {
+    top: 0;
+    border-bottom: 1px solid rgba(255, 50, 50, 0.6);
+    box-shadow: 0 0 25px rgba(220, 20, 60, 0.2);
+    animation: slideDownModern 0.6s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+
+.shutterBottom {
+    bottom: 0;
+    background: linear-gradient(0deg, #2b0505 0%, #5c0e0e 100%);
+    border-top: 1px solid rgba(255, 50, 50, 0.6);
+    box-shadow: 0 0 25px rgba(220, 20, 60, 0.2);
+    animation: slideUpModern 0.6s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+
+.root.exit .shutterTop {
+    animation: slideOutUpModern 0.6s cubic-bezier(0.7, 0, 0.3, 1) forwards;
+    animation-delay: 0.15s;
+}
+
+.root.exit .shutterBottom {
+    animation: slideOutDownModern 0.6s cubic-bezier(0.7, 0, 0.3, 1) forwards;
+    animation-delay: 0.15s;
+}
+
+.root.exit .content {
+    animation: fadeOutScale 0.15s cubic-bezier(0.6, 0, 0.4, 1) forwards;
+}
+
+.content {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    animation: fadeInContent 0.5s 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.logoWrapper {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Halo adapté au fond rouge */
+    background: radial-gradient(circle, rgba(0, 0, 0, 0.4) 0%, transparent 70%);
+    border-radius: 50%;
+    padding: 30px;
+}
+
+.redShirt {
+    position: relative;
+    z-index: 2;
+    filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.2)); /* Lueur un peu plus blanche pour contraster sur le rouge */
+    animation: floatPulse 3s ease-in-out infinite;
+}
+
+@keyframes slideDownModern {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(0); }
+}
+
+@keyframes slideUpModern {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+@keyframes slideOutUpModern {
+    to { transform: translateY(-100%); }
+}
+
+@keyframes slideOutDownModern {
+    to { transform: translateY(100%); }
+}
+
+@keyframes fadeInContent {
+    from { opacity: 0; transform: scale(0.8); filter: blur(5px); }
+    to { opacity: 1; transform: scale(1); filter: blur(0); }
+}
+
+@keyframes fadeOutScale {
     to {
-        transform: rotate(360deg);
+        opacity: 0;
+        transform: scale(0.5);
+        filter: blur(10px);
+    }
+}
+
+@keyframes floatPulse {
+    0%, 100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.5));
+    }
+    50% {
+        transform: scale(1.08);
+        filter: drop-shadow(0 0 40px rgba(0, 0, 0, 0.8));
     }
 }
