@@ -34,7 +34,7 @@
                class="text-sm font-semibold transition"
                style="color: #FFFFFF;display: flex; align-content: center; gap: 0.25rem;">
                 Toutes les parties
-                <img src="{{ asset('icons/Arrow_alt_lright_alt.svg') }}"
+                <img src="{{ asset('back/public/icons/Arrow_alt_lright_alt.svg') }}"
                      alt="close_chat"
                      class="w-5 h-5"
                      style="filter: brightness(0) invert(1);"

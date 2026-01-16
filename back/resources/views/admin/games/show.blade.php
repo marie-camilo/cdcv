@@ -54,7 +54,7 @@
                 align-content: center;
            ">
 
-            <img src="{{ asset('icons/Arrow_alt_left_alt.svg') }}"
+            <img src="{{ asset('back/public/icons/Arrow_alt_left_alt.svg') }}"
                  alt="close_chat"
                  class="w-5 h-5"
                  style="filter: brightness(0) invert(1);"
