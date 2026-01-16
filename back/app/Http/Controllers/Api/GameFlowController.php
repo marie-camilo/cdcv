@@ -289,4 +289,25 @@ class GameFlowController extends Controller
 
         return response()->json(['message' => 'État de l’énigme diffusé']);
     }
+
+    public function getCountdown($code)
+    {
+        $game = Game::where('code', $code)->firstOrFail();
+
+        if ($game->status !== 'started' || !$game->ending_at) {
+            return response()->json([
+                'message' => 'La partie n\'est pas en cours ou la date de fin est inconnue.'
+            ], 400);
+        }
+
+        $now = now();
+        $endingAt = $game->ending_at;
+
+        $remainingSeconds = max(0, $now->diffInSeconds($endingAt));
+
+        return response()->json([
+            'remaining_seconds' => $remainingSeconds
+        ]);
+
+    }
 }

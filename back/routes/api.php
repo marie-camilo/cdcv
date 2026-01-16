@@ -43,14 +43,6 @@ Route::middleware('api.key')
 
         //Récupérer le code de la partie depuis le cookie
         Route::get('/games/log/session', [GameFlowController::class, 'getLogSession']);
-        // Routes Talkie-Walkie
-//        Route::prefix('talkie')->group(function () {
-//            Route::post('/rooms/join', [TalkieWalkieController::class, 'joinRoom']);
-//            Route::get('/rooms/{code}', [TalkieWalkieController::class, 'getRoom']);
-//            Route::post('/rooms/update-timer', [TalkieWalkieController::class, 'updateTimer']);
-//            Route::post('/rooms/speaking', [TalkieWalkieController::class, 'speaking']);
-//            Route::post('/rooms/leave', [TalkieWalkieController::class, 'leaveRoom']);
-//        });
 
         // récupération des messages audio
         Route::get('/audio/messages', [AudioController::class, 'index']);
@@ -71,6 +63,8 @@ Route::middleware('api.key')
         Route::post('/chat/{game}', [ChatController::class, 'storePlayer']);
         Route::post('/chat/impostor/{game}', [ChatController::class, 'storeImpostor']);
         Route::get('/chat/{game}', [ChatController::class, 'getGameMessages']);
+
+        Route::get('/countdown/{code}', [GameFlowController::class, 'getCountdown']);
     });
 
 
