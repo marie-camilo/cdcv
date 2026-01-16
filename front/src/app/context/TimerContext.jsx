@@ -1,46 +1,37 @@
 "use client";
-import React, { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 
 const TimerContext = createContext();
 
-export const TimerProvider = ({ children }) => {
-    const DURATION = 60 * 60;
-    const [seconds, setSeconds] = useState(DURATION);
+export function TimerProvider({ children }) {
+    const [seconds, setSeconds] = useState(undefined);
+    const intervalRef = useRef(null);
 
-    useEffect(() => {
-        let endTime = localStorage.getItem("timer_end_time");
+    const startTimer = (initialSeconds) => {
+        clearInterval(intervalRef.current);
+        setSeconds(initialSeconds);
 
-        if (!endTime) {
-            endTime = Date.now() + DURATION * 1000;
-            localStorage.setItem("timer_end_time", endTime);
-        }
-
-        const interval = setInterval(() => {
-            const now = Date.now();
-            const remaining = Math.round((endTime - now) / 1000);
-
-            if (remaining <= 0) {
-                setSeconds(0);
-                clearInterval(interval);
-            } else {
-                setSeconds(remaining);
-            }
+        intervalRef.current = setInterval(() => {
+            setSeconds((prev) => {
+                if (prev === undefined) return prev;
+                if (prev <= 1) {
+                    clearInterval(intervalRef.current);
+                    return 0;
+                }
+                return prev - 1;
+            });
         }, 1000);
-
-        return () => clearInterval(interval);
-    }, []);
-
-    const simulateEnd = () => {
-        const newEnd = Date.now() - 1000;
-        localStorage.setItem("timer_end_time", newEnd);
-        setSeconds(0);
     };
 
+    useEffect(() => {
+        return () => clearInterval(intervalRef.current);
+    }, []);
+
     return (
-        <TimerContext.Provider value={{ seconds, simulateEnd }}>
+        <TimerContext.Provider value={{ seconds, startTimer }}>
             {children}
         </TimerContext.Provider>
     );
-};
+}
 
 export const useTimer = () => useContext(TimerContext);

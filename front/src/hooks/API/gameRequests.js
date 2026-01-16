@@ -118,3 +118,11 @@ export async function sendImpostorChatMessage(gameId, content) {
         body: JSON.stringify({ content }),
     });
 }
+
+export async function getTimeRemaining(gameCode) {
+    if (!gameCode) throw new Error("gameCode manquant");
+
+    return apiFetch(`/api/v1/countdown/${gameCode}`, {
+        method: "GET",
+    });
+}
