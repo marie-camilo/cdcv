@@ -76,7 +76,7 @@ export default function RolePage() {
     const { mission, equipement, info } = roleData;
 
     return (
-        <main className="min-h-screen px-8 py-10 text-white">
+        <main className="min-h-screen min-h-[100dvh] px-8 py-10 text-white overflow-y-auto">
             {/* Header */}
             <header className="pb-6">
                 <SectionTitle

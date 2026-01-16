@@ -104,8 +104,8 @@ export default function StartPage() {
   };
 
   return (
-      <main className="h-full flex flex-col md:max-w-md mx-auto text-white font-mono">
-        <section className="flex flex-col h-full justify-center px-6 gap-8">
+      <main className="min-h-[100dvh] flex flex-col md:max-w-md mx-auto text-white font-mono overflow-y-auto">
+        <section className="flex flex-col flex-1 justify-center px-6 gap-8">
 
           <div className="space-y-2">
             <p className="text-xs text-(--color-turquoise)">

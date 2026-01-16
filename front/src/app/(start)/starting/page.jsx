@@ -78,7 +78,7 @@ export default function StartingPage() {
     if (loading || remaining === null) return null;
 
     return (
-        <main className="h-screen flex flex-col items-center justify-center px-8 text-white bg-[var(--color-dark)] overflow-hidden">
+        <main className="h-screen flex flex-col items-center justify-center px-8 text-white bg-[var(--color-dark)] overflow-hidden min-h-[100dvh]">
             <div className="mb-16 text-center space-y-4">
                 <h1 className="text-3xl font-bold tracking-wide">
                     La partie va commencer

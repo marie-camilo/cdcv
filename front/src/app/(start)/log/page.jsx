@@ -68,10 +68,10 @@ export default function JoinGamePage() {
     };
 
     return (
-        <main className="h-full flex flex-col md:max-w-md mx-auto text-white">
-            <section className="flex flex-col h-full">
-
+        <main className="min-h-screen min-h-[100dvh] flex flex-col md:max-w-md mx-auto text-white overflow-y-auto">
+            <section className="flex flex-col flex-1">
                 <article className="flex flex-col justify-center items-center flex-1 px-6 gap-6">
+
                     <form
                         onSubmit={handleSubmit}
                         className="w-full flex flex-col gap-4"

@@ -131,7 +131,7 @@ export default function LobbyPage() {
     if (!authorized) return null;
 
     return (
-        <main className="min-h-screen flex flex-col p-8 md:max-w-md mx-auto py-16">
+        <main className="min-h-screen min-h-[100dvh] flex flex-col px-8 py-10 md:max-w-md mx-auto overflow-y-auto">
             <SectionTitle
                 variant="lobby"
                 title="Salle d'attente"
