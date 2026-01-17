@@ -2,10 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="093ef52b-a12e-4b25-bd90-7fac44d39d4f" name="Changes" comment="(fix)[Laby]Retours après beta test, modif des malus et apparence des sorties + ajout btn log">
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/front/src/app/(enigmes)/enigme-1/page.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/front/src/app/(enigmes)/enigme-1/page.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/front/src/styles/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/front/src/styles/globals.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front/src/components/organisms/AnswerTerminal/AnswerTerminal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/front/src/components/organisms/AnswerTerminal/AnswerTerminal.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

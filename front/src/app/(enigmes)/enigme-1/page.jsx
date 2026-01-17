@@ -125,29 +125,23 @@ export default function Enigme1Page() {
     ];
 
     return (
-        <main className="min-h-[100dvh] w-full relative flex flex-col bg-[var(--color-darker-red)] overflow-hidden font-mono">
+        <main className="min-h-[100dvh] w-full flex flex-col bg-[var(--color-darker-red)] overflow-y-auto font-mono">
+            <section className="flex flex-col min-h-[100dvh] md:max-w-md mx-auto p-4 gap-4">
 
-            <section className="relative z-10 flex flex-col h-[100dvh] md:max-w-md mx-auto p-4">
-
-                <article className="flex-shrink-0 pt-2 pb-2 border-b-2 border-[var(--color-mid-red)] h-[30dvh] overflow-y-auto text-xs">
-                    <TypewriterTerminal textLines={terminalLines} speed={10} />
+                <article className="shrink-0 pt-4 pb-2 border-b border-[var(--color-mid-red)] min-h-[120px]">
+                    <TypewriterTerminal textLines={terminalLines} speed={15} />
                 </article>
 
-                <article className="flex-1 flex items-center justify-center py-4">
-                    <div className="w-full grid grid-cols-2 gap-4 bg-[var(--color-mid-red)]/30 rounded-2xl p-6 border border-[var(--color-mat-red)]/20 shadow-xl backdrop-blur-sm">
-                        {numbers.map((n, index) => (
-                            <div
-                                key={index}
-                                className="text-8xl font-black text-center drop-shadow-md"
-                                style={{ color: n.color }}
-                            >
+                <article className="flex-1 flex items-center justify-center">
+                    <div className="w-full grid grid-cols-2 gap-4 bg-[var(--color-mid-red)]/20 rounded-2xl p-6 border border-[var(--color-mat-red)]/40 shadow-2xl backdrop-blur-sm">                        {numbers.map((n, index) => (
+                            <div key={index} className="text-8xl font-black text-center" style={{ color: n.color }}>
                                 {n.val}
                             </div>
                         ))}
                     </div>
                 </article>
 
-                <article className="flex-shrink-0 pb-6">
+                <article className="shrink-0 pb-4">
                     <AnswerTerminal
                         expectedAnswer="FOYER"
                         onValidate={handleSuccess}
@@ -159,7 +153,7 @@ export default function Enigme1Page() {
             <BaseModal
                 isOpen={isModalOpen}
                 title="< ACCÈS DÉBLOQUÉ />"
-                message="Eh ben... C'était laborieux. Rendez-vous au Foyer pour la suite des énigmes, si vous y arrivez... - LES CHEMISES ROUGES"
+                message="Code validé. Module de Scan actif. Rendez-vous au Foyer. - LES CHEMISES ROUGES"
                 onConfirm={() => { setIsModalOpen(false); router.push('/'); }}
             />
         </main>
