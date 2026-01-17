@@ -5,7 +5,7 @@ import GameOverModal from "@/components/molecules/GameOverModal";
 export default function EnigmeLayout({ children }) {
     return (
         <TimerProvider>
-            <div className="bg-dark text-light-green h-full w-full overflow-y-auto">
+            <div className="bg-[var(--color-darker-red)] text-light-green h-full w-full overflow-y-auto">
                 {children}
             </div>
             <GameOverModal />
