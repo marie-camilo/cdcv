@@ -101,49 +101,61 @@ export default function Enigme1Page() {
         } catch (error) {
             console.error("❌ Erreur lors de la validation :", error.message);
             // En cas d'erreur réseau, on peut quand même ouvrir la modal localement
-            // mais les autres joueurs ne seront pas notifiés
             alert("Erreur de connexion. Vérifiez votre réseau.");
         }
     };
 
     const terminalLines = [
-        "> CONNEXION SÉCURISÉE ÉTABLIE...",
-        "> IDENTITÉ : M. JACQUOT",
-        "> Équipe, je suis à l'intérieur de leur réseau.",
-        "> Voici leur premier verrou numérique.",
-        "> — M. JACQUOT"
+        "> LIAISON ÉTABLIE. CANAL CHIFFRÉ.",
+        "> M. JACQUOT :",
+        "> Ça y est, j'ai réussi à forcer leur premier point d'entrée.",
+        "> Je vous envoie les données brutes que j'ai pu intercepter.",
+        "> Regardez l'écran, ces chiffres doivent former un code.",
+        "> Une fois que vous l'avez, tapez-le dans la console juste en dessous.",
+        "> Concentrez-vous, on ne peut pas se permettre de rater le premier verrou.",
+        "> - Jacquot"
     ];
 
     const numbers = [
-        { val: "6", color: "#347E84" },
-        { val: "15", color: "#4FD1C5" },
-        { val: "25", color: "#9AE6B4" },
-        { val: "5", color: "#FFACAC" },
-        { val: "18", color: "#D6BCFA" }
+        { val: "6", color: "var(--color-mat-blue)" },
+        { val: "15", color: "var(--color-sand)" },
+        { val: "25", color: "var(--color-mat-red)" },
+        { val: "5", color: "var(--color-red)" },
+        { val: "18", color: "var(--color-mat-blue)" }
     ];
 
     return (
-        <main className="h-full w-full relative flex flex-col" style={{
-            backgroundImage: "url('/background-computer.png')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-        }}>
-            <div className="absolute inset-0 bg-black/60 z-0" />
-            <section className="relative z-10 h-full flex flex-col md:max-w-md mx-auto p-4 overflow-hidden">
-                <article className="flex-shrink-0 pt-2 pb-1 border-b-2 border-white/20 max-h-[20dvh] overflow-y-auto">
+        <main className="min-h-[100dvh] w-full relative flex flex-col bg-[var(--color-darker-red)] overflow-hidden font-mono">
+
+            <section className="relative z-10 flex flex-col h-[100dvh] md:max-w-md mx-auto p-4">
+
+                <article className="flex-shrink-0 pt-2 pb-2 border-b-2 border-[var(--color-mid-red)] h-[30dvh] overflow-y-auto text-xs">
                     <TypewriterTerminal textLines={terminalLines} speed={10} />
                 </article>
-                <article className="flex-1 flex items-center justify-center min-h-0">
-                    <div className="w-full grid grid-cols-2 gap-2 bg-black/40 rounded-xl p-3 border border-white/10 shadow-2xl">
+
+                <article className="flex-1 flex items-center justify-center py-4">
+                    <div className="w-full grid grid-cols-2 gap-4 bg-[var(--color-mid-red)]/30 rounded-2xl p-6 border border-[var(--color-mat-red)]/20 shadow-xl backdrop-blur-sm">
                         {numbers.map((n, index) => (
-                            <div key={index} className="text-6xl font-bold text-center" style={{ color: n.color }}>{n.val}</div>
+                            <div
+                                key={index}
+                                className="text-8xl font-black text-center drop-shadow-md"
+                                style={{ color: n.color }}
+                            >
+                                {n.val}
+                            </div>
                         ))}
                     </div>
                 </article>
-                <article className="flex-shrink-0 pt-2">
-                    <AnswerTerminal expectedAnswer="FOYER" onValidate={handleSuccess} placeholder="ENTREZ LE MOT DE PASSE..." />
+
+                <article className="flex-shrink-0 pb-6">
+                    <AnswerTerminal
+                        expectedAnswer="FOYER"
+                        onValidate={handleSuccess}
+                        placeholder="MOT DE PASSE..."
+                    />
                 </article>
             </section>
+
             <BaseModal
                 isOpen={isModalOpen}
                 title="< ACCÈS DÉBLOQUÉ />"
