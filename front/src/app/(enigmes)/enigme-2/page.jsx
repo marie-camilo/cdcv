@@ -174,8 +174,10 @@ export default function Enigme2Page() {
     };
 
     return (
-        <main className="min-h-screen flex flex-col md:max-w-md mx-auto p-4">
+        <main className="min-h-[100dvh] w-full flex flex-col md:max-w-md mx-auto p-4 bg-[var(--color-darker-red)] overflow-hidden">
+
             <CodeSlots digits={codeDigits} />
+
             <article className="flex flex-col gap-10 justify-start items-center text-white flex-1 py-4 overflow-y-auto">
                 <LockerGrid
                     side="left"
@@ -192,6 +194,7 @@ export default function Enigme2Page() {
                     onCaseClick={handleCaseClick}
                 />
             </article>
+
             <VictoryPopup
                 isOpen={showVictory}
                 codeDigits={codeDigits}
