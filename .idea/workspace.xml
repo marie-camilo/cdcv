@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="093ef52b-a12e-4b25-bd90-7fac44d39d4f" name="Changes" comment="(fix)[Laby]Retours après beta test, modif des malus et apparence des sorties + ajout btn log" />
+    <list default="true" id="093ef52b-a12e-4b25-bd90-7fac44d39d4f" name="Changes" comment="(fix)[Laby]Retours après beta test, modif des malus et apparence des sorties + ajout btn log">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front/src/app/(enigmes)/enigme-2/(games)/snake/page.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/front/src/app/(enigmes)/enigme-2/(games)/snake/page.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front/src/components/molecules/enigme2/LockerGrid.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/front/src/components/molecules/enigme2/LockerGrid.jsx" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
