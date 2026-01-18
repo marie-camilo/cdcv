@@ -289,6 +289,22 @@ class GameFlowController extends Controller
 
         return response()->json(['message' => 'État de l’énigme diffusé']);
     }
+    public function unlockApp(Request $request, string $code)
+    {
+        $request->validate([
+            'app_id' => 'required|string'
+        ]);
+
+        $appId = $request->input('app_id');
+
+        // Diffuser à tout le groupe via Pusher
+        event(new AppUnlocked($code, $appId));
+
+        return response()->json([
+            'status' => 'success',
+            'unlocked_app' => $appId
+        ]);
+    }
 
     public function getCountdown($code)
     {
@@ -309,5 +325,15 @@ class GameFlowController extends Controller
             'remaining_seconds' => $remainingSeconds
         ]);
 
+    }
+    public function triggerVideo(Request $request, string $code)
+    {
+        $request->validate([
+            'video_id' => 'required|string'
+        ]);
+
+        broadcast(new \App\Events\VideoTriggered($code, $request->video_id))->toOthers();
+
+        return response()->json(['status' => 'video_triggered']);
     }
 }

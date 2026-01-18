@@ -1,42 +1,49 @@
-// hooks/useGameEvents.js
+// hooks/API/useGameEvents.js
 import { useEffect, useState, useCallback } from 'react';
 import { gameEvents, GAME_EVENTS } from '@/lib/gameEventBus';
 
-// Hook pour les apps débloquées
 export function useUnlockedApps() {
     const [unlockedApps, setUnlockedApps] = useState([]);
 
-    // Chargement initial
     useEffect(() => {
         const stored = JSON.parse(localStorage.getItem('unlockedApps') || '[]');
+        console.log("📦 [useUnlockedApps] Chargement initial:", stored);
         setUnlockedApps(stored);
     }, []);
 
-    // Écoute des événements Pusher
     useEffect(() => {
+        console.log("👂 [useUnlockedApps] Installation du listener...");
+
         const unsubscribe = gameEvents.on(GAME_EVENTS.APP_UNLOCKED, (data) => {
-            console.log("🔔 [EVENT] App unlocked reçu:", data);
+            console.log("🔔 [useUnlockedApps] Event reçu:", data);
             setUnlockedApps([...data.unlockedApps]);
         });
 
-        return unsubscribe;
+        return () => {
+            console.log("🧹 [useUnlockedApps] Nettoyage du listener");
+            unsubscribe();
+        };
     }, []);
 
+    console.log("🔍 [useUnlockedApps] State actuel:", unlockedApps);
     return unlockedApps;
 }
 
-// Hook pour l'état de l'énigme 2
 export function useEnigma2State() {
     const [codeDigits, setCodeDigits] = useState({
-        motus: null, simon: null, zip: null, tuile: null
+        motus: null,
+        simon: null,
+        zip: null,
+        tuile: null
     });
     const [leftLocker, setLeftLocker] = useState('locked');
     const [rightLocker, setRightLocker] = useState('locked');
     const [leftCases, setLeftCases] = useState(Array(8).fill(null));
     const [rightCases, setRightCases] = useState(Array(8).fill(null));
 
-    // Fonction de chargement depuis localStorage
     const loadFromStorage = useCallback(() => {
+        console.log("📦 [useEnigma2State] Chargement depuis localStorage...");
+
         setCodeDigits({
             motus: localStorage.getItem('motus_digit') ? parseInt(localStorage.getItem('motus_digit')) : null,
             simon: localStorage.getItem('simon_digit') ? parseInt(localStorage.getItem('simon_digit')) : null,
@@ -57,28 +64,40 @@ export function useEnigma2State() {
         setRightCases(newRight);
     }, []);
 
-    // Chargement initial
     useEffect(() => {
         loadFromStorage();
     }, [loadFromStorage]);
 
-    // Écoute des événements
     useEffect(() => {
+        console.log("👂 [useEnigma2State] Installation des listeners...");
+
         const unsubs = [
             gameEvents.on(GAME_EVENTS.DIGIT_UPDATED, ({ side, value }) => {
-                console.log("🔔 [EVENT] Digit updated:", side, value);
+                console.log("🔔 [useEnigma2State] Digit updated:", side, value);
+
+                // ✅ METTRE À JOUR LOCALSTORAGE IMMÉDIATEMENT
+                localStorage.setItem(side, value);
+
                 const key = side.replace('_digit', '');
                 setCodeDigits(prev => ({ ...prev, [key]: parseInt(value) }));
             }),
 
             gameEvents.on(GAME_EVENTS.LOCKER_UPDATED, ({ side, status }) => {
-                console.log("🔔 [EVENT] Locker updated:", side, status);
+                console.log("🔔 [useEnigma2State] Locker updated:", side, status);
+
+                // ✅ METTRE À JOUR LOCALSTORAGE IMMÉDIATEMENT
+                localStorage.setItem(`locker_${side}`, status);
+
                 if (side === 'left') setLeftLocker(status);
                 else setRightLocker(status);
             }),
 
             gameEvents.on(GAME_EVENTS.SNAKE_UPDATED, ({ side, index, status }) => {
-                console.log("🔔 [EVENT] Snake updated:", side, index, status);
+                console.log("🔔 [useEnigma2State] Snake updated:", side, index, status);
+
+                // ✅ METTRE À JOUR LOCALSTORAGE IMMÉDIATEMENT
+                localStorage.setItem(`snake_${side}_${index}`, status);
+
                 if (side === 'left') {
                     setLeftCases(prev => {
                         const newArr = [...prev];
@@ -95,7 +114,10 @@ export function useEnigma2State() {
             }),
         ];
 
-        return () => unsubs.forEach(unsub => unsub());
+        return () => {
+            console.log("🧹 [useEnigma2State] Nettoyage des listeners");
+            unsubs.forEach(unsub => unsub());
+        };
     }, []);
 
     return { codeDigits, leftLocker, rightLocker, leftCases, rightCases };

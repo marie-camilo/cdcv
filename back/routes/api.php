@@ -59,12 +59,15 @@ Route::middleware('api.key')
         // Route pour valider une étape de jeu
         Route::post('/game/{code}/validate-step', [GameFlowController::class, 'validateStep']);
         Route::post('/game/{code}/update-enigma', [GameFlowController::class, 'updateEnigmaState']);
+        Route::post('/game/{code}/unlock-app', [GameFlowController::class, 'unlockApp']);
 
         Route::post('/chat/{game}', [ChatController::class, 'storePlayer']);
         Route::post('/chat/impostor/{game}', [ChatController::class, 'storeImpostor']);
         Route::get('/chat/{game}', [ChatController::class, 'getGameMessages']);
 
         Route::get('/countdown/{code}', [GameFlowController::class, 'getCountdown']);
+
+        Route::post('/game/{code}/trigger-video', [GameFlowController::class, 'triggerVideo']);
     });
 
 

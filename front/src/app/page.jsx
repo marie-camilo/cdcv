@@ -1,8 +1,7 @@
 "use client";
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import Pusher from "pusher-js";
 import {
     RiDoorLockBoxLine,
     RiCellphoneFill,
@@ -17,8 +16,9 @@ import {
 import TypewriterTerminal from "@/components/molecules/TypewriterTerminal/TypewriterTerminal";
 import clsx from "clsx";
 
-import {getPlayerRole} from "@/hooks/API/gameRequests";
-import {checkPlayerCookie, getCodeFromCookie} from "@/hooks/API/rules";
+import { getPlayerRole } from "@/hooks/API/gameRequests";
+import { checkPlayerCookie, getCodeFromCookie } from "@/hooks/API/rules";
+import { useUnlockedApps } from '@/hooks/API/useGameEvents';
 
 const TOOLS_DATA = {
     console: {
@@ -178,17 +178,21 @@ const AppIcon = ({ id, unlockedApps, seenApps, onOpen }) => {
 
 export default function InfiltrationHub() {
     const router = useRouter();
-    const pusherRef = useRef(null);
 
-    const [unlockedApps, setUnlockedApps] = useState([]);
+    // ✅ HOOK RÉACTIF : se met à jour automatiquement via Pusher
+    const unlockedApps = useUnlockedApps();
+
     const [seenApps, setSeenApps] = useState([]);
     const [userRole, setUserRole] = useState(null);
     const [selectedTool, setSelectedTool] = useState(null);
     const [startTyping, setStartTyping] = useState(false);
-    const [code, setCode] = useState(null);
-    const [authorized, setAuthorized] = useState(false);
 
-    // ✅ 1) LOGIQUE DE GARDE / SESSION
+    // ✅ DEBUG : Afficher les apps débloquées dans la console
+    useEffect(() => {
+        console.log("🎯 [PAGE] Apps débloquées actuelles:", unlockedApps);
+    }, [unlockedApps]);
+
+    // ✅ LOGIQUE DE GARDE / SESSION
     useEffect(() => {
         const init = async () => {
             try {
@@ -203,15 +207,9 @@ export default function InfiltrationHub() {
                 const roleRes = await getPlayerRole();
                 setUserRole(roleRes?.role?.toLowerCase() || localStorage.getItem('userRole'));
 
-                // ✅ Chargement initial depuis localStorage
-                const storedUnlocked = JSON.parse(localStorage.getItem('unlockedApps') || '[]');
+                // Chargement des apps vues
                 const storedSeen = JSON.parse(localStorage.getItem('seenApps') || '[]');
-
-                setUnlockedApps(storedUnlocked);
                 setSeenApps(storedSeen);
-
-                setCode(game.game.code);
-                setAuthorized(true);
             } catch (e) {
                 console.error("Erreur initialisation:", e);
                 router.replace("/");
@@ -220,50 +218,7 @@ export default function InfiltrationHub() {
         init();
     }, [router]);
 
-    // ✅ 2) LOGIQUE PUSHER - Synchronisation temps réel
-    useEffect(() => {
-        if (!authorized || !code || pusherRef.current) return;
-
-        const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_APP_KEY, {
-            cluster: "eu",
-            forceTLS: true,
-        });
-
-        pusherRef.current = pusher;
-        const channel = pusher.subscribe(`game.${code}`);
-
-        // 🔥 ÉCOUTE DU DÉBLOCAGE D'APPLICATIONS
-        channel.bind('AppUnlocked', (data) => {
-            console.log("🔓 NOUVEL OUTIL DÉBLOQUÉ:", data.appId);
-
-            setUnlockedApps((prev) => {
-                // Protection anti-doublon
-                if (!prev.includes(data.appId)) {
-                    const newApps = [...prev, data.appId];
-                    localStorage.setItem('unlockedApps', JSON.stringify(newApps));
-                    console.log("✅ Apps débloquées:", newApps);
-                    return newApps;
-                }
-                return prev;
-            });
-
-            // ✅ Retirer l'app de "seenApps" pour qu'elle pulse
-            setSeenApps((prev) => {
-                const filtered = prev.filter(id => id !== data.appId);
-                localStorage.setItem('seenApps', JSON.stringify(filtered));
-                return filtered;
-            });
-        });
-
-        return () => {
-            channel.unbind_all();
-            pusher.unsubscribe(`game.${code}`);
-            pusher.disconnect();
-            pusherRef.current = null;
-        };
-    }, [authorized, code]);
-
-    // ✅ 3) TIMER TERMINAL
+    // ✅ TIMER TERMINAL
     useEffect(() => {
         const typingTimer = setTimeout(() => setStartTyping(true), 1000);
         return () => clearTimeout(typingTimer);
@@ -321,6 +276,7 @@ export default function InfiltrationHub() {
                     </div>
 
                     <div className="grid grid-cols-3 gap-5">
+                        {/* Console est toujours débloquée */}
                         <AppIcon id="console" unlockedApps={['console', ...unlockedApps]} seenApps={seenApps} onOpen={handleOpenTool} />
                         <AppIcon id="scan" unlockedApps={unlockedApps} seenApps={seenApps} onOpen={handleOpenTool} />
                         <AppIcon id="puzzle" unlockedApps={unlockedApps} seenApps={seenApps} onOpen={handleOpenTool} />
