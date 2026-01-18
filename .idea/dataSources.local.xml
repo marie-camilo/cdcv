@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="dataSourceStorageLocal" created-in="PS-253.28294.345">
+  <component name="dataSourceStorageLocal" created-in="PS-253.29346.151">
     <data-source name="cs5d@23.gremmi.fr" uuid="6ffe876f-7d99-4f1b-b98c-1ca672f9c669">
       <database-info product="MariaDB" version="11.4.9-MariaDB-deb12" jdbc-version="4.2" driver-name="MariaDB Connector/J" driver-version="3.3.3" dbms="MARIADB" exact-version="11.4.9" exact-driver-version="3.3">
         <extra-name-characters>#@</extra-name-characters>

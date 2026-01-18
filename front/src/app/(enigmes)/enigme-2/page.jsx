@@ -68,24 +68,48 @@ export default function Enigme2Page() {
     };
 
     return (
-        <main className="min-h-screen flex flex-col md:max-w-md mx-auto p-4">
+        <main className="min-h-[100dvh] w-full flex flex-col md:max-w-md mx-auto p-4 bg-[var(--color-darker-red)] overflow-hidden">
+
             <CodeSlots digits={codeDigits} />
+
             <article className="flex flex-col gap-10 justify-start items-center text-white flex-1 py-4 overflow-y-auto">
-                <LockerGrid
-                    side="left"
-                    status={leftLocker}
-                    cases={leftCases}
-                    onLockerClick={handleLockerClick}
-                    onCaseClick={handleCaseClick}
-                />
-                <LockerGrid
-                    side="right"
-                    status={rightLocker}
-                    cases={rightCases}
-                    onLockerClick={handleLockerClick}
-                    onCaseClick={handleCaseClick}
-                />
+
+                {/* BLOC GAUCHE */}
+                <div className="flex flex-col items-center gap-2 w-full">
+                    {/* Inscription visible uniquement si débloqué */}
+                    {leftLocker === 'unlocked' && (
+                        <span className="text-[var(--color-sand)] font-mono text-xs font-bold tracking-[4px] opacity-80 animate-pulse">
+                            ZONE GAUCHE
+                        </span>
+                    )}
+                    <LockerGrid
+                        side="left"
+                        status={leftLocker}
+                        cases={leftCases}
+                        onLockerClick={handleLockerClick}
+                        onCaseClick={handleCaseClick}
+                    />
+                </div>
+
+                {/* BLOC DROITE */}
+                <div className="flex flex-col items-center gap-2 w-full">
+                    {/* Inscription visible uniquement si débloqué */}
+                    {rightLocker === 'unlocked' && (
+                        <span className="text-[var(--color-sand)] font-mono text-xs font-bold tracking-[4px] opacity-80 animate-pulse">
+                            ZONE DROITE
+                        </span>
+                    )}
+                    <LockerGrid
+                        side="right"
+                        status={rightLocker}
+                        cases={rightCases}
+                        onLockerClick={handleLockerClick}
+                        onCaseClick={handleCaseClick}
+                    />
+                </div>
+
             </article>
+
             <VictoryPopup
                 isOpen={showVictory}
                 codeDigits={codeDigits}
