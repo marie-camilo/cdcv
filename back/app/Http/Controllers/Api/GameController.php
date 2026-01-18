@@ -55,4 +55,22 @@ class GameController extends Controller
             })
         ]);
     }
+
+    public function clearCookie()
+    {
+        $cookies = [
+            'game_cookie',
+            'player_cookie'
+        ];
+
+        $response = response()->json([
+            'message' => 'Cookies supprimés'
+        ]);
+
+        foreach ($cookies as $name) {
+            $response = $response->withCookie(cookie($name, '', -1, '/'));
+        }
+
+        return $response;
+    }
 }

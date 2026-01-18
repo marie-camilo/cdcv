@@ -2,11 +2,13 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from "next/navigation";
 import QRScanner from "@/components/organisms/QRScanner/QRScanner";
+import { apiFetch } from "@/hooks/API/fetchAPI";
 
 export default function ScanPage() {
     const router = useRouter();
     const [message, setMessage] = useState("");
-    const [scannedValue, setScannedValue] = useState(""); // Pour voir le code brut sur mobile
+    const [scannedValue, setScannedValue] = useState("");
+    const [isProcessing, setIsProcessing] = useState(false);
 
     useEffect(() => {
         document.title = "Scan QR Code | La Click";
@@ -17,38 +19,71 @@ export default function ScanPage() {
         'FOYER': 'scan',
         'BETA5678': 'phone',
         'GAMMA9012': 'puzzle',
-        'OMEGA7890': 'folder',
-        'DELTA3456': 'chat',
+        'OMEGA7890': 'boussole',
+        'DELTA3456': 'terminal',
     };
 
-    const handleScanSuccess = (decodedText) => {
-        // Nettoyage du texte (enlève les espaces et force majuscules)
+    const handleScanSuccess = async (decodedText) => {
+        if (isProcessing) return;
+
         const cleanCode = decodedText.trim().toUpperCase();
-        setScannedValue(cleanCode); // Affiche la valeur brute sur l'écran
+        setScannedValue(cleanCode);
+        setIsProcessing(true);
 
         const appId = codes[cleanCode];
 
-        if (appId) {
-            const unlocked = JSON.parse(localStorage.getItem('unlockedApps') || '[]');
-
-            if (unlocked.includes(appId)) {
-                setMessage("⚠️ CETTE APPLICATION EST DÉJÀ DÉBLOQUÉE !");
-            } else {
-                unlocked.push(appId);
-                localStorage.setItem('unlockedApps', JSON.stringify(unlocked));
-                setMessage(`✅ APPLICATION "${appId.toUpperCase()}" DÉBLOQUÉE !`);
-
-                // Petit feedback haptique si le téléphone le supporte
-                if (window.navigator.vibrate) window.navigator.vibrate(200);
-
-                setTimeout(() => router.push('/'), 2000);
-            }
-        } else {
+        if (!appId) {
             setMessage("❌ CODE INVALIDE. ACCÈS REFUSÉ.");
-            // On reset le message après 3 secondes pour permettre de scanner à nouveau
             setTimeout(() => {
                 setMessage("");
                 setScannedValue("");
+                setIsProcessing(false);
+            }, 3000);
+            return;
+        }
+
+        // Appel API au lieu de localStorage
+        const gameCode = localStorage.getItem('currentGameCode');
+
+        try {
+            const response = await apiFetch(`/api/v1/game/${gameCode}/unlock-app`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    app_id: appId,
+                    entered_code: cleanCode
+                })
+            });
+
+            if (response.status === 'error') {
+                if (response.code_status === 'already_used') {
+                    setMessage("⚠️ CE CODE A DÉJÀ ÉTÉ UTILISÉ !");
+                } else {
+                    setMessage("❌ ERREUR : " + response.message);
+                }
+
+                setTimeout(() => {
+                    setMessage("");
+                    setScannedValue("");
+                    setIsProcessing(false);
+                }, 3000);
+                return;
+            }
+
+            // Succès
+            setMessage(`✅ APPLICATION "${appId.toUpperCase()}" DÉBLOQUÉE !`);
+
+            if (window.navigator.vibrate) window.navigator.vibrate(200);
+
+            setTimeout(() => router.push('/'), 2000);
+
+        } catch (error) {
+            console.error("Erreur lors du déblocage:", error);
+            setMessage("❌ ERREUR DE CONNEXION AU SERVEUR");
+
+            setTimeout(() => {
+                setMessage("");
+                setScannedValue("");
+                setIsProcessing(false);
             }, 3000);
         }
     };
@@ -61,7 +96,6 @@ export default function ScanPage() {
                         [ SYSTÈME DE SCAN ACTIVÉ ]
                     </p>
 
-                    {/* Zone de feedback en temps réel */}
                     {scannedValue && !message.startsWith('✅') && (
                         <p className="text-yellow-400 font-mono text-xs mb-2">
                             DERNIER CODE DÉTECTÉ : "{scannedValue}"
@@ -76,12 +110,10 @@ export default function ScanPage() {
                 </div>
             </div>
 
-            {/* Le scanner (on garde ton composant actuel) */}
             <div className="relative w-full max-w-md">
                 <QRScanner onScanSuccess={handleScanSuccess} />
             </div>
 
-            {/* Message de succès ou d'erreur très marqué */}
             {message && (
                 <div className={`mt-6 p-6 border-2 rounded max-w-md w-full animate-in fade-in zoom-in duration-300 ${
                     message.startsWith('✅')

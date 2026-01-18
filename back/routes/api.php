@@ -68,6 +68,8 @@ Route::middleware('api.key')
         Route::get('/countdown/{code}', [GameFlowController::class, 'getCountdown']);
 
         Route::post('/game/{code}/trigger-video', [GameFlowController::class, 'triggerVideo']);
+
+        Route::post('/game/clear-cookie', [GameController::class, 'clearCookie']);
     });
 
 

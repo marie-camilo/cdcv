@@ -4,7 +4,7 @@ export const dynamic = 'force-static';
 
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-
+import {clearAllStorage} from "@/lib/clearStorage";
 import { addPlayer } from '@/hooks/API/gameRequests';
 import {
   checkGameState,
@@ -25,8 +25,14 @@ export default function StartPage() {
    * Lecture du query param APRÈS hydration
    */
   useEffect(() => {
-    const c = searchParams.get('code');
-    setCode(c);
+      const c = searchParams.get('code');
+
+      if (!c) return;
+
+      (async () => {
+          await clearAllStorage();
+          setCode(c); // code défini **après** le clear
+      })();
   }, [searchParams]);
 
   /**
@@ -49,12 +55,12 @@ export default function StartPage() {
           }
 
           if (state.status === 'started') {
-            router.replace('/');
+            router.replace('/log');
             return;
           }
         }
       } catch {
-        router.replace('/');
+        router.replace('/log');
       }
     };
 
