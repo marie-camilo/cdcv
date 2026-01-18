@@ -30,6 +30,7 @@ const GAME_ROUTES = [
     "/enigme-2/simon",
     "/enigme-2/tuile",
     "/enigme-2/fleche",
+    "/enigme-2/snake",
 ];
 
 export default function RootLayout({ children }) {
