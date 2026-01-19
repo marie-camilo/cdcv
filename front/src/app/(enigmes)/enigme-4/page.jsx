@@ -42,7 +42,7 @@ export default function Enigme4Page() {
         "> RADAR INITIALISÉ. 11 SIGNAUX DÉTECTÉS.",
         "> REMPLISSEZ LES 7 SLOTS DE LA GRILLE.",
         "> [HACK] : UTILISATION LIMITÉE (3/3).",
-        "> ATTENTION : LES PIÈCES SABOTÉES (LAVANDE) ALTÈRENT LE CODE FINAL."
+        "> ATTENTION : LES PIÈCES SABOTÉES (BLEU GRIS) ALTÈRENT LE CODE FINAL."
     ];
 
     useEffect(() => {
@@ -97,7 +97,7 @@ export default function Enigme4Page() {
     };
 
     return (
-        <section className="min-h-screen flex flex-col items-center p-4 pb-20 relative bg-black">
+        <section className="min-h-screen flex flex-col items-center p-4 pb-20 relative bg-darker-red">
             <div className="z-10 w-full max-w-[450px] mb-4 mt-2">
                 <TypewriterTerminal textLines={step === 'SEARCH' ? terminalMsgSearch : ["Analyses terminées..."]} speed={30} key={step} />
             </div>
@@ -107,7 +107,7 @@ export default function Enigme4Page() {
                     <>
                         <div className="relative my-4">
                             <RadarCompass targets={ALL_PIECES_IN_ROOM} foundIds={Object.values(assignedPieces)} isPirateVision={isHackActive} />
-                            <button onClick={handleHack} disabled={hackCharges === 0 || isHackActive} className="absolute -bottom-6 -right-6 w-16 h-16 rounded-full border-2 border-[var(--color-lavender)] bg-black text-[var(--color-lavender)] z-50 flex flex-col items-center justify-center font-black active:scale-95 transition-transform disabled:opacity-20 shadow-[0_0_15px_rgba(143,147,255,0.4)]">
+                            <button onClick={handleHack} disabled={hackCharges === 0 || isHackActive} className="absolute -bottom-6 -right-6 w-16 h-16 rounded-full border-2 border-[var(--color-mat-blue)] bg-black text-[var(--color-mat-blue)] z-50 flex flex-col items-center justify-center font-black active:scale-95 transition-transform disabled:opacity-20 shadow-[0_0_15px_rgba(143,147,255,0.4)]">
                                 <span className="text-xs font-mono">{hackCharges}/3</span>
                             </button>
                         </div>
