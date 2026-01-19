@@ -18,6 +18,13 @@ const GAME_ROUTES = [
     "/enigme-3/navigateur", "/enigme-3/guideur",
     "/enigme-2/motus", "/enigme-2/zip", "/enigme-2/simon",
     "/enigme-2/tuile", "/enigme-2/fleche", "/enigme-2/snake",
+    "/answer",
+    "/scan",
+];
+
+const NO_LOADER_TRANSITION_GROUPS = [
+    "/enigme-2/",
+    "/enigme-3/"
 ];
 
 export default function RootLayout({ children }) {
@@ -25,6 +32,13 @@ export default function RootLayout({ children }) {
     useEnigma2State();
 
     const pathname = usePathname();
+
+    const getLoaderKey = () => {
+        const group = NO_LOADER_TRANSITION_GROUPS.find(prefix => pathname?.startsWith(prefix));
+        if (group) return group;
+        return pathname;
+    };
+
     const isGamePage = GAME_ROUTES.some((route) => pathname?.startsWith(route));
 
     return (
@@ -38,7 +52,7 @@ export default function RootLayout({ children }) {
         <GlobalVideoOverlay />
 
         <TimerProvider>
-            <SplashScreen key={pathname} />
+            <SplashScreen key={getLoaderKey()} />
             {!isGamePage && <Navbar />}
         </TimerProvider>
         <div className="flex-1 overflow-y-auto overflow-x-hidden">

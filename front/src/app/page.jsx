@@ -158,20 +158,33 @@ const AppIcon = ({ id, unlockedApps, seenApps, onOpen }) => {
         <button
             onClick={() => onOpen(id)}
             className={clsx(
-                "relative aspect-square flex flex-col items-center justify-center rounded-2xl border transition-all active:scale-90 group overflow-visible",
-                shouldPulse ? "border-[var(--color-light-green)] bg-[var(--color-light-green)]/10 animate-[pulse_3s_ease-in-out_infinite] shadow-[0_0_15px_rgba(0,255,100,0.2)]" : "border-white/10 bg-white/5 hover:border-white/30"
+                "relative aspect-square flex flex-col items-center p-3 rounded-2xl border transition-all active:scale-90 group overflow-visible",
+                shouldPulse
+                    ? "border-[var(--color-light-green)] bg-[var(--color-light-green)]/10 animate-[pulse_3s_ease-in-out_infinite] shadow-[0_0_15px_rgba(0,255,100,0.2)]"
+                    : "border-white/10 bg-white/5 hover:border-white/30"
             )}
         >
-            <div className="relative z-10 transform -translate-y-1 group-hover:scale-110 transition-transform duration-300">
+            <div className="flex-1 flex items-center justify-center w-full group-hover:scale-110 transition-transform duration-300">
                 {tool.image ? (
-                    <Image src={tool.image} alt="" width={56} height={56} className="object-contain" unoptimized />
+                    <Image
+                        src={tool.image}
+                        alt=""
+                        width={48}
+                        height={48}
+                        className="object-contain"
+                        unoptimized
+                    />
                 ) : (
                     <tool.fallbackIcon className={clsx("text-4xl", tool.color)} />
                 )}
             </div>
+
             {shouldPulse && <div className="absolute top-2 right-2 w-3 h-3 bg-red-500 rounded-full animate-pulse border-2 border-black z-20 shadow-[0_0_8px_red]" />}
             {!shouldPulse && <div className="absolute -top-2 -right-2 bg-green-900/80 text-green-400 border border-green-700 text-[10px] rounded-full w-5 h-5 flex items-center justify-center shadow-sm">✓</div>}
-            <div className={`absolute bottom-2 text-[8px] font-mono font-bold tracking-tighter uppercase opacity-60 ${tool.color}`}>{id}</div>
+
+            <div className={`mt-1 text-[11px] font-mono font-bold tracking-tighter uppercase opacity-60 ${tool.color}`}>
+                {id}
+            </div>
         </button>
     );
 };
