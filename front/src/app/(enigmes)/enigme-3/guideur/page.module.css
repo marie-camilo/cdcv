@@ -5,7 +5,7 @@
     justify-content: center;
     padding: 20px;
     min-height: 100vh;
-    background: var(--color-purple-dark);
+    background: var(--color-darker-red);
     overflow: hidden;
     width: 100%;
     box-sizing: border-box;
@@ -19,7 +19,7 @@
     align-items: flex-start;
 }
 
-/* Bouton Logs Container - positionné comme les cœurs sur TeamB */
+/* Bouton Logs Container - positionné comme les cœurs sur Navigateur */
 .logsButtonContainer {
     position: absolute;
     top: 0;
@@ -33,9 +33,9 @@
     gap: 8px;
     padding: 10px 18px;
     background: rgba(255, 255, 255, 0.03);
-    border: 2px solid var(--color-cyan-bright);
+    border: 2px solid var(--color-mat-blue);
     border-radius: 8px;
-    color: var(--color-cyan-bright);
+    color: var(--color-mat-blue);
     font-family: 'Courier New', monospace;
     font-size: 16px;
     font-weight: bold;
@@ -45,10 +45,10 @@
 }
 
 .logsButton:hover {
-    background: var(--color-cyan-bright);
-    color: var(--color-purple-darker);
+    background: var(--color-mat-blue);
+    color: var(--color-darker-red);
     transform: translateY(-2px);
-    box-shadow: 0 0 20px rgba(0, 242, 254, 0.5);
+    box-shadow: 0 0 20px rgba(169, 185, 200, 0.5);
 }
 
 .logsButton:active {
@@ -57,7 +57,7 @@
 
 .logsIcon {
     font-size: 20px;
-    filter: drop-shadow(0 0 8px var(--color-cyan-bright));
+    filter: drop-shadow(0 0 8px var(--color-mat-blue));
 }
 
 /* Overlay Terminal - Plein écran */
@@ -120,18 +120,18 @@
     gap: 10px;
     padding: 10px 18px;
     background: rgba(255, 255, 255, 0.03);
-    border: 2px solid var(--color-cyan-bright);
+    border: 2px solid var(--color-mat-blue);
     border-radius: 8px;
 }
 
 .heartFull {
-    color: var(--color-red-bright);
+    color: var(--color-red);
     font-size: 24px;
-    filter: drop-shadow(0 0 8px var(--color-red-bright));
+    filter: drop-shadow(0 0 8px var(--color-red));
 }
 
 .heartEmpty {
-    color: rgba(255, 23, 68, 0.2);
+    color: rgba(173, 11, 22, 0.2);
     font-size: 24px;
 }
 
@@ -142,21 +142,21 @@
 }
 
 .counterBox {
-    background: var(--color-red-accent);
-    color: var(--color-purple-darker);
+    background: var(--color-mid-red);
+    color: var(--color-sand);
     padding: 12px 28px;
     border-radius: 8px;
     font-family: 'Courier New', monospace;
     font-size: 22px;
     font-weight: bold;
     text-align: center;
-    border: 2px solid var(--color-red-bright);
+    border: 2px solid var(--color-red);
 }
 
 .resetButton {
     background: rgba(255, 255, 255, 0.03);
-    border: 2px solid var(--color-cyan-bright);
-    color: var(--color-cyan-bright);
+    border: 2px solid var(--color-mat-blue);
+    color: var(--color-mat-blue);
     padding: 0;
     border-radius: 8px;
     font-size: 24px;
@@ -170,8 +170,8 @@
 }
 
 .resetButton:hover {
-    background: var(--color-cyan-bright);
-    color: var(--color-purple-darker);
+    background: var(--color-mat-blue);
+    color: var(--color-darker-red);
     transform: rotate(180deg);
 }
 
@@ -186,21 +186,21 @@
     height: 100%;
     margin: 0 auto;
     background: #000;
-    border: 2px solid var(--color-red-accent);
+    border: 2px solid var(--color-mid-red);
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 0 20px rgba(255, 48, 79, 0.3);
+    box-shadow: 0 0 20px rgba(173, 11, 22, 0.3);
     display: flex;
     flex-direction: column;
 }
 
 .terminalHeader {
-    background: var(--color-purple-darker);
+    background: var(--color-darker-red);
     padding: 12px 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid var(--color-red-accent);
+    border-bottom: 1px solid var(--color-mid-red);
     flex-shrink: 0;
 }
 
@@ -214,7 +214,7 @@
     width: 12px;
     height: 12px;
     border-radius: 50%;
-    background: var(--color-red-bright);
+    background: var(--color-red);
     animation: pulse 2s infinite;
 }
 
@@ -224,16 +224,16 @@
 }
 
 .headerTitle {
-    color: var(--color-red-bright);
+    color: var(--color-red);
     font-family: 'Courier New', monospace;
     font-size: 14px;
     font-weight: bold;
 }
 
 .minimizeButton {
-    color: var(--color-red-bright);
+    color: var(--color-red);
     background: transparent;
-    border: 1px solid var(--color-red-accent);
+    border: 1px solid var(--color-mid-red);
     padding: 6px 12px;
     font-family: 'Courier New', monospace;
     font-size: 12px;
@@ -243,8 +243,8 @@
 }
 
 .minimizeButton:hover {
-    background: rgba(255, 48, 79, 0.1);
-    color: var(--color-red-accent);
+    background: rgba(173, 11, 22, 0.1);
+    color: var(--color-mid-red);
 }
 
 .logsContainer {
@@ -262,11 +262,11 @@
 }
 
 .logsContainer::-webkit-scrollbar-track {
-    background: var(--color-purple-darker);
+    background: var(--color-darker-red);
 }
 
 .logsContainer::-webkit-scrollbar-thumb {
-    background: var(--color-red-accent);
+    background: var(--color-mid-red);
     border-radius: 4px;
 }
 
@@ -289,12 +289,12 @@
 
 .highlight {
     font-weight: bold;
-    color: var(--color-cyan-bright);
-    text-shadow: 0 0 5px rgba(0, 242, 254, 0.5);
+    color: var(--color-mat-blue);
+    text-shadow: 0 0 5px rgba(169, 185, 200, 0.5);
 }
 
 .cursor {
-    color: var(--color-red-bright);
+    color: var(--color-red);
     display: inline-block;
     animation: blink 1s infinite;
 }
