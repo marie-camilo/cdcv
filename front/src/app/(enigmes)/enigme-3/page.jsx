@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Pusher from "pusher-js";
 
 import TypewriterTerminal from "@/components/molecules/TypewriterTerminal/TypewriterTerminal";
@@ -24,13 +24,13 @@ export default function Enigme3Page() {
 
     const addLog = (msg) => setLogs((prev) => [...prev.slice(-4), msg]);
 
-    // Auto-scroll (uniquement quand un nouveau message arrive)
+    // Auto-scroll
     useEffect(() => {
         if (!scrollRef.current) return;
         scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }, [messages.length]);
 
-    // 1) Init : récupérer myPlayerId + gameCode + historique
+    // 1) Init
     useEffect(() => {
         let cancelled = false;
 
@@ -40,9 +40,7 @@ export default function Enigme3Page() {
                 const gameRes = await getCodeFromCookie();
                 const roleRes = await getPlayerRole();
                 setPlayerRole(roleRes?.role ?? null);
-
                 if (!playerRes?.authenticated || !playerRes?.player?.id || !gameRes?.game?.code) {
-                    // tu peux router ailleurs si tu veux
                     addLog("SESSION INVALIDE");
                     return;
                 }
@@ -53,11 +51,9 @@ export default function Enigme3Page() {
                 setMyPlayerId(playerRes.player.id);
                 setGameCode(code);
 
-                // historique
                 const history = await getAudioMessages();
                 const list = history?.messages ?? [];
 
-                // dédoublonnage + tri
                 const sorted = [...list].sort(
                     (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
                 );
@@ -80,7 +76,7 @@ export default function Enigme3Page() {
         };
     }, []);
 
-    // 2) Pusher : temps réel
+    // 2) Pusher
     useEffect(() => {
         if (!gameCode || pusherRef.current) return;
 
@@ -95,10 +91,7 @@ export default function Enigme3Page() {
         const channel = pusher.subscribe(channelName);
 
         channel.bind("AudioMessageSent", (payload) => {
-            // payload attendu: { id, url, senderPlayerId, createdAt, filename? }
             if (!payload?.id) return;
-
-            // anti-doublon
             if (seenIdsRef.current.has(payload.id)) return;
             seenIdsRef.current.add(payload.id);
 
@@ -119,11 +112,9 @@ export default function Enigme3Page() {
         };
     }, [gameCode]);
 
-    // 3) Quand *moi* j’upload : on injecte aussi dans la liste (sans attendre Pusher)
+    // 3) Upload local
     const handleUploadSuccess = (msgFromApi) => {
-        // msgFromApi doit être { id, url, senderPlayerId, createdAt }
         if (!msgFromApi?.id) return;
-
         if (seenIdsRef.current.has(msgFromApi.id)) return;
         seenIdsRef.current.add(msgFromApi.id);
 
@@ -146,115 +137,120 @@ export default function Enigme3Page() {
 
     return (
         <>
-        {isLoading && <LoadingIndicator fullscreen={true} />}
+            {isLoading && <LoadingIndicator fullscreen={true} />}
 
-        <section
-            className="min-h-[100dvh] w-full"
-            style={{
-                backgroundImage: "url('/background-computer.png')",
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                padding: "40px 20px",
-            }}
-        >
-            <div className="absolute inset-0 bg-black/60 z-0"/>
-            <div
-                className="z-10 w-full max-w-[450px] grid gap-6 z-100"
-            >
-                {/* ✅ TERMINAL : fixe */}
-                <div className="w-full">
-                    <TypewriterTerminal
-                        textLines={["FREQUENCE : 443.5 MHz", "MAINTENEZ POUR COMMUNIQUER"]}
-                        speed={40}
-                    />
-                </div>
+            <section className="min-h-[100dvh] w-full flex flex-col bg-[var(--color-darker-red)] p-4 font-mono overflow-hidden relative">
 
-                {/* ✅ CONVERSATION : prend le reste + scroll */}
-                <div
-                    ref={scrollRef}
-                    className="w-full h-[45dvh] max-h-[45dvh] overflow-y-auto p-4 rounded-lg border border-cyan-500/30 bg-black/40 backdrop-blur-md flex flex-col gap-4"
-                    style={{scrollbarWidth: "none"}}
-                >
-                    {messages.length === 0 && (
-                        <p className="text-cyan-500/40 text-center text-xs italic mt-10">
-                            Aucun signal radio détecté...
-                        </p>
-                    )}
+                <div className="absolute inset-0 pointer-events-none opacity-10"
+                     style={{
+                         backgroundImage: `linear-gradient(var(--color-mat-red) 1px, transparent 1px), linear-gradient(90deg, var(--color-mat-red) 1px, transparent 1px)`,
+                         backgroundSize: '40px 40px'
+                     }}
+                />
 
-                    {messages.map((msg) => {
-                        const isMine = myPlayerId != null && msg.senderPlayerId === myPlayerId;
+                <div className="z-10 w-full max-w-[450px] mx-auto flex flex-col gap-6 h-full">
 
-                        return (
-                            <div
-                                key={msg.id}
-                                className={`${
-                                    isMine ? "self-end items-end" : "self-start items-start"
-                                } flex flex-col max-w-[85%]`}
-                            >
+                    <div className="w-full shrink-0">
+                        <TypewriterTerminal
+                            textLines={[
+                                "Ici P.A. Jacquot. J'ai réussi à déployer ce canal radio de secours.",
+                                "Vos coéquipiers sont piégés dans un labyrinthe et doivent trouver leur sortie.",
+                                "Des logs système sont inscrits sur l'interface du labyrinthe.",
+                                "Il est primoridal que vous analysiez ces données brutes pour leur dicter la route de sortie.",
+                                "Utilisez vos talkies-walkies pour communiquer, mais attention! Seuls les agents ayant le rôle de communiquant peuvent y accéder.",
+                            ]}
+                            speed={30}
+                        />
+                    </div>
+
+                    <div
+                        ref={scrollRef}
+                        className="flex-1 min-h-0 overflow-y-auto p-4 rounded-lg border border-[var(--color-mat-red)] bg-black/40 backdrop-blur-md flex flex-col gap-4 shadow-[0_0_15px_rgba(0,0,0,0.5)]"
+                    >
+                        {messages.length === 0 && (
+                            <div className="flex flex-col items-center justify-center h-full opacity-60">
+                                <span className="text-[var(--color-mat-red)] text-xs italic animate-pulse">
+                                    -- CANAL DÉSACTIVÉ --
+                                </span>
+                            </div>
+                        )}
+
+                        {messages.map((msg) => {
+                            const isMine = myPlayerId != null && msg.senderPlayerId === myPlayerId;
+
+                            return (
                                 <div
-                                    className={`p-2 border shadow-[0_0_10px_rgba(0,255,255,0.1)] ${
-                                        isMine
-                                            ? "bg-cyan-900/20 border-cyan-500/50 rounded-l-2xl rounded-tr-2xl"
-                                            : "bg-white/10 border-white/20 rounded-r-2xl rounded-tl-2xl"
-                                    }`}
+                                    key={msg.id}
+                                    className={`${
+                                        isMine ? "self-end items-end" : "self-start items-start"
+                                    } flex flex-col max-w-[85%]`}
                                 >
-                                    <audio
-                                        src={msg.url}
-                                        controls
-                                        className="h-9 w-44 invert grayscale brightness-200"
-                                    />
+                                    <div
+                                        className={`p-2 border backdrop-blur-sm ${
+                                            isMine
+                                                ? "bg-[var(--color-mid-red)] border-[var(--color-mat-red)] rounded-l-xl rounded-tr-xl shadow-[0_0_10px_rgba(195,118,112,0.2)]"
+                                                : "bg-[var(--color-sand)]/10 border-[var(--color-sand)]/30 rounded-r-xl rounded-tl-xl"
+                                        }`}
+                                    >
+                                        {/* Player audio style personnalisé */}
+                                        <audio
+                                            src={msg.url}
+                                            controls
+                                            className="h-8 w-40 opacity-80 mix-blend-screen"
+                                            style={{ filter: "sepia(1) hue-rotate(-50deg) saturate(3)" }}
+                                        />
+                                    </div>
+
+                                    <span className="text-[9px] text-[var(--color-sand)] mt-1 font-bold uppercase opacity-60 tracking-wider">
+                                        {formatTime(msg.createdAt)} • {isMine ? "TX" : "RX"}
+                                    </span>
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    <div className="w-full shrink-0 flex flex-col items-center justify-center gap-4 pb-6">
+
+                        {playerRole === "communicant" ? (
+                            <>
+                                <TalkieButton onLog={addLog} onUploadSuccess={handleUploadSuccess} />
+
+                                <div className="font-mono text-[10px] text-[var(--color-sand)] uppercase tracking-[0.2em] h-4 animate-pulse">
+                                    {logs[logs.length - 1]}
+                                </div>
+                            </>
+                        ) : (
+                            <div className="w-full flex flex-col items-center animate-in fade-in slide-in-from-bottom-4 duration-700">
+
+                                {/* Faux bouton désactivé */}
+                                <div className="w-24 h-24 rounded-full border-2 border-dashed border-[var(--color-mid-red)] flex items-center justify-center bg-black/50 opacity-50 mb-4 grayscale">
+                                    <span className="text-[10px] text-[var(--color-mat-red)] font-bold text-center leading-tight">
+                                        SIGNAL<br/>OFF
+                                    </span>
                                 </div>
 
-                                <span className="text-[9px] text-cyan-400 mt-1 font-mono uppercase opacity-70">
-                                  {formatTime(msg.createdAt)} • {isMine ? "ENVOYÉ" : "REÇU"}
-                                </span>
+                                {/* Message d'alerte bien visible */}
+                                <div className="w-full rounded border-l-4 border-[var(--color-red)] bg-[var(--color-mid-red)] p-4 shadow-[0_0_20px_rgba(0,0,0,0.6)] relative overflow-hidden group">
+                                    {/* Effet scanline */}
+                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+
+                                    <div className="flex items-center gap-3">
+                                        <div>
+                                            <p className="text-[var(--color-sand)] font-black text-sm uppercase tracking-widest mb-1">
+                                                ACCÈS REFUSÉ
+                                            </p>
+                                            <p className="text-[13px] text-white/80 leading-tight">
+                                                Votre terminal n'est pas équipé pour l'émission radio.
+                                                Seul le rôle <strong className="text-[var(--color-red)] bg-black/30 px-1 rounded">COMMUNICANT</strong> peut parler.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        );
-                    })}
+                        )}
+                    </div>
                 </div>
-
-                {/* ✅ CONTROLS : fixe */}
-                <div className="w-full flex flex-col items-center justify-center gap-4 z-100">
-
-                    {playerRole === "communicant" ? (
-                        <>
-                            <TalkieButton onLog={addLog} onUploadSuccess={handleUploadSuccess} />
-
-                            <div className="font-mono text-[10px] text-cyan-400 uppercase tracking-[0.2em] h-4">
-                                {logs[logs.length - 1]}
-                            </div>
-                        </>
-                    ) : (
-                        <>
-                            {/* Bouton désactivé "fake" pour garder la cohérence */}
-                            <div className="w-32 h-32 rounded-full border-4 flex flex-col items-center justify-center text-center font-bold text-[10px] bg-black/30 border-red-500/40 text-red-300 shadow-[0_0_14px_rgba(255,0,0,0.12)] select-none">
-                                PUSH
-                                <br />
-                                TO TALK
-                                <span className="mt-2 text-[9px] font-mono opacity-80">
-                                  LOCKED
-                                </span>
-                            </div>
-
-                            {/* Message immersif */}
-                            <div className="w-full rounded-lg border border-red-500/20 bg-black/30 p-3 text-center">
-                                <p className="text-[11px] text-red-200 font-mono uppercase tracking-[0.18em]">
-                                    ACCÈS REFUSÉ
-                                </p>
-
-                                <p className="mt-2 text-[10px] text-cyan-200/70 font-mono leading-relaxed">
-                                    Vous n’avez pas l’autorisation radio.
-                                    <br />
-                                    <span className="text-cyan-300/90">Seul le rôle</span>{" "}
-                                    <span className="text-cyan-300 font-bold">COMMUNICANT</span>{" "}
-                                    <span className="text-cyan-300/90">peut transmettre.</span>
-                                </p>
-                            </div>
-                        </>
-                    )}
-                </div>
-            </div>
-        </section>
+            </section>
         </>
     );
 }
