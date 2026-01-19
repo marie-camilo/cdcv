@@ -72,6 +72,12 @@ Route::middleware('api.key')
         Route::post('/game/clear-cookie', [GameController::class, 'clearCookie']);
 
         Route::get('/game/end/{code}', [GameController::class, 'getEndingAt']);
+
+        Route::prefix('labyrinth')->group(function () {
+            Route::post('/initialize', [GameFlowController::class, 'initializeLabyrinth']);
+            Route::get('/code', [GameFlowController::class, 'getLabyrinthCode']);
+            Route::post('/complete', [GameFlowController::class, 'completeLabyrinth']);
+        });
     });
 
 

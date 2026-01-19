@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Events\AppUnlocked;
 use App\Events\EnigmaUpdated;
+use App\Events\LabyrinthCompleted;
 use App\Http\Controllers\Controller;
 use App\Models\Game;
 use App\Models\Labyrinth;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -346,5 +348,126 @@ class GameFlowController extends Controller
         broadcast(new \App\Events\VideoTriggered($code, $request->video_id))->toOthers();
 
         return response()->json(['status' => 'video_triggered']);
+    }
+
+    public function initializeLabyrinth(Request $request)
+    {
+        $request->validate([
+            'game_code' => 'required|string|exists:games,code'
+        ]);
+
+        $gameCode = $request->input('game_code');
+
+        // Récupérer la ligne unique du labyrinthe
+        $labyrinth = Labyrinth::findOrFail(1);
+
+        // Mettre à jour le code
+        $labyrinth->code = $gameCode;
+        $labyrinth->save();
+
+        \Log::info("Labyrinthe initialisé", ['game_code' => $gameCode]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Labyrinthe initialisé avec succès',
+            'game_code' => $gameCode
+        ]);
+    }
+
+    /**
+     * 🎮 LABYRINTHE : Récupérer le game_code
+     */
+    public function getLabyrinthCode()
+    {
+        $labyrinth = Labyrinth::findOrFail(1);
+
+        if (!$labyrinth->code) {
+            return response()->json([
+                'code' => null,
+                'message' => 'Aucun code de partie associé au labyrinthe'
+            ], 404);
+        }
+
+        return response()->json([
+            'code' => $labyrinth->code
+        ]);
+    }
+
+    /**
+     * 🎯 LABYRINTHE : Compléter et broadcaster le code final
+     */
+    public function completeLabyrinth(Request $request)
+    {
+        $request->validate([
+            'game_code' => 'required|string|exists:games,code',
+            'exit_direction' => 'required|in:north,east',
+            'malus_count' => 'required|integer|min:0'
+        ]);
+
+        $gameCode = $request->input('game_code');
+        $exitDirection = $request->input('exit_direction');
+        $malusCount = $request->input('malus_count');
+
+        // Récupérer la partie
+        $game = Game::where('code', $gameCode)->firstOrFail();
+
+        // Vérifier que le labyrinthe n'a pas déjà été complété
+        if ($game->labyrinth_exit !== 'none') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Le labyrinthe a déjà été complété'
+            ], 400);
+        }
+
+        // 🎯 Générer le code final selon la sortie
+        $finalCode = $this->generateFinalCode($exitDirection);
+
+        // 📉 Appliquer les malus au timer
+        $malusMinutes = $malusCount * 5; // 5 min par malus
+        $newEndingAt = Carbon::parse($game->ending_at)->subMinutes($malusMinutes);
+
+        // 💾 Sauvegarder en DB
+        $game->ending_at = $newEndingAt;
+        $game->labyrinth_exit = $exitDirection;
+        $game->labyrinth_malus_count = $malusCount;
+        $game->save();
+
+        // 📡 Broadcast à TOUS les joueurs
+        event(new LabyrinthCompleted(
+            $gameCode,
+            $newEndingAt->timestamp * 1000,
+            $malusMinutes,
+            $finalCode
+        ));
+
+        \Log::info("Labyrinthe complété", [
+            'game_code' => $gameCode,
+            'exit' => $exitDirection,
+            'malus_count' => $malusCount,
+            'malus_minutes' => $malusMinutes,
+            'final_code' => $finalCode
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'exit_direction' => $exitDirection,
+            'malus_applied' => $malusMinutes,
+            'new_ending_at_ms' => $newEndingAt->timestamp * 1000,
+            'final_code' => $finalCode
+        ]);
+    }
+
+    /**
+     * 🔐 Génère le code final selon la sortie
+     */
+    private function generateFinalCode($exitDirection)
+    {
+        if ($exitDirection === 'north') {
+            // Sortie des bons enquêteurs
+            return 'REACTOR_CORE';
+        } else {
+            // Sortie des saboteurs
+            return 'SHADOW_OPS';
+        }
     }
 }
