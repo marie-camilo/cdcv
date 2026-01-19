@@ -39,10 +39,11 @@ export default function Enigme4Page() {
     const [finalStatus, setFinalStatus] = useState({ title: "", message: "", file: "" });
 
     const terminalMsgSearch = [
-        "> RADAR INITIALISÉ. 11 SIGNAUX DÉTECTÉS.",
-        "> REMPLISSEZ LES 7 SLOTS DE LA GRILLE.",
-        "> [HACK] : UTILISATION LIMITÉE (3/3).",
-        "> ATTENTION : LES PIÈCES SABOTÉES (BLEU GRIS) ALTÈRENT LE CODE FINAL."
+        "> M. JACQUOT : Utilisez la boussole pour localiser les 11 fragments.",
+        "> M. JACQUOT : Remplissez les 7 slots de la grille pour valider l'extraction.",
+        "> [!!! HACK SYSTÈME - CHEMISES ROUGES !!!]",
+        "> Saboteur, tu as 3 charges de hack. Révèle les pièces sabotées qui apparaitront en bleue.",
+        "> Si tu en valides 4, le signal final sera détourné vers NOTRE chemise."
     ];
 
     useEffect(() => {
