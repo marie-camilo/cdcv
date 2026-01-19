@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="093ef52b-a12e-4b25-bd90-7fac44d39d4f" name="Changes" comment="(fix)[Laby]Retours après beta test, modif des malus et apparence des sorties + ajout btn log">
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/6ffe876f-7d99-4f1b-b98c-1ca672f9c669.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/front/src/app/(enigmes)/enigme-2/(games)/snake/page.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/front/src/app/(enigmes)/enigme-2/(games)/snake/page.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/front/src/components/molecules/enigme2/LockerGrid.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/front/src/components/molecules/enigme2/LockerGrid.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front/src/app/(enigmes)/enigme-4/page.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/front/src/app/(enigmes)/enigme-4/page.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front/src/components/atoms/RadarCompass/RadarCompass.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/front/src/components/atoms/RadarCompass/RadarCompass.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -181,9 +186,10 @@
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "git-widget-placeholder": "camilomm",
+    "git-widget-placeholder": "monnete",
     "ignore.virus.scanning.warn.message": "true",
     "list.type.of.created.stylesheet": "CSS",
+    "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "vue.rearranger.settings.migration": "true"
   },
