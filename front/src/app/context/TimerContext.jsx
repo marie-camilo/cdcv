@@ -13,6 +13,7 @@ const TimerContext = createContext(null);
 
 export function TimerProvider({ children }) {
     const [seconds, setSeconds] = useState(undefined);
+    const [isFinished, setIsFinished] = useState(false);
 
     const endingAtRef = useRef(null);
     const intervalRef = useRef(null);
@@ -23,6 +24,12 @@ export function TimerProvider({ children }) {
             intervalRef.current = null;
         }
     }, []);
+
+    const triggerGameOver = useCallback(() => {
+        stop();
+        setSeconds(0);
+        setIsFinished(true);
+    }, [stop]);
 
     const startFromEndingAt = useCallback(
         (endingAtMs) => {
@@ -35,6 +42,7 @@ export function TimerProvider({ children }) {
             }
 
             endingAtRef.current = parsed;
+            setIsFinished(false);
 
             const compute = () => {
                 const end = endingAtRef.current;
@@ -45,7 +53,11 @@ export function TimerProvider({ children }) {
 
                 setSeconds(safe);
 
-                if (safe <= 0) stop();
+                // Détection de la fin du timer
+                if (safe <= 0) {
+                    stop();
+                    setIsFinished(true);
+                }
             };
 
             stop();
@@ -60,7 +72,7 @@ export function TimerProvider({ children }) {
     }, [stop]);
 
     return (
-        <TimerContext.Provider value={{ seconds, startFromEndingAt, stop }}>
+        <TimerContext.Provider value={{ seconds, startFromEndingAt, stop, isFinished, triggerGameOver }}>
             {children}
         </TimerContext.Provider>
     );
