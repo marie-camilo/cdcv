@@ -1,7 +1,8 @@
 "use client";
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from 'next/navigation';
-import { apiFetch } from "@/hooks/API/fetchAPI"; // Import de l'utilitaire API
+import { apiFetch } from "@/hooks/API/fetchAPI";
+import { RiInformationLine, RiCloseLine, RiCheckLine } from "react-icons/ri";
 
 const SOLUTION_WORDS = [
     "PIXEL", "ICONE", "MEDIA", "VIDEO", "PHOTO", "STYLE",
@@ -21,23 +22,21 @@ const MotusCyberMission = () => {
     const [isValidating, setIsValidating] = useState(false);
     const [showRules, setShowRules] = useState(false);
 
-    // Fonction de synchronisation pour mettre à jour les autres joueurs via Pusher
     const syncDigit = async (digit, storageKey) => {
         const gameCode = localStorage.getItem('currentGameCode');
         localStorage.setItem(storageKey, digit);
-
         try {
             await apiFetch(`/api/v1/game/${gameCode}/update-enigma`, {
                 method: 'POST',
                 body: JSON.stringify({
                     type: 'digit_update',
-                    side: storageKey, // 'motus_digit'
+                    side: storageKey,
                     index: 99,
                     status: digit
                 })
             });
         } catch (e) {
-            console.error("Erreur de synchronisation Motus:", e);
+            console.error("Erreur sync Motus:", e);
         }
     };
 
@@ -52,16 +51,14 @@ const MotusCyberMission = () => {
     }, []);
 
     const checkWordExists = async (word) => {
-        const cleanWord = word.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
         if (SOLUTION_WORDS.includes(word)) return true;
         try {
+            const cleanWord = word.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
             const url = `https://fr.wiktionary.org/w/api.php?action=query&format=json&origin=*&titles=${cleanWord}`;
             const response = await fetch(url);
             const data = await response.json();
             return Object.keys(data.query.pages)[0] !== "-1";
-        } catch {
-            return true;
-        }
+        } catch { return true; }
     };
 
     const handleSubmit = async (e) => {
@@ -109,46 +106,31 @@ const MotusCyberMission = () => {
 
         if (formattedGuess === currentSolution) {
             setGameState("solved");
-            setMessage("ACCÈS ACCORDÉ - SYNCHRONISATION...");
-
-            // Synchronisation et sauvegarde
+            setMessage("ACCÈS ACCORDÉ");
             syncDigit('4', 'motus_digit');
-
-            setTimeout(() => {
-                setGameState("won");
-            }, 1500);
+            setTimeout(() => setGameState("won"), 1500);
         } else if (newHistory.length >= MAX_ATTEMPTS) {
             setGameState("lost");
-            setMessage(`ÉCHEC. LE MOT ÉTAIT : ${currentSolution}`);
         } else {
             setMessage("");
         }
     };
 
-    const handleReturn = () => {
-        router.push('/enigme-2');
-    };
-
     return (
         <div style={styles.container}>
-            <button onClick={() => setShowRules(true)} style={styles.infoBtn}>i</button>
+            {/* Bouton Info moderne */}
+            <button onClick={() => setShowRules(true)} style={styles.infoBtn}>
+                <RiInformationLine size={20} />
+            </button>
 
             <div style={styles.header}>
-                <h1 style={{
-                    ...styles.title,
-                    color: gameState === "solved" || gameState === "won" ? "#00ff88" : "#ff3333",
-                }}>
-                    MOTUS PROTOCOL
-                </h1>
+                <h1 style={styles.title}>MOTUS PROTOCOL</h1>
                 <div style={styles.statusBar}>
                     <div style={styles.levelIndicator}>
-                        TENTATIVE : {history.length} / {MAX_ATTEMPTS}
+                        TENTATIVE {history.length} / {MAX_ATTEMPTS}
                     </div>
                     <div style={styles.progressTrack}>
-                        <div style={{
-                            ...styles.progressFill,
-                            width: `${(history.length / MAX_ATTEMPTS) * 100}%`,
-                        }}></div>
+                        <div style={{ ...styles.progressFill, width: `${(history.length / MAX_ATTEMPTS) * 100}%` }} />
                     </div>
                 </div>
             </div>
@@ -158,9 +140,13 @@ const MotusCyberMission = () => {
                     <div key={i} style={styles.row}>
                         {Array.from({ length: WORD_LENGTH }).map((_, j) => {
                             const attempt = history[i];
-                            const char = attempt ? attempt.word[j] : i === history.length ? guess[j] : "";
+                            const isCurrent = i === history.length;
+                            const char = attempt ? attempt.word[j] : isCurrent ? guess[j] : "";
+
                             let cellStyle = { ...styles.cell };
                             if (attempt) cellStyle = { ...cellStyle, ...styles[attempt.feedback[j]] };
+                            if (isCurrent && char) cellStyle.borderColor = "var(--color-mat-red)";
+
                             return <div key={j} style={cellStyle}>{char}</div>;
                         })}
                     </div>
@@ -170,36 +156,32 @@ const MotusCyberMission = () => {
             {(gameState === "playing" || gameState === "solved") && (
                 <form onSubmit={handleSubmit} style={styles.form}>
                     <input
-                        style={{
-                            ...styles.input,
-                            borderColor: gameState === "solved" ? "#00ff88" : "#ff3333",
-                        }}
+                        style={styles.input}
                         value={guess}
                         onChange={(e) => setGuess(e.target.value.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 5))}
                         disabled={isValidating || gameState === "solved"}
-                        placeholder={gameState === "solved" ? "OK" : "SAISIR"}
+                        placeholder="ENTRER MOT"
                         autoFocus
                     />
                 </form>
             )}
 
-            {message && (
-                <p style={{ ...styles.msgText, color: gameState === "solved" ? "#00ff88" : "white" }}>
-                    {message}
-                </p>
-            )}
+            <p style={styles.msgText}>{message}</p>
 
+            {/* MODALE D'AIDE ET INITIALISATION */}
             {(gameState === "start" || showRules) && (
                 <div style={styles.overlay}>
                     <div style={styles.modal}>
-                        <h2 style={styles.cyberText}>{showRules ? "AIDE" : "SYSTÈME VERROUILLÉ"}</h2>
+                        <h2 style={styles.modalTitle}>{showRules ? "ARCHIVES" : "SYSTÈME VERROUILLÉ"}</h2>
                         <div style={styles.docBox}>
-                            <p>Trouvez le mot de 5 lettres.</p>
+                            <p style={{ marginBottom: "15px", color: "white" }}>Déchiffrez le mot de 5 lettres pour obtenir le fragment du code.</p>
                             <div style={styles.docItem}>
-                                <div style={{ ...styles.miniCell, ...styles.correct }}></div> BIEN PLACÉ
+                                <div style={{ ...styles.miniCell, ...styles.correct }}>A</div>
+                                <span><b>LETTRE CORRECTE :</b> BIEN PLACÉE</span>
                             </div>
                             <div style={styles.docItem}>
-                                <div style={{ ...styles.miniCell, ...styles.present }}></div> MAL PLACÉ
+                                <div style={{ ...styles.miniCell, ...styles.present }}>B</div>
+                                <span><b>LETTRE PRÉSENTE :</b> MAL PLACÉE</span>
                             </div>
                         </div>
                         <button onClick={showRules ? () => setShowRules(false) : initializeGame} style={styles.mainBtn}>
@@ -209,24 +191,28 @@ const MotusCyberMission = () => {
                 </div>
             )}
 
+            {/* MODALE PERDU */}
             {gameState === "lost" && (
                 <div style={styles.overlay}>
                     <div style={styles.modal}>
-                        <h2 style={{ color: "#ff3333" }}>ACCÈS REFUSÉ</h2>
-                        <p style={styles.descText}>{message}</p>
+                        <RiCloseLine size={40} color="var(--color-red)" style={{ margin: "0 auto 10px" }} />
+                        <h2 style={styles.modalTitle}>ACCÈS REFUSÉ</h2>
+                        <p style={styles.descText}>Le mot était : <b style={{ color: "white" }}>{currentSolution}</b></p>
                         <button onClick={initializeGame} style={styles.mainBtn}>RÉESSAYER</button>
                     </div>
                 </div>
             )}
 
+            {/* MODALE VICTOIRE */}
             {gameState === "won" && (
                 <div style={styles.overlay}>
                     <div style={styles.modal}>
-                        <h2 style={{ color: "#00ff88" }}>MOT DÉCRYPTÉ</h2>
+                        <RiCheckLine size={40} color="var(--color-sand)" style={{ margin: "0 auto 10px" }} />
+                        <h2 style={{ ...styles.modalTitle, color: "var(--color-sand)" }}>FRAGMENT RÉCUPÉRÉ</h2>
                         <p style={styles.descText}>Premier numéro de la combinaison :</p>
                         <div style={styles.resultNum}>4</div>
-                        <button onClick={handleReturn} style={styles.secondaryBtn}>
-                            RETOUR
+                        <button onClick={() => router.push('/enigme-2')} style={styles.mainBtn}>
+                            RETOUR AU TERMINAL
                         </button>
                     </div>
                 </div>
@@ -236,33 +222,69 @@ const MotusCyberMission = () => {
 };
 
 const styles = {
-    container: { position: "fixed", inset: 0, backgroundColor: "#050202", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", touchAction: "none", fontFamily: "monospace" },
-    infoBtn: { position: "absolute", top: "20px", left: "20px", width: "35px", height: "35px", borderRadius: "50%", border: "1px solid #ff3333", backgroundColor: "transparent", color: "#ff3333", zIndex: 110, display: "flex", alignItems: "center", justifyContent: "center" },
-    header: { marginBottom: "30px", width: "80%", textAlign: "center" },
-    title: { fontSize: "1.4rem", letterSpacing: "4px", margin: "0 0 10px 0", transition: "color 0.5s" },
-    statusBar: { width: "100%" },
-    levelIndicator: { color: "#ff9999", fontSize: "0.7rem", marginBottom: "5px" },
-    progressTrack: { height: "3px", backgroundColor: "#220000" },
-    progressFill: { height: "100%", backgroundColor: "#ff3333", transition: "width 0.4s" },
-    grid: { display: "flex", flexDirection: "column", gap: "5px", marginTop: "20px" },
-    row: { display: "flex", gap: "5px" },
-    cell: { width: "50px", height: "50px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.4rem", border: "2px solid #222", backgroundColor: "#111", color: "white", transition: "all 0.3s" },
-    correct: { backgroundColor: "#00ff88", color: "black", borderColor: "#00ff88" },
-    present: { backgroundColor: "#ffcc00", color: "black", borderRadius: "50%", borderColor: "#ffcc00" },
-    absent: { backgroundColor: "#222", color: "#444" },
-    form: { width: "100%", display: "flex", justifyContent: "center", marginTop: "20px" },
-    input: { backgroundColor: "#000", color: "#ff3333", border: "2px solid #ff3333", padding: "12px", textAlign: "center", fontSize: "1.2rem", width: "180px", outline: "none", fontFamily: "monospace", transition: "border-color 0.5s" },
-    msgText: { marginTop: "15px", fontSize: "0.7rem", letterSpacing: "1px", height: "1em" },
-    overlay: { position: "absolute", inset: 0, backgroundColor: "rgba(0,0,0,0.98)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100 },
-    modal: { background: "#0a0505", border: "1px solid #ff3333", padding: "30px", borderRadius: "4px", textAlign: "center", width: "85%" },
-    cyberText: { color: "#ff3333", fontSize: "1.3rem", marginBottom: "15px" },
-    descText: { color: "#ccc", fontSize: "0.9rem", marginBottom: "20px" },
-    docBox: { textAlign: "left", color: "#888", fontSize: "0.75rem", marginBottom: "20px" },
-    docItem: { display: "flex", alignItems: "center", marginTop: "8px" },
-    miniCell: { width: "15px", height: "15px", marginRight: "10px", border: "1px solid #555" },
-    resultNum: { fontSize: "6rem", color: "#ff3333", fontWeight: "bold", textShadow: "0 0 30px #ff3333", margin: "15px 0" },
-    mainBtn: { padding: "14px 30px", backgroundColor: "#ff3333", color: "#000", border: "none", fontWeight: "bold", letterSpacing: "2px" },
-    secondaryBtn: { background: "none", border: "1px solid #333", color: "#555", padding: "10px 20px", marginTop: "10px" }
+    container: {
+        position: "fixed", inset: 0,
+        backgroundColor: "var(--color-darker-red)",
+        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+        fontFamily: "'JetBrains Mono', monospace", color: "var(--color-sand)"
+    },
+    infoBtn: {
+        position: "absolute", top: "20px", right: "20px",
+        width: "40px", height: "40px", borderRadius: "10px",
+        border: "1px solid var(--color-mid-red)", backgroundColor: "rgba(0,0,0,0.3)",
+        color: "var(--color-sand)", display: "flex", alignItems: "center", justifyContent: "center"
+    },
+    header: { marginBottom: "20px", width: "280px", textAlign: "center" },
+    title: { fontSize: "1.1rem", fontWeight: "900", letterSpacing: "4px", marginBottom: "15px" },
+    statusBar: { width: "100%", background: "rgba(0,0,0,0.2)", padding: "10px", borderRadius: "8px" },
+    levelIndicator: { color: "var(--color-mat-red)", fontSize: "0.6rem", fontWeight: "bold", marginBottom: "8px", tracking: "2px" },
+    progressTrack: { height: "4px", backgroundColor: "var(--color-darker-red)", borderRadius: "2px" },
+    progressFill: { height: "100%", backgroundColor: "var(--color-red)", transition: "width 0.4s", borderRadius: "2px" },
+
+    grid: { display: "flex", flexDirection: "column", gap: "6px" },
+    row: { display: "flex", gap: "6px" },
+    cell: {
+        width: "50px", height: "50px", display: "flex", alignItems: "center", justifyContent: "center",
+        fontSize: "1.5rem", fontWeight: "900", border: "2px solid var(--color-mid-red)",
+        backgroundColor: "rgba(0,0,0,0.3)", color: "white", transition: "all 0.3s"
+    },
+
+    // Status Couleurs (Palette)
+    correct: { backgroundColor: "var(--color-mat-blue)", borderColor: "var(--color-mat-blue)", color: "white" },
+    present: { backgroundColor: "transparent", borderColor: "var(--color-sand)", color: "var(--color-sand)", borderRadius: "50%" },
+    absent: { opacity: 0.3, borderColor: "transparent" },
+
+    form: { marginTop: "30px" },
+    input: {
+        backgroundColor: "rgba(0,0,0,0.4)", color: "var(--color-sand)",
+        border: "1px solid var(--color-mid-red)", padding: "15px",
+        textAlign: "center", fontSize: "1.2rem", width: "220px", outline: "none",
+        borderRadius: "8px", fontWeight: "bold"
+    },
+    msgText: { marginTop: "15px", fontSize: "0.7rem", fontWeight: "bold", letterSpacing: "1px", height: "1.2em", color: "var(--color-mat-red)" },
+
+    overlay: {
+        position: "absolute", inset: 0, backgroundColor: "rgba(0,0,0,0.9)",
+        display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, backdropFilter: "blur(4px)"
+    },
+    modal: {
+        background: "var(--color-darker-red)", border: "1px solid var(--color-mid-red)",
+        padding: "30px", borderRadius: "16px", textAlign: "center", width: "85%", maxWidth: "340px"
+    },
+    modalTitle: { color: "var(--color-red)", fontSize: "1.1rem", fontWeight: "900", marginBottom: "20px", letterSpacing: "2px" },
+    docBox: { textAlign: "left", fontSize: "0.75rem", marginBottom: "25px" },
+    docItem: { display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px", color: "var(--color-mat-blue)" },
+    miniCell: {
+        width: "30px", height: "30px", display: "flex", alignItems: "center", justifyContent: "center",
+        border: "1px solid var(--color-mid-red)", fontWeight: "bold", fontSize: "0.8rem"
+    },
+    resultNum: { fontSize: "6rem", color: "var(--color-sand)", fontWeight: "900", margin: "10px 0", lineHeight: "1" },
+    mainBtn: {
+        width: "100%", padding: "16px", backgroundColor: "var(--color-red)",
+        color: "white", border: "none", fontWeight: "900", borderRadius: "8px",
+        letterSpacing: "2px", cursor: "pointer"
+    },
+    descText: { color: "var(--color-mat-blue)", fontSize: "0.9rem", marginBottom: "20px" }
 };
 
 export default MotusCyberMission;

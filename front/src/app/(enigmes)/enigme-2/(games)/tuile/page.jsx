@@ -1,7 +1,8 @@
 "use client";
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from 'next/navigation';
-import { apiFetch } from "@/hooks/API/fetchAPI"; // Import de l'utilitaire de fetch
+import { apiFetch } from "@/hooks/API/fetchAPI";
+import { RiInformationLine, RiCheckLine, RiGridFill } from "react-icons/ri";
 
 const CipherPuzzleDelayed = () => {
     const router = useRouter();
@@ -12,24 +13,20 @@ const CipherPuzzleDelayed = () => {
     const [gameState, setGameState] = useState("start");
     const isLocked = useRef(false);
 
-    // Fonction de synchronisation pour mettre à jour les autres joueurs via Pusher
     const syncDigit = async (digit, storageKey) => {
         const gameCode = localStorage.getItem('currentGameCode');
         localStorage.setItem(storageKey, digit);
-
         try {
             await apiFetch(`/api/v1/game/${gameCode}/update-enigma`, {
                 method: 'POST',
                 body: JSON.stringify({
                     type: 'digit_update',
-                    side: storageKey, // ex: 'tuile_digit'
-                    index: 99, // Identifiant spécial pour les chiffres globaux
+                    side: storageKey,
+                    index: 99,
                     status: digit
                 })
             });
-        } catch (e) {
-            console.error("Erreur de synchronisation Pusher:", e);
-        }
+        } catch (e) { console.error("Erreur sync Puzzle:", e); }
     };
 
     const createBoard = useCallback(() => {
@@ -55,8 +52,7 @@ const CipherPuzzleDelayed = () => {
             if (col > 0) neighbors.push(emptyIndex - 1);
             if (col < gridSize - 1) neighbors.push(emptyIndex + 1);
 
-            const moveToIndex =
-                neighbors[Math.floor(Math.random() * neighbors.length)];
+            const moveToIndex = neighbors[Math.floor(Math.random() * neighbors.length)];
             const temp = newTiles[emptyIndex];
             newTiles[emptyIndex] = newTiles[moveToIndex];
             newTiles[moveToIndex] = temp;
@@ -65,6 +61,7 @@ const CipherPuzzleDelayed = () => {
 
         setTiles(newTiles.map((tile, index) => ({ ...tile, currentPos: index })));
         setGameState("playing");
+        setShowRules(false);
     };
 
     const handleTileClick = (clickedIndex) => {
@@ -78,60 +75,35 @@ const CipherPuzzleDelayed = () => {
 
         if (Math.abs(rowClick - rowEmpty) + Math.abs(colClick - colEmpty) === 1) {
             const newTiles = [...tiles];
-            [newTiles[clickedIndex], newTiles[emptyIndex]] = [
-                newTiles[emptyIndex],
-                newTiles[clickedIndex],
-            ];
+            [newTiles[clickedIndex], newTiles[emptyIndex]] = [newTiles[emptyIndex], newTiles[clickedIndex]];
             setTiles(newTiles);
 
             if (newTiles.every((tile, index) => tile.originalPos === index)) {
                 isLocked.current = true;
                 setGameState("solved");
-
-                // Synchronisation Pusher et sauvegarde locale
                 syncDigit('9', 'tuile_digit');
-
-                setTimeout(() => {
-                    setGameState("won");
-                }, 1200);
+                setTimeout(() => setGameState("won"), 1200);
             }
         }
-    };
-
-    const handleReturn = () => {
-        router.push('/enigme-2');
     };
 
     return (
         <div style={styles.container}>
             <button onClick={() => setShowRules(true)} style={styles.infoBtn}>
-                i
+                <RiInformationLine size={22} />
             </button>
 
             <div style={styles.header}>
                 <h1 style={styles.title}>CIPHER PUZZLE</h1>
-                <p
-                    style={{
-                        ...styles.levelIndicator,
-                        color: gameState === "solved" ? "#00ff88" : "#661111",
-                    }}
-                >
-                    {gameState === "solved"
-                        ? "MATRICE RESTAURÉE..."
-                        : "RÉTABLISSEZ LA MATRICE"}
+                <p style={{ ...styles.levelIndicator, color: gameState === "solved" ? "var(--color-sand)" : "var(--color-mat-red)" }}>
+                    {gameState === "solved" ? "MATRICE RESTAURÉE" : "RÉALIGNEZ LES FRAGMENTS"}
                 </p>
             </div>
 
-            <div
-                style={{
-                    ...styles.board,
-                    borderColor:
-                        gameState === "solved" || gameState === "won"
-                            ? "#00ff88"
-                            : "#ff3333",
-                    transition: "border-color 0.5s ease",
-                }}
-            >
+            <div style={{
+                ...styles.board,
+                borderColor: gameState === "solved" ? "var(--color-sand)" : "var(--color-mid-red)"
+            }}>
                 {tiles.map((tile, index) => (
                     <div
                         key={tile.id}
@@ -142,15 +114,11 @@ const CipherPuzzleDelayed = () => {
                             height: tileSize - 4,
                             left: (index % gridSize) * tileSize,
                             top: Math.floor(index / gridSize) * tileSize,
-                            backgroundColor: tile.isEmpty ? "transparent" : "#1a0a0a",
-                            border: tile.isEmpty
-                                ? "1px dashed #331111"
-                                : `2px solid ${gameState === "solved" ? "#00ff88" : "#ff3333"}`,
-                            color: gameState === "solved" ? "#00ff88" : "#ff3333",
+                            backgroundColor: tile.isEmpty ? "transparent" : "rgba(0,0,0,0.4)",
+                            border: tile.isEmpty ? "1px dashed var(--color-mid-red)" : `2px solid ${gameState === "solved" ? "var(--color-sand)" : "var(--color-red)"}`,
+                            color: gameState === "solved" ? "var(--color-sand)" : "white",
                             opacity: tile.isEmpty ? 0 : 1,
-                            boxShadow: tile.isEmpty
-                                ? "none"
-                                : "inset 0 0 15px rgba(255,51,51,0.1)",
+                            boxShadow: tile.isEmpty ? "none" : "inset 0 0 10px rgba(173,11,22,0.2)",
                             transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                         }}
                     >
@@ -160,25 +128,24 @@ const CipherPuzzleDelayed = () => {
             </div>
 
             {gameState === "playing" && (
-                <div style={styles.hint}>ALIGNEMENT EN COURS...</div>
+                <div style={styles.hint}>
+                    <RiGridFill style={{ marginRight: "8px" }} />
+                    INTÉGRITÉ SYSTÈME : {Math.round((tiles.filter((t, i) => t.originalPos === i).length / 9) * 100)}%
+                </div>
             )}
 
+            {/* MODALES */}
             {(gameState === "start" || showRules) && (
                 <div style={styles.overlay}>
                     <div style={styles.modal}>
-                        <h2 style={styles.cyberText}>
-                            {showRules ? "AIDE" : "SYSTÈME BLOQUÉ"}
-                        </h2>
+                        <h2 style={styles.modalTitle}>{showRules ? "ARCHIVES" : "MATRICE CORROMPUE"}</h2>
                         <p style={styles.descText}>
-                            Faites glisser les tuiles de 1 à 8.
-                            <br />
-                            Le trou doit finir en bas à droite.
+                            Réorganisez les fragments de 1 à 8 pour stabiliser le noyau.
+                            <br /><br />
+                            Le secteur vide doit se situer sur le noeud final (en bas à droite).
                         </p>
-                        <button
-                            onClick={showRules ? () => setShowRules(false) : shufflePuzzle}
-                            style={styles.mainBtn}
-                        >
-                            {showRules ? "RETOUR" : "DÉBLOQUER"}
+                        <button onClick={showRules ? () => setShowRules(false) : shufflePuzzle} style={styles.mainBtn}>
+                            {showRules ? "RETOUR" : "DÉBLOQUER L'ACCÈS"}
                         </button>
                     </div>
                 </div>
@@ -187,14 +154,12 @@ const CipherPuzzleDelayed = () => {
             {gameState === "won" && (
                 <div style={styles.overlay}>
                     <div style={styles.modal}>
-                        <h2 style={{ color: "#00ff88" }}>ACCÈS TOTAL</h2>
-                        <p style={styles.descText}>Code de fin de matrice identifié :</p>
+                        <RiCheckLine size={40} color="var(--color-sand)" style={{ margin: "0 auto 10px" }} />
+                        <h2 style={{ ...styles.modalTitle, color: "var(--color-sand)" }}>ACCÈS TOTAL</h2>
+                        <p style={styles.descText}>Dernière séquence identifiée :</p>
                         <div style={styles.resultNum}>9</div>
-                        <button
-                            onClick={handleReturn}
-                            style={styles.mainBtn}
-                        >
-                            RETOUR
+                        <button onClick={() => router.push('/enigme-2')} style={styles.mainBtn}>
+                            RETOUR AU TERMINAL
                         </button>
                     </div>
                 </div>
@@ -204,21 +169,52 @@ const CipherPuzzleDelayed = () => {
 };
 
 const styles = {
-    container: { position: "fixed", inset: 0, backgroundColor: "#050202", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", touchAction: "none", fontFamily: "monospace" },
-    infoBtn: { position: "absolute", top: "20px", left: "20px", width: "35px", height: "35px", borderRadius: "50%", border: "1px solid #ff3333", backgroundColor: "transparent", color: "#ff3333", zIndex: 110 },
+    container: {
+        position: "fixed", inset: 0,
+        backgroundColor: "var(--color-darker-red)",
+        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+        touchAction: "none", fontFamily: "'JetBrains Mono', monospace"
+    },
+    infoBtn: {
+        position: "absolute", top: "20px", right: "20px",
+        width: "40px", height: "40px", borderRadius: "10px",
+        border: "1px solid var(--color-mid-red)", backgroundColor: "rgba(0,0,0,0.3)",
+        color: "var(--color-sand)", display: "flex", alignItems: "center", justifyContent: "center"
+    },
     header: { marginBottom: "40px", textAlign: "center" },
-    title: { color: "#ff3333", fontSize: "1.5rem", letterSpacing: "4px", margin: 0 },
-    levelIndicator: { fontSize: "0.7rem", marginTop: "5px", transition: "color 0.5s" },
-    board: { position: "relative", width: "270px", height: "270px", backgroundColor: "#000", border: "2px solid #ff3333" },
-    tile: { position: "absolute", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.5rem", fontWeight: "bold", userSelect: "none" },
-    hint: { marginTop: "30px", color: "#ff3333", fontSize: "0.6rem", opacity: 0.5, letterSpacing: "1px" },
-    overlay: { position: "absolute", inset: 0, backgroundColor: "rgba(0,0,0,0.95)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100 },
-    modal: { background: "#0a0505", border: "1px solid #ff3333", padding: "30px", borderRadius: "15px", textAlign: "center", width: "80%" },
-    cyberText: { color: "#ff3333", fontSize: "1.2rem", marginBottom: "15px" },
-    descText: { color: "#ccc", fontSize: "0.8rem", marginBottom: "25px", lineHeight: "1.5" },
-    resultNum: { fontSize: "6rem", color: "#ff3333", fontWeight: "bold", textShadow: "0 0 20px #ff3333", margin: "10px 0" },
-    mainBtn: { padding: "12px 25px", backgroundColor: "#ff3333", color: "#000", border: "none", fontWeight: "bold", letterSpacing: "1px" },
-    secondaryBtn: { background: "none", border: "1px solid #333", color: "#555", padding: "10px 20px", fontSize: "0.7rem" },
+    title: { color: "var(--color-sand)", fontSize: "1.2rem", letterSpacing: "4px", fontWeight: "900", margin: 0 },
+    levelIndicator: { fontSize: "0.65rem", marginTop: "8px", fontWeight: "bold", textTransform: "uppercase", tracking: "1px" },
+
+    board: {
+        position: "relative", width: "270px", height: "270px",
+        backgroundColor: "rgba(0,0,0,0.2)", border: "2px solid",
+        borderRadius: "8px", padding: "0px"
+    },
+    tile: {
+        position: "absolute", display: "flex", alignItems: "center", justifyContent: "center",
+        fontSize: "1.8rem", fontWeight: "900", borderRadius: "4px", cursor: "pointer"
+    },
+    hint: {
+        marginTop: "40px", color: "var(--color-mat-red)", fontSize: "0.65rem",
+        fontWeight: "bold", opacity: 0.8, letterSpacing: "2px", display: "flex", alignItems: "center"
+    },
+
+    overlay: {
+        position: "absolute", inset: 0, backgroundColor: "rgba(0,0,0,0.9)",
+        display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, backdropFilter: "blur(4px)"
+    },
+    modal: {
+        background: "var(--color-darker-red)", border: "1px solid var(--color-mid-red)",
+        padding: "30px", borderRadius: "20px", textAlign: "center", width: "85%", maxWidth: "340px"
+    },
+    modalTitle: { color: "var(--color-red)", fontSize: "1.1rem", fontWeight: "900", marginBottom: "20px", letterSpacing: "2px" },
+    descText: { color: "var(--color-mat-blue)", fontSize: "0.85rem", marginBottom: "25px", lineHeight: "1.6" },
+    resultNum: { fontSize: "6rem", color: "var(--color-sand)", fontWeight: "900", margin: "10px 0", lineHeight: "1" },
+    mainBtn: {
+        width: "100%", padding: "16px", backgroundColor: "var(--color-red)",
+        color: "white", border: "none", fontWeight: "900", borderRadius: "8px",
+        letterSpacing: "2px", cursor: "pointer"
+    },
 };
 
 export default CipherPuzzleDelayed;

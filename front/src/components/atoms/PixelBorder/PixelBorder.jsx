@@ -18,7 +18,7 @@ export default function PixelBorder({ children }) {
                     shapeRendering="crispEdges"
                     xmlns="http://www.w3.org/2000/svg"
                 >
-                    <g clip-path="url(#clip0_318_470)">
+                    <g clipPath="url(#clip0_318_470)">
                         <rect width="10" height="10" fill="#832026"/>
                         <rect y="80" width="10" height="10" fill="#832026"/>
                         <rect y="40" width="10" height="10" fill="#832026"/>

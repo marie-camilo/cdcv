@@ -231,49 +231,55 @@ const SnakeFinalMobile = () => {
 };
 
 const styles = {
-        appContainer: {
-        minHeight: "100dvh",
+    appContainer: {
+        height: "100dvh",
         width: "100%",
         backgroundColor: "var(--color-darker-red)",
         display: "flex",
         flexDirection: "column",
         fontFamily: "'JetBrains Mono', monospace",
-        paddingTop: "80px",
-        paddingBottom: "40px",
-        overflowY: "auto"
+        overflow: "hidden"
     },
     gameContent: {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        justifyContent: "center",
+        justifyContent: "space-between",
         width: "100%",
-        flex: 1
+        flex: 1,
+        padding: "10px 0"
     },
-    header: { marginBottom: "20px", textAlign: "center" },
+    header: {
+        marginTop: "10px",
+        textAlign: "center",
+        flexShrink: 0
+    },
     mainTitle: { color: "var(--color-sand)", margin: 0, fontSize: "1.3rem", letterSpacing: "3px", fontWeight: "900" },
     scoreBoard: { color: "var(--color-mat-red)", fontSize: "0.9rem", marginTop: "5px", fontWeight: "bold" },
     canvasContainer: {
         padding: "4px",
         background: "var(--color-mid-red)",
         borderRadius: "12px",
-        boxShadow: "0 0 40px rgba(0,0,0,0.6)"
+        boxShadow: "0 0 40px rgba(0,0,0,0.6)",
+        margin: "10px 0"
     },
     canvas: {
         border: "1px solid var(--color-mat-red)",
         borderRadius: "8px",
         background: "#2A0C0C",
         display: "block",
-        maxWidth: "85vw", // Sécurité pour mobile
+        maxWidth: "80vw",
+        maxHeight: "45vh",
         height: "auto"
     },
     dpad: {
         display: "grid",
-        gridTemplateColumns: "repeat(3, 65px)",
-        gridTemplateRows: "repeat(3, 65px)",
-        gap: "10px",
-        marginTop: "30px",
-        touchAction: "none"
+        gridTemplateColumns: "repeat(3, 60px)",
+        gridTemplateRows: "repeat(3, 60px)",
+        gap: "8px",
+        marginBottom: "calc(10px + env(safe-area-inset-bottom))",
+        touchAction: "none",
+        flexShrink: 0
     },
     btn: {
         backgroundColor: "var(--color-mid-red)",

@@ -1,7 +1,8 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from 'next/navigation';
-import { apiFetch } from "@/hooks/API/fetchAPI"; // Import de l'utilitaire de fetch
+import { apiFetch } from "@/hooks/API/fetchAPI";
+import { RiInformationLine, RiCheckLine, RiCloseLine } from "react-icons/ri";
 
 const ZipCyberShielded = () => {
     const router = useRouter();
@@ -21,24 +22,20 @@ const ZipCyberShielded = () => {
     const posRef = useRef(0);
     const isLocked = useRef(false);
 
-    // Fonction de synchronisation pour mettre à jour les autres joueurs via Pusher
     const syncDigit = async (digit, storageKey) => {
         const gameCode = localStorage.getItem('currentGameCode');
         localStorage.setItem(storageKey, digit);
-
         try {
             await apiFetch(`/api/v1/game/${gameCode}/update-enigma`, {
                 method: 'POST',
                 body: JSON.stringify({
                     type: 'digit_update',
-                    side: storageKey, // ex: 'zip_digit'
-                    index: 99, // Identifiant spécial pour les chiffres globaux
+                    side: storageKey,
+                    index: 99,
                     status: digit
                 })
             });
-        } catch (e) {
-            console.error("Erreur de synchronisation Pusher:", e);
-        }
+        } catch (e) { console.error("Erreur sync Zip:", e); }
     };
 
     const resetSystem = () => {
@@ -51,7 +48,6 @@ const ZipCyberShielded = () => {
     const animate = () => {
         if (isLocked.current) return;
         posRef.current += speed * directionRef.current;
-
         if (posRef.current >= containerWidth - barWidth) {
             posRef.current = containerWidth - barWidth;
             directionRef.current = -1;
@@ -59,7 +55,6 @@ const ZipCyberShielded = () => {
             posRef.current = 0;
             directionRef.current = 1;
         }
-
         setBarPos(posRef.current);
         requestRef.current = requestAnimationFrame(animate);
     };
@@ -72,18 +67,15 @@ const ZipCyberShielded = () => {
     }, [gameState, score]);
 
     const handleStart = (e) => {
-        if (e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
+        if (e) e.stopPropagation();
         resetSystem();
         setScore(0);
         setGameState("playing");
+        setShowRules(false);
     };
 
     const handleAction = (e) => {
         if (gameState !== "playing" || isLocked.current || showRules) return;
-
         if (e && e.type === "touchstart") e.preventDefault();
 
         isLocked.current = true;
@@ -96,7 +88,6 @@ const ZipCyberShielded = () => {
 
         if (barCenter >= targetStart && barCenter <= targetEnd) {
             if (score + 1 === targetCount) {
-                // Synchronisation et sauvegarde
                 syncDigit('3', 'zip_digit');
                 setTimeout(() => setGameState("won"), 400);
             } else {
@@ -108,32 +99,21 @@ const ZipCyberShielded = () => {
                 }, 500);
             }
         } else {
-            setTimeout(() => {
-                setGameState("lost");
-            }, 400);
+            setTimeout(() => setGameState("lost"), 400);
         }
-    };
-
-    const handleReturn = () => {
-        router.push('/enigme-2');
     };
 
     return (
         <div
             style={styles.container}
             onTouchStart={handleAction}
-            onMouseDown={(e) => {
-                if (!("ontouchstart" in window)) handleAction(e);
-            }}
+            onMouseDown={(e) => { if (!("ontouchstart" in window)) handleAction(e); }}
         >
             <button
-                onPointerDown={(e) => {
-                    e.stopPropagation();
-                    setShowRules(true);
-                }}
+                onPointerDown={(e) => { e.stopPropagation(); setShowRules(true); }}
                 style={styles.infoBtn}
             >
-                i
+                <RiInformationLine size={22} />
             </button>
 
             <div style={styles.header}>
@@ -143,107 +123,76 @@ const ZipCyberShielded = () => {
                         SYNCHRONISATION : {score} / {targetCount}
                     </div>
                     <div style={styles.progressTrack}>
-                        <div
-                            style={{
-                                ...styles.progressFill,
-                                width: `${(score / targetCount) * 100}%`,
-                            }}
-                        />
+                        <div style={{ ...styles.progressFill, width: `${(score / targetCount) * 100}%` }} />
                     </div>
                 </div>
             </div>
 
             <div style={styles.gameArea}>
                 <div style={styles.track}>
+                    {/* Zone Cible en Sable */}
                     <div
                         style={{
                             ...styles.targetZone,
                             width: `${targetWidth}px`,
                             left: `${(containerWidth - targetWidth) / 2}px`,
-                            backgroundColor:
-                                isLocked.current && gameState !== "lost"
-                                    ? "rgba(0, 255, 136, 0.6)"
-                                    : "rgba(0, 255, 136, 0.15)",
+                            backgroundColor: isLocked.current && gameState !== "lost"
+                                ? "var(--color-sand)"
+                                : "rgba(235, 221, 196, 0.15)",
+                            borderColor: "var(--color-sand)"
                         }}
                     />
+                    {/* Barre Mobile en Rouge Mat */}
                     <div
                         style={{
                             ...styles.movingBar,
                             left: `${barPos}px`,
                             width: `${barWidth}px`,
                             backgroundColor: isLocked.current
-                                ? gameState === "lost"
-                                    ? "#ff3333"
-                                    : "#00ff88"
-                                : "#ff3333",
+                                ? gameState === "lost" ? "var(--color-red)" : "white"
+                                : "var(--color-mat-red)",
                         }}
                     />
                 </div>
-                <div style={styles.hintText}>PRÉCISION REQUISE</div>
+                <div style={styles.hintText}>ALIGNEMENT LASER REQUIS</div>
             </div>
 
-            {(showRules ||
-                gameState === "start" ||
-                gameState === "lost" ||
-                gameState === "won") && (
+            {/* MODALES */}
+            {(showRules || gameState === "start" || gameState === "lost" || gameState === "won") && (
                 <div style={styles.overlay}>
                     <div style={styles.modal}>
                         {showRules && (
                             <>
-                                <h2 style={styles.cyberText}>INSTRUCTIONS</h2>
-                                <p style={styles.descText}>
-                                    Alignement laser nécessaire. La zone se réduit à chaque
-                                    succès.
-                                </p>
-                                <button
-                                    onPointerDown={(e) => {
-                                        e.stopPropagation();
-                                        setShowRules(false);
-                                    }}
-                                    style={styles.mainBtn}
-                                >
-                                    COMPRIS
-                                </button>
+                                <h2 style={styles.modalTitle}>CALIBRATION</h2>
+                                <p style={styles.descText}>Stabilisez le flux au centre de la mire. La zone de capture se réduit à chaque palier.</p>
+                                <button onPointerDown={(e) => { e.stopPropagation(); setShowRules(false); }} style={styles.mainBtn}>RETOUR</button>
                             </>
                         )}
 
                         {gameState === "start" && !showRules && (
                             <>
-                                <h2 style={styles.cyberText}>ACCÈS ZIP</h2>
-                                <p style={styles.descText}>Séquence de calibration niv. 5.</p>
-                                <button onPointerDown={handleStart} style={styles.mainBtn}>
-                                    INITIALISER
-                                </button>
+                                <h2 style={styles.modalTitle}>ACCÈS SÉCURISÉ</h2>
+                                <p style={styles.descText}>Initialisation de la séquence de synchronisation niv. 5.</p>
+                                <button onPointerDown={handleStart} style={styles.mainBtn}>INITIALISER</button>
                             </>
                         )}
 
                         {gameState === "lost" && (
                             <>
-                                <h2 style={{ color: "#ff3333", marginBottom: "20px" }}>
-                                    ERREUR TIMING
-                                </h2>
-                                <p style={styles.descText}>
-                                    Désynchronisation critique détectée.
-                                </p>
-                                <button onPointerDown={handleStart} style={styles.mainBtn}>
-                                    RÉESSAYER
-                                </button>
+                                <RiCloseLine size={40} color="var(--color-red)" style={{margin: "0 auto 10px"}} />
+                                <h2 style={{ ...styles.modalTitle, color: "var(--color-red)" }}>DÉSYNCHRONISATION</h2>
+                                <p style={styles.descText}>Alignement critique échoué. Tentative de reconnexion...</p>
+                                <button onPointerDown={handleStart} style={styles.mainBtn}>RÉESSAYER</button>
                             </>
                         )}
 
                         {gameState === "won" && (
                             <>
-                                <h2 style={{ color: "#00ff88", marginBottom: "20px" }}>
-                                    FLUX STABLE
-                                </h2>
+                                <RiCheckLine size={40} color="var(--color-sand)" style={{margin: "0 auto 10px"}} />
+                                <h2 style={{ ...styles.modalTitle, color: "var(--color-sand)" }}>FLUX STABLE</h2>
                                 <p style={styles.descText}>Troisième numéro extrait :</p>
                                 <div style={styles.resultNum}>3</div>
-                                <button
-                                    onClick={handleReturn}
-                                    style={styles.mainBtn}
-                                >
-                                    RETOUR
-                                </button>
+                                <button onClick={() => router.push('/enigme-2')} style={styles.mainBtn}>RETOUR AU TERMINAL</button>
                             </>
                         )}
                     </div>
@@ -254,26 +203,37 @@ const ZipCyberShielded = () => {
 };
 
 const styles = {
-    container: { position: "fixed", inset: 0, backgroundColor: "#050202", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", touchAction: "none", fontFamily: '"Courier New", Courier, monospace', overflow: "hidden" },
-    infoBtn: { position: "absolute", top: "20px", left: "20px", width: "40px", height: "40px", borderRadius: "50%", border: "1px solid #ff3333", backgroundColor: "transparent", color: "#ff3333", fontSize: "20px", zIndex: 110, display: "flex", alignItems: "center", justifyContent: "center" },
-    header: { marginBottom: "80px", width: "85%", textAlign: "center" },
-    title: { color: "#ff3333", fontSize: "1.6rem", letterSpacing: "6px", margin: "0 0 15px 0", fontWeight: "bold" },
-    statusBar: { width: "100%" },
-    levelIndicator: { color: "#ff9999", fontSize: "0.7rem", marginBottom: "8px", textAlign: "center", letterSpacing: "1px" },
-    progressTrack: { height: "3px", backgroundColor: "#331111", borderRadius: "2px" },
-    progressFill: { height: "100%", backgroundColor: "#ff3333", boxShadow: "0 0 15px #ff3333", transition: "width 0.3s ease" },
+    container: {
+        position: "fixed", inset: 0,
+        backgroundColor: "var(--color-darker-red)",
+        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+        touchAction: "none", fontFamily: "'JetBrains Mono', monospace", overflow: "hidden"
+    },
+    infoBtn: {
+        position: "absolute", top: "20px", right: "20px",
+        width: "40px", height: "40px", borderRadius: "10px",
+        border: "1px solid var(--color-mid-red)", backgroundColor: "rgba(0,0,0,0.3)",
+        color: "var(--color-sand)", display: "flex", alignItems: "center", justifyContent: "center"
+    },
+    header: { marginBottom: "60px", width: "280px", textAlign: "center" },
+    title: { color: "var(--color-sand)", fontSize: "1.2rem", letterSpacing: "4px", fontWeight: "900", marginBottom: "15px" },
+    statusBar: { width: "100%", background: "rgba(0,0,0,0.2)", padding: "10px", borderRadius: "8px" },
+    levelIndicator: { color: "var(--color-mat-red)", fontSize: "0.6rem", fontWeight: "bold", marginBottom: "8px", tracking: "2px" },
+    progressTrack: { height: "4px", backgroundColor: "var(--color-darker-red)", borderRadius: "2px" },
+    progressFill: { height: "100%", backgroundColor: "var(--color-red)", transition: "width 0.3s ease" },
+
     gameArea: { display: "flex", flexDirection: "column", alignItems: "center", width: "100%" },
-    track: { position: "relative", width: "300px", height: "50px", backgroundColor: "#000", border: "1px solid #ff3333", borderRadius: "4px" },
-    targetZone: { position: "absolute", top: 0, bottom: 0, borderLeft: "1px solid #00ff88", borderRight: "1px solid #00ff88" },
-    movingBar: { position: "absolute", top: "2px", bottom: "2px", transition: "background-color 0.1s" },
-    hintText: { marginTop: "30px", color: "#ff3333", fontSize: "0.7rem", letterSpacing: "3px", fontWeight: "bold", opacity: 0.5 },
-    overlay: { position: "absolute", inset: 0, backgroundColor: "rgba(0,0,0,0.98)", display: "flex", alignItems: "center", justifyContent: "center" },
-    modal: { background: "#0a0505", border: "1px solid #ff3333", padding: "30px", borderRadius: "4px", textAlign: "center", width: "85%" },
-    cyberText: { color: "#ff3333", fontSize: "1.4rem", marginBottom: "20px", letterSpacing: "2px" },
-    descText: { color: "#ccc", fontSize: "0.9rem", marginBottom: "30px", lineHeight: "1.6" },
-    resultNum: { fontSize: "6rem", color: "#ff3333", fontWeight: "bold", textShadow: "0 0 30px #ff3333", margin: "15px 0" },
-    mainBtn: { padding: "14px 30px", backgroundColor: "#ff3333", color: "#000", border: "none", borderRadius: "2px", fontWeight: "bold", fontSize: "0.9rem", letterSpacing: "2px", cursor: "pointer" },
-    secondaryBtn: { background: "none", border: "1px solid #333", color: "#555", padding: "10px 20px", borderRadius: "2px", fontSize: "0.7rem", marginTop: "10px" },
+    track: { position: "relative", width: "300px", height: "50px", backgroundColor: "rgba(0,0,0,0.4)", border: "1px solid var(--color-mid-red)", borderRadius: "8px" },
+    targetZone: { position: "absolute", top: 0, bottom: 0, borderLeft: "2px solid", borderRight: "2px solid", transition: "all 0.3s" },
+    movingBar: { position: "absolute", top: "4px", bottom: "4px", borderRadius: "2px", transition: "background-color 0.1s" },
+    hintText: { marginTop: "30px", color: "var(--color-mat-red)", fontSize: "0.7rem", letterSpacing: "3px", fontWeight: "bold", opacity: 0.6 },
+
+    overlay: { position: "absolute", inset: 0, backgroundColor: "rgba(0,0,0,0.9)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, backdropFilter: "blur(4px)" },
+    modal: { background: "var(--color-darker-red)", border: "1px solid var(--color-mid-red)", padding: "30px", borderRadius: "20px", textAlign: "center", width: "85%", maxWidth: "340px" },
+    modalTitle: { color: "var(--color-red)", fontSize: "1.1rem", fontWeight: "900", marginBottom: "20px", letterSpacing: "2px" },
+    descText: { color: "var(--color-mat-blue)", fontSize: "0.85rem", marginBottom: "25px", lineHeight: "1.5" },
+    resultNum: { fontSize: "6rem", color: "var(--color-sand)", fontWeight: "900", margin: "10px 0", lineHeight: "1" },
+    mainBtn: { width: "100%", padding: "16px", backgroundColor: "var(--color-red)", color: "white", border: "none", fontWeight: "900", borderRadius: "8px", letterSpacing: "2px", cursor: "pointer" },
 };
 
 export default ZipCyberShielded;

@@ -239,15 +239,61 @@ export default function ArrowMazeCyberStyle() {
 }
 
 const styles = {
-    container: { minHeight: "100dvh", width: "100%", backgroundColor: "var(--color-darker-red)", display: "flex", flexDirection: "column", fontFamily: "'JetBrains Mono', monospace" },
-    header: { padding: "15px", textAlign: "center", borderBottom: "1px solid var(--color-mid-red)", background: "rgba(0,0,0,0.2)" },
+    container: {
+        height: "100dvh",
+        width: "100%",
+        backgroundColor: "var(--color-darker-red)",
+        display: "flex",
+        flexDirection: "column",
+        fontFamily: "'JetBrains Mono', monospace",
+        overflow: "hidden"
+    },
+    header: {
+        padding: "10px",
+        textAlign: "center",
+        borderBottom: "1px solid var(--color-mid-red)",
+        background: "rgba(0,0,0,0.2)",
+        flexShrink: 0
+    },
     title: { color: "var(--color-sand)", margin: "0 0 5px", fontSize: "1rem", letterSpacing: "4px", fontWeight: "900" },
     statsRow: { display: "flex", justifyContent: "left" },
     arrowsIndicator: { backgroundColor: "var(--color-mid-red)", padding: "4px 15px", borderRadius: "20px", border: "1px solid var(--color-mat-red)" },
-    canvasWrapper: { flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" },
-    canvasFrame: { padding: "4px", background: "var(--color-mid-red)", borderRadius: "12px", boxShadow: "0 0 30px rgba(0,0,0,0.5)" },
-    canvas: { backgroundColor: "#2A0C0C", borderRadius: "8px", display: "block" },
-    controls: { height: "160px", backgroundColor: "rgba(0,0,0,0.2)", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 30px", borderTop: "1px solid var(--color-mid-red)", touchAction: "none" },
+    canvasWrapper: {
+        flex: 1,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "10px",
+        minHeight: 0
+    },
+    canvasFrame: {
+        padding: "4px",
+        background: "var(--color-mid-red)",
+        borderRadius: "12px",
+        boxShadow: "0 0 30px rgba(0,0,0,0.5)",
+        maxWidth: "90vw"
+    },
+    canvas: {
+        backgroundColor: "#2A0C0C",
+        borderRadius: "8px",
+        display: "block",
+        width: "100%",
+        height: "auto",
+        maxHeight: "60vh"
+    },
+    controls: {
+        height: "auto", // Hauteur automatique
+        minHeight: "120px",
+        backgroundColor: "rgba(0,0,0,0.3)",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        padding: "15px 30px",
+        borderTop: "1px solid var(--color-mid-red)",
+        touchAction: "none",
+        flexShrink: 0,
+        paddingBottom: "calc(15px + env(safe-area-inset-bottom))" // Gère l'encoche du bas sur iPhone
+    },
     dPad: { display: "flex", gap: "20px" },
     btnMove: { width: "65px", height: "65px", backgroundColor: "var(--color-mid-red)", border: "1px solid var(--color-mat-red)", color: "var(--color-sand)", borderRadius: "12px", fontSize: "20px", outline: "none" },
     btnJump: { width: "80px", height: "80px", backgroundColor: "var(--color-red)", border: "2px solid var(--color-sand)", borderRadius: "50%", color: "var(--color-sand)", fontWeight: "900", fontSize: "12px", boxShadow: "0 0 20px rgba(173,11,22,0.4)", outline: "none" },
