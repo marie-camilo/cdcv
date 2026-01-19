@@ -239,6 +239,7 @@ export default function Navbar() {
             <ChatWidget
                 isOpen={isChatOpen}
                 onClose={() => setIsChatOpen(false)}
+                onOpen={() => setIsChatOpen(true)}
                 playerName={playerName}
                 playerRole={playerRole}
             />

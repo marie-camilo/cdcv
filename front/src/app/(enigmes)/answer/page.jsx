@@ -116,7 +116,7 @@ export default function AnswerPage() {
                 className="mb-8 flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 text-gray-400 hover:text-[var(--color-lavender)] hover:border-[var(--color-lavender)]/30 transition-all text-xs tracking-widest group"
             >
                 <RiArrowLeftLine className="group-hover:-translate-x-1 transition-transform" />
-                RETOUR AU NEXUS
+                RETOUR
             </button>
 
             <div className={clsx("max-w-md w-full transition-all duration-300", isShaking && "animate-shake")}>
