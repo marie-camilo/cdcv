@@ -126,3 +126,11 @@ export async function getTimeRemaining(gameCode) {
         method: "GET",
     });
 }
+
+export async function getEndingAt(code) {
+    if (!code) throw new Error("code manquant");
+
+    return apiFetch(`/api/v1/game/end/${code}`, {
+        method: "GET",
+    });
+}
