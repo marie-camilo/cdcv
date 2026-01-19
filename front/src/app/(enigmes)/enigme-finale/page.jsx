@@ -52,7 +52,7 @@ const FILE_SYSTEM = {
                     "Linux": {
                         ...generateMassiveNoise(2),
                         // Même nom de fichier que le chemin vert
-                        "sys_config_v2.0.bak": "--- SECURE CORE ---\nIDENTITY: SABOTEUR\nSECURITY_CODE: 0000\nSTATUS: OVERRIDE"
+                        "sys_config_v2.0.bak": "--- SECURE CORE ---\nIDENTITY: SABOTEUR\nSECURITY_CODE: 0305\nSTATUS: OVERRIDE"
                     }
                 }
             }
