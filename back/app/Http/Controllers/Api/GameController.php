@@ -80,8 +80,15 @@ class GameController extends Controller
     {
         $game = Game::where('code', $code)->firstOrFail();
 
+        if (!$game->ending_at) {
+            return response()->json([
+                'message' => 'Aucune date de fin définie'
+            ], 400);
+        }
+
+        // ✅ FIX : Utiliser timestamp * 1000
         return response()->json([
-            'ending_at_ms' => $game->ending_at->getTimestampMs(),
+            'ending_at_ms' => \Carbon\Carbon::parse($game->ending_at)->timestamp * 1000,
         ]);
     }
 

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from "next/navigation";
 import QRScanner from "@/components/organisms/QRScanner/QRScanner";
 import { apiFetch } from "@/hooks/API/fetchAPI";
+import { getCodeInfo } from "@/lib/gameCodes"; // ✅ Import
 
 export default function ScanPage() {
     const router = useRouter();
@@ -15,14 +16,6 @@ export default function ScanPage() {
         return () => { document.title = "La Click"; };
     }, []);
 
-    const codes = {
-        'FOYER': 'scan',
-        'BETA5678': 'phone',
-        'GAMMA9012': 'puzzle',
-        'OMEGA7890': 'boussole',
-        'DELTA3456': 'terminal',
-    };
-
     const handleScanSuccess = async (decodedText) => {
         if (isProcessing) return;
 
@@ -30,9 +23,9 @@ export default function ScanPage() {
         setScannedValue(cleanCode);
         setIsProcessing(true);
 
-        const appId = codes[cleanCode];
+        const codeInfo = getCodeInfo(cleanCode);
 
-        if (!appId) {
+        if (!codeInfo) {
             setMessage("❌ CODE INVALIDE. ACCÈS REFUSÉ.");
             setTimeout(() => {
                 setMessage("");
@@ -42,7 +35,7 @@ export default function ScanPage() {
             return;
         }
 
-        // Appel API au lieu de localStorage
+        const { appId, fileName, videoId } = codeInfo;
         const gameCode = localStorage.getItem('currentGameCode');
 
         try {
@@ -50,6 +43,7 @@ export default function ScanPage() {
                 method: 'POST',
                 body: JSON.stringify({
                     app_id: appId,
+                    file_name: fileName,
                     entered_code: cleanCode
                 })
             });
@@ -69,7 +63,44 @@ export default function ScanPage() {
                 return;
             }
 
-            // Succès
+            // ✅ MISE À JOUR LOCALE (car Pusher exclut l'émetteur)
+            const unlocked = JSON.parse(localStorage.getItem('unlockedApps') || '[]');
+            if (!unlocked.includes(appId)) {
+                unlocked.push(appId);
+                localStorage.setItem('unlockedApps', JSON.stringify(unlocked));
+            }
+
+            // ✅ Ajouter à game_codes localement aussi
+            if (fileName) {
+                const currentCodes = JSON.parse(localStorage.getItem('game_codes') || '[]');
+                if (!currentCodes.find(c => c.value === fileName)) {
+                    currentCodes.push({
+                        label: `APP: ${appId.toUpperCase()}`,
+                        value: fileName
+                    });
+                    localStorage.setItem('game_codes', JSON.stringify(currentCodes));
+                }
+            }
+
+            // ✅ Émettre l'événement localement pour mettre à jour l'UI
+            gameEvents.emit(GAME_EVENTS.APP_UNLOCKED, {
+                appId: appId,
+                fileName: fileName,
+                unlockedApps: unlocked
+            });
+
+            // Déclencher la vidéo SI présente
+            if (videoId) {
+                await apiFetch(`/api/v1/game/${gameCode}/trigger-video`, {
+                    method: 'POST',
+                    body: JSON.stringify({ video_id: videoId })
+                });
+
+                // ✅ Émettre localement aussi
+                gameEvents.emit(GAME_EVENTS.VIDEO_TRIGGERED, { videoId: videoId });
+                console.log("🎬 Vidéo déclenchée:", videoId);
+            }
+
             setMessage(`✅ APPLICATION "${appId.toUpperCase()}" DÉBLOQUÉE !`);
 
             if (window.navigator.vibrate) window.navigator.vibrate(200);
@@ -120,7 +151,7 @@ export default function ScanPage() {
                         ? "bg-green-900/40 border-green-400 shadow-[0_0_20px_rgba(74,222,128,0.4)]"
                         : "bg-red-900/40 border-red-500"
                 }`}>
-                    <p className={`font-mono font-bold text-center ${
+                    <p className={`font-mono font-bold text-center whitespace-pre-line ${
                         message.startsWith('✅') ? "text-green-400 text-lg" : "text-red-400"
                     }`}>
                         {message}

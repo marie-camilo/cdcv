@@ -1,21 +1,17 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import {checkGameState, getCodeFromCookie} from "@/hooks/API/rules";
+import { getCodeFromCookie } from "@/hooks/API/rules";
 
-const TOTAL_DURATION = 11000;
+const COUNTDOWN_DURATION = 11; // 11 secondes
 
 export default function StartingPage() {
     const router = useRouter();
-
-    const [code, setCode] = useState(null);
-    const [startAt, setStartAt] = useState(null);
-    const [remaining, setRemaining] = useState(null);
+    const [remaining, setRemaining] = useState(COUNTDOWN_DURATION);
     const [loading, setLoading] = useState(true);
 
     /**
-     * 1️⃣ Initialisation (cookie + localStorage)
+     * 1️⃣ Initialisation - Vérifier que la partie existe
      */
     useEffect(() => {
         let cancelled = false;
@@ -23,23 +19,32 @@ export default function StartingPage() {
         const init = async () => {
             try {
                 const game = await getCodeFromCookie().catch(() => null);
-                const storedTime = localStorage.getItem("currentGameStartingAt");
-
                 const gameCode = game?.game?.code;
 
-                if (!gameCode || !storedTime) {
+                if (!gameCode) {
+                    console.error("❌ [Starting] Aucun code de partie");
                     router.replace("/log");
                     return;
                 }
 
+                // Vérifier que ending_at existe (partie démarrée)
+                const endingAt = localStorage.getItem("game_ending_at_ms");
+                if (!endingAt) {
+                    console.warn("⚠️ [Starting] Timer pas encore initialisé, attente...");
+                    // La partie n'a peut-être pas encore été démarrée
+                    // On peut attendre un peu ou rediriger
+                }
+
                 if (cancelled) return;
 
-                setCode(gameCode);
-                setStartAt(Number(storedTime) * 1000);
-            } catch {
-                router.replace("/log");
-            } finally {
-                if (!cancelled) setLoading(false);
+                console.log("✅ [Starting] Page chargée - Code:", gameCode);
+                setLoading(false);
+
+            } catch (err) {
+                console.error("❌ [Starting] Erreur init:", err);
+                if (!cancelled) {
+                    router.replace("/log");
+                }
             }
         };
 
@@ -51,31 +56,39 @@ export default function StartingPage() {
     }, [router]);
 
     /**
-     * 2️⃣ Timer
+     * 2️⃣ Compte à rebours simple (11 secondes)
      */
     useEffect(() => {
-        if (!code || !startAt) return;
+        if (loading) return;
 
-        const update = () => {
-            const diff = TOTAL_DURATION - (Date.now() - startAt);
+        let count = COUNTDOWN_DURATION;
+        setRemaining(count);
 
-            if (diff <= 0) {
+        const interval = setInterval(() => {
+            count -= 1;
+
+            if (count <= 0) {
+                clearInterval(interval);
                 router.replace("/role");
                 return;
             }
 
-            setRemaining(Math.ceil(diff / 1000));
-        };
+            setRemaining(count);
+        }, 1000);
 
-        update();
-        const interval = setInterval(update, 200);
         return () => clearInterval(interval);
-    }, [code, startAt, router]);
+    }, [loading, router]);
 
     /**
-     * UI states
+     * UI
      */
-    if (loading || remaining === null) return null;
+    if (loading) {
+        return (
+            <main className="h-screen flex items-center justify-center bg-[var(--color-dark)]">
+                <div className="text-white text-xl animate-pulse">Chargement...</div>
+            </main>
+        );
+    }
 
     return (
         <main className="h-screen flex flex-col items-center justify-center px-8 text-white bg-[var(--color-dark)] overflow-hidden min-h-[100dvh]">
@@ -89,11 +102,15 @@ export default function StartingPage() {
             </div>
 
             <div className="relative flex items-center justify-center mb-20">
-                <div className="absolute w-48 h-48 rounded-full bg-[var(--color-light-green)]/10 blur-2xl" />
+                <div className="absolute w-48 h-48 rounded-full bg-[var(--color-light-green)]/10 blur-2xl animate-pulse" />
                 <span className="relative text-[6rem] font-extrabold text-[var(--color-light-green)] leading-none">
                     {remaining}
                 </span>
             </div>
+
+            <p className="text-white/50 text-xs font-mono mt-8">
+                Redirection automatique vers votre rôle...
+            </p>
         </main>
     );
 }

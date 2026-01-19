@@ -68,4 +68,6 @@ export const GAME_EVENTS = {
     LOCKER_UPDATED: 'locker_updated',
     SNAKE_UPDATED: 'snake_updated',
     VIDEO_TRIGGERED: 'video_triggered',
+    LABYRINTH_COMPLETED: 'labyrinth_completed',
+    GAME_STARTING: 'game_starting',
 };

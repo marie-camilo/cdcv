@@ -4,9 +4,6 @@ namespace App\Events;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -16,20 +13,20 @@ class GameStarting implements ShouldBroadcastNow
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public string $gameCode;
-    public int $startingAt;
+    public int $endingAtMs; // ✅ CHANGÉ : on envoie ending_at, pas starting_at
 
     /**
      * @param string $gameCode
-     * @param int $startingAt Timestamp UNIX (secondes)
+     * @param int $endingAtMs Timestamp UNIX en MILLISECONDES
      */
-    public function __construct(string $gameCode, int $startingAt)
+    public function __construct(string $gameCode, int $endingAtMs)
     {
         $this->gameCode = $gameCode;
-        $this->startingAt = $startingAt;
+        $this->endingAtMs = $endingAtMs; // ✅ CHANGÉ
     }
 
     /**
-     * Nom de l’event côté Pusher
+     * Nom de l'event côté Pusher
      */
     public function broadcastAs(): string
     {
@@ -50,7 +47,7 @@ class GameStarting implements ShouldBroadcastNow
     public function broadcastWith(): array
     {
         return [
-            'startingAt' => $this->startingAt
+            'ending_at_ms' => $this->endingAtMs // ✅ CHANGÉ : ending_at_ms au lieu de startingAt
         ];
     }
 }
