@@ -46,7 +46,7 @@ export default function TypewriterTerminal({ textLines, speed = 50 }) {
                         <button className={`${styles.dot} ${styles.minimize}`} onClick={toggleMinimize}></button>
                         <button className={`${styles.dot} ${styles.maximize}`}></button>
                     </div>
-                    <div className={styles.title}>bash — root@chemises-rouges</div>
+                    <div className={styles.title}>bash — root@jacquot</div>
                 </div>
 
                 <div className={styles.body}>

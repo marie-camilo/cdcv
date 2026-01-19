@@ -187,12 +187,12 @@ export default function InfiltrationHub() {
     const [selectedTool, setSelectedTool] = useState(null);
     const [startTyping, setStartTyping] = useState(false);
 
-    // ✅ DEBUG : Afficher les apps débloquées dans la console
+    // DEBUG : Afficher les apps débloquées dans la console
     useEffect(() => {
         console.log("🎯 [PAGE] Apps débloquées actuelles:", unlockedApps);
     }, [unlockedApps]);
 
-    // ✅ LOGIQUE DE GARDE / SESSION
+    // LOGIQUE DE GARDE / SESSION
     useEffect(() => {
         const init = async () => {
             try {
@@ -218,7 +218,7 @@ export default function InfiltrationHub() {
         init();
     }, [router]);
 
-    // ✅ TIMER TERMINAL
+    // TIMER TERMINAL
     useEffect(() => {
         const typingTimer = setTimeout(() => setStartTyping(true), 1000);
         return () => clearTimeout(typingTimer);
@@ -252,7 +252,7 @@ export default function InfiltrationHub() {
     const isRoleMismatch = selectedTool && selectedTool.roleKey !== 'all' && selectedTool.roleKey !== userRole;
 
     return (
-        <main className="flex flex-col md:max-w-md mx-auto min-h-screen bg-[var(--color-dark)] pt-12">
+        <main className="flex flex-col md:max-w-md mx-auto min-h-screen bg-[var(--color-dark)]">
             {selectedTool && (
                 <DidacticModal
                     tool={selectedTool}
@@ -263,7 +263,7 @@ export default function InfiltrationHub() {
             )}
 
             <section className="flex flex-col h-full flex-1">
-                <article className="text-[var(--color-light-green)] py-4 px-4 font-mono text-xs overflow-y-auto flex-shrink-0 min-h-[150px] max-h-[30vh] border-b border-[var(--color-light-green)]/30 bg-black/40 backdrop-blur-sm relative z-50">
+                <article className="text-[var(--color-light-green)] py-4 px-4 font-mono text-xs flex-shrink-0 min-h-[150px] h-auto backdrop-blur-sm relative z-50">
                     <div className="flex flex-col gap-1 mt-2">
                         {startTyping && <TypewriterTerminal textLines={terminalLines} speed={15} />}
                     </div>
@@ -276,7 +276,6 @@ export default function InfiltrationHub() {
                     </div>
 
                     <div className="grid grid-cols-3 gap-5">
-                        {/* Console est toujours débloquée */}
                         <AppIcon id="console" unlockedApps={['console', ...unlockedApps]} seenApps={seenApps} onOpen={handleOpenTool} />
                         <AppIcon id="scan" unlockedApps={unlockedApps} seenApps={seenApps} onOpen={handleOpenTool} />
                         <AppIcon id="puzzle" unlockedApps={unlockedApps} seenApps={seenApps} onOpen={handleOpenTool} />
