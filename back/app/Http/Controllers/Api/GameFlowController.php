@@ -81,7 +81,18 @@ class GameFlowController extends Controller
 
         return redirect()
             ->route('admin.games.show', $game)
-            ->with('success', "Partie démarrée.");
+            ->with('success', "Partie démarrée.")
+            ->cookie(
+                'ending_at',
+                $game->ending_at,
+                60 * 24 * 7,   // 7 jours
+                '/',
+                null,
+                false,         // Secure (HTTPS)
+                true,         // HttpOnly
+                false,
+                'Lax'
+            );
     }
 
 

@@ -60,7 +60,8 @@ class GameController extends Controller
     {
         $cookies = [
             'game_cookie',
-            'player_cookie'
+            'player_cookie',
+            'ending_at'
         ];
 
         $response = response()->json([
@@ -73,4 +74,15 @@ class GameController extends Controller
 
         return $response;
     }
+
+
+    public function getEndingAt(Request $request, string $code)
+    {
+        $game = Game::where('code', $code)->firstOrFail();
+
+        return response()->json([
+            'ending_at_ms' => $game->ending_at->getTimestampMs(),
+        ]);
+    }
+
 }

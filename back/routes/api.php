@@ -70,6 +70,8 @@ Route::middleware('api.key')
         Route::post('/game/{code}/trigger-video', [GameFlowController::class, 'triggerVideo']);
 
         Route::post('/game/clear-cookie', [GameController::class, 'clearCookie']);
+
+        Route::get('/game/end/{code}', [GameController::class, 'getEndingAt']);
     });
 
 
