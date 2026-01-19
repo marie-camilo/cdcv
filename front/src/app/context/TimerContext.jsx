@@ -15,7 +15,11 @@ const STORAGE_KEY = "game_ending_at_ms";
 
 export function TimerProvider({ children }) {
     const [seconds, setSeconds] = useState(undefined);
+<<<<<<< HEAD
     const [endingAtMs, setEndingAtMs] = useState(null);
+=======
+    const [isFinished, setIsFinished] = useState(false);
+>>>>>>> 1c49f8e13f489cb16783ff73889c246b82d51209
 
     const intervalRef = useRef(null);
 
@@ -40,7 +44,52 @@ export function TimerProvider({ children }) {
         }
     }, []);
 
+<<<<<<< HEAD
     // ✅ 2. Calculer le temps restant chaque seconde
+=======
+    const triggerGameOver = useCallback(() => {
+        stop();
+        setSeconds(0);
+        setIsFinished(true);
+    }, [stop]);
+
+    const startFromEndingAt = useCallback(
+        (endingAtMs) => {
+            const parsed = Number(endingAtMs);
+
+            if (!parsed || Number.isNaN(parsed)) {
+                console.error("TimerContext: endingAtMs invalide:", endingAtMs);
+                setSeconds(0);
+                return;
+            }
+
+            endingAtRef.current = parsed;
+            setIsFinished(false);
+
+            const compute = () => {
+                const end = endingAtRef.current;
+                if (!end) return;
+
+                const diffSec = Math.ceil((end - Date.now()) / 1000);
+                const safe = Math.max(0, diffSec);
+
+                setSeconds(safe);
+
+                // Détection de la fin du timer
+                if (safe <= 0) {
+                    stop();
+                    setIsFinished(true);
+                }
+            };
+
+            stop();
+            compute();
+            intervalRef.current = setInterval(compute, 1000);
+        },
+        [stop]
+    );
+
+>>>>>>> 1c49f8e13f489cb16783ff73889c246b82d51209
     useEffect(() => {
         if (!endingAtMs) {
             setSeconds(undefined);
@@ -130,7 +179,11 @@ export function TimerProvider({ children }) {
         return () => clearInterval(syncInterval);
     }, []);
     return (
+<<<<<<< HEAD
         <TimerContext.Provider value={{ seconds, startFromEndingAt }}>
+=======
+        <TimerContext.Provider value={{ seconds, startFromEndingAt, stop, isFinished, triggerGameOver }}>
+>>>>>>> 1c49f8e13f489cb16783ff73889c246b82d51209
             {children}
         </TimerContext.Provider>
     );
