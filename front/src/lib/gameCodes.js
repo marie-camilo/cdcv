@@ -31,11 +31,11 @@ export const GAME_CODES = {
 
     // Codes du labyrinthe (juste pour la sidebar, pas pour débloquer)
     'REACTOR_CORE': {
-        appId: null, // Ne débloque rien, juste un indice
+        appId: 'boussole', // Ne débloque rien, juste un indice
         fileName: 'reactor_core_path'
     },
     'SHADOW_OPS': {
-        appId: null,
+        appId: 'boussole',
         fileName: 'shadow_ops_path'
     },
     // Boussole QR → Débloque TERMINAL
