@@ -25,13 +25,13 @@ export default function ArrowMazeCyberStyle() {
     const canvasWidth = 350;
     const canvasHeight = 480;
 
-    // 🐌 VALEURS RALENTIES (Spécial Écrans Rapides & Contrôle Précis)
-    const gravity = 0.25;    // Chute beaucoup plus douce (Avant: 0.5 ou 0.6)
-    const jumpPower = -7;    // Saut moins explosif (Avant: -10 ou -12)
-    const moveSpeed = 2.5;   // Déplacement lent (Avant: 4 ou 5)
-    const friction = 0.85;   // Glisse un peu moins (Freinage plus net)
+    // vitesse et physiques curseur
+    const gravity = 0.6;
+    const jumpPower = -11;
+    const moveSpeed = 5.8;
+    const friction = 0.82;
 
-    // ⌨️ GESTION DU CLAVIER
+    // GESTION DU CLAVIER
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (e.key === "ArrowLeft" || e.key === "q") controlsRef.current.left = true;
