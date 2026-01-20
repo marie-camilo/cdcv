@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { IoClose, IoConstruct, IoPerson, IoInformationCircle } from "react-icons/io5";
 import { getPlayerRole } from "@/hooks/API/gameRequests";
+import { gameEvents, GAME_EVENTS } from '@/lib/gameEventBus';
 
 export default function SidePanel({ isOpen, onClose, onOpenRole }) {
     const [codes, setCodes] = useState([]);
@@ -14,10 +15,17 @@ export default function SidePanel({ isOpen, onClose, onOpenRole }) {
         setIsMounted(true);
     }, []);
 
+    // 🔥 Fonction pour charger les codes
+    const loadCodes = () => {
+        const storedCodes = JSON.parse(localStorage.getItem('game_codes') || '[]');
+        setCodes(storedCodes);
+        console.log('🔄 [SidePanel] Codes rechargés:', storedCodes);
+    };
+
+    // Charger les codes au départ et à chaque ouverture
     useEffect(() => {
         if (isMounted && isOpen) {
-            const storedCodes = JSON.parse(localStorage.getItem('game_codes') || '[]');
-            setCodes(storedCodes);
+            loadCodes();
 
             setIsLoading(true);
             getPlayerRole()
@@ -36,6 +44,41 @@ export default function SidePanel({ isOpen, onClose, onOpenRole }) {
                     setIsLoading(false);
                 });
         }
+    }, [isMounted, isOpen]);
+
+    // 🔥 Écouter TOUS les événements qui modifient game_codes
+    useEffect(() => {
+        if (!isMounted) return;
+
+        console.log("👂 [SidePanel] Installation des listeners...");
+
+        // ✅ CORRECTION : Utiliser les fonctions de cleanup retournées par .on()
+        const unsubLabyrinth = gameEvents.on(GAME_EVENTS.LABYRINTH_COMPLETED, () => {
+            console.log("🎯 [SidePanel] Labyrinthe complété, refresh codes");
+            loadCodes();
+        });
+
+        const unsubAppUnlocked = gameEvents.on(GAME_EVENTS.APP_UNLOCKED, () => {
+            console.log("🔓 [SidePanel] App débloquée, refresh codes");
+            loadCodes();
+        });
+
+        return () => {
+            console.log("🧹 [SidePanel] Nettoyage des listeners");
+            unsubLabyrinth();
+            unsubAppUnlocked();
+        };
+    }, [isMounted]);
+
+    // 🔥 Polling de secours (au cas où les events ne marchent pas)
+    useEffect(() => {
+        if (!isMounted || !isOpen) return;
+
+        const interval = setInterval(() => {
+            loadCodes();
+        }, 3000);
+
+        return () => clearInterval(interval);
     }, [isMounted, isOpen]);
 
     if (!isMounted) return null;
@@ -68,7 +111,10 @@ export default function SidePanel({ isOpen, onClose, onOpenRole }) {
                         </p>
                     ) : (
                         codes.map((item, index) => (
-                            <div key={index} className="bg-black/40 p-4 rounded border border-[var(--color-medium)] shrink-0">
+                            <div
+                                key={index}
+                                className="bg-black/40 p-4 rounded border border-[var(--color-medium)] shrink-0 animate-in fade-in slide-in-from-right duration-300"
+                            >
                                 <p className="text-[10px] text-[var(--color-light-green)] uppercase tracking-widest mb-1">
                                     {item.label}
                                 </p>
@@ -82,8 +128,6 @@ export default function SidePanel({ isOpen, onClose, onOpenRole }) {
 
                 {/* FOOTER */}
                 <div className="mt-6 pt-6 border-t border-white/10 shrink-0 flex flex-col gap-3">
-
-                    {/* BOUTON ROLE INTERACTIF */}
                     <button
                         onClick={onOpenRole}
                         className="group flex items-center justify-between gap-3 w-full px-4 py-3 bg-[var(--color-light-green)]/10 hover:bg-[var(--color-light-green)]/20 border border-[var(--color-light-green)] rounded transition-all duration-300"
@@ -94,14 +138,12 @@ export default function SidePanel({ isOpen, onClose, onOpenRole }) {
                                 {roleLabel}
                             </span>
                         </div>
-
                         <IoInformationCircle
                             size={20}
                             className="text-[var(--color-light-green)] opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all"
                         />
                     </button>
 
-                    {/* BOUTON BOITE À OUTILS */}
                     <Link
                         href="/"
                         onClick={onClose}

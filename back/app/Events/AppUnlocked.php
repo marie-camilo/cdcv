@@ -4,7 +4,6 @@ namespace App\Events;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-// Importation indispensable pour le "Now"
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -15,19 +14,22 @@ class AppUnlocked implements ShouldBroadcastNow
 
     public $gameCode;
     public $appId;
+    public $fileName; // ✅ AJOUT
 
     /**
      * @param string $gameCode Le code du lobby (ex: ABCD)
      * @param string $appId L'ID de l'app à débloquer (ex: 'scan', 'puzzle')
+     * @param string|null $fileName Le nom de fichier pour l'énigme finale (ex: 'mission_foyer_log')
      */
-    public function __construct($gameCode, $appId)
+    public function __construct($gameCode, $appId, $fileName = null)
     {
         $this->gameCode = $gameCode;
         $this->appId = $appId;
+        $this->fileName = $fileName; // ✅ AJOUT
     }
 
     /**
-     * Canal sur lequel diffuser (Public ici pour simplifier)
+     * Canal sur lequel diffuser
      */
     public function broadcastOn()
     {
@@ -35,10 +37,21 @@ class AppUnlocked implements ShouldBroadcastNow
     }
 
     /**
-     * Nom de l'événement reçu par le Front (optionnel, par défaut c'est le nom de la classe)
+     * Nom de l'événement reçu par le Front
      */
     public function broadcastAs()
     {
         return 'AppUnlocked';
+    }
+
+    /**
+     * ✅ AJOUT : Données envoyées au frontend
+     */
+    public function broadcastWith()
+    {
+        return [
+            'appId' => $this->appId,
+            'fileName' => $this->fileName,
+        ];
     }
 }

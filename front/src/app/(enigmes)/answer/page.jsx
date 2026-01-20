@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { RiLockUnlockLine, RiArrowLeftLine, RiShieldKeyholeLine } from 'react-icons/ri';
 import { apiFetch } from "@/hooks/API/fetchAPI";
 import { gameEvents, GAME_EVENTS } from '@/lib/gameEventBus';
+import { getCodeInfo } from "@/lib/gameCodes"; // ✅ Import
 import clsx from "clsx";
 
 export default function AnswerPage() {
@@ -12,14 +13,6 @@ export default function AnswerPage() {
     const [status, setStatus] = useState({ type: '', msg: '' });
     const [isShaking, setIsShaking] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-
-    const codes = {
-        'FOYER': 'scan',
-        'BETA5678': 'phone',
-        'GAMMA9012': 'puzzle',
-        'OMEGA7890': 'boussole',
-        'DELTA3456': 'terminal',
-    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -35,36 +28,19 @@ export default function AnswerPage() {
             return;
         }
 
-        // Code spécial pour la vidéo
-        if (inputCode === 'P7AJ0') {
-            setIsSubmitting(true);
-            try {
-                await apiFetch(`/api/v1/game/${gameCode}/trigger-video`, {
-                    method: 'POST',
-                    body: JSON.stringify({ video_id: 'foyer' })
-                });
-                gameEvents.emit(GAME_EVENTS.VIDEO_TRIGGERED, { videoId: 'foyer' });
-            } catch (err) {
-                console.error("❌ Erreur déclenchement vidéo:", err);
-                setStatus({ type: 'error', msg: "ERREUR DE CONNEXION" });
-                triggerShake();
-            } finally {
-                setIsSubmitting(false);
-                setCode("");
-            }
-            return;
-        }
+        // ✅ Récupérer les infos du code
+        const codeInfo = getCodeInfo(inputCode);
 
-        // Code normal pour débloquer une app
-        const appId = codes[inputCode];
-        if (!appId) {
+        if (!codeInfo) {
             setStatus({ type: 'error', msg: "CODE D'ACCÈS INVALIDE" });
             triggerShake();
             setCode("");
             return;
         }
 
-        // Vérifier si déjà débloquée
+        const { appId, fileName, videoId } = codeInfo;
+
+        // Vérifier si app déjà débloquée
         const unlocked = JSON.parse(localStorage.getItem('unlockedApps') || '[]');
         if (unlocked.includes(appId)) {
             setStatus({ type: 'error', msg: "APPLICATION DÉJÀ ACTIVE" });
@@ -75,24 +51,47 @@ export default function AnswerPage() {
 
         setIsSubmitting(true);
         try {
-            // ✅ NOUVELLE API : débloquer une app spécifique
+            // 1️⃣ Débloquer l'app
             await apiFetch(`/api/v1/game/${gameCode}/unlock-app`, {
                 method: 'POST',
-                body: JSON.stringify({ app_id: appId })
+                body: JSON.stringify({
+                    app_id: appId,
+                    file_name: fileName
+                })
             });
 
-            // Mettre à jour localement aussi
+            // Mettre à jour localement
             unlocked.push(appId);
             localStorage.setItem('unlockedApps', JSON.stringify(unlocked));
 
-            // Émettre l'événement localement
+            const currentCodes = JSON.parse(localStorage.getItem('game_codes') || '[]');
+            if (!currentCodes.find(c => c.value === fileName)) {
+                currentCodes.push({
+                    label: `APP: ${appId.toUpperCase()}`,
+                    value: fileName
+                });
+                localStorage.setItem('game_codes', JSON.stringify(currentCodes));
+            }
+
             gameEvents.emit(GAME_EVENTS.APP_UNLOCKED, {
                 appId: appId,
+                fileName: fileName,
                 unlockedApps: unlocked
             });
 
+            // 2️⃣ Déclencher la vidéo SI présente
+            if (videoId) {
+                await apiFetch(`/api/v1/game/${gameCode}/trigger-video`, {
+                    method: 'POST',
+                    body: JSON.stringify({ video_id: videoId })
+                });
+                gameEvents.emit(GAME_EVENTS.VIDEO_TRIGGERED, { videoId: videoId });
+                console.log("🎬 Vidéo déclenchée:", videoId);
+            }
+
             setStatus({ type: 'success', msg: "DÉCRYPTAGE RÉUSSI" });
             setTimeout(() => router.push('/'), 1500);
+
         } catch (err) {
             console.error("❌ Erreur validation:", err);
             setStatus({ type: 'error', msg: "ERREUR DE CONNEXION" });
@@ -116,7 +115,7 @@ export default function AnswerPage() {
                 className="mb-8 flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 text-gray-400 hover:text-[var(--color-lavender)] hover:border-[var(--color-lavender)]/30 transition-all text-xs tracking-widest group"
             >
                 <RiArrowLeftLine className="group-hover:-translate-x-1 transition-transform" />
-                RETOUR
+                RETOUR AU NEXUS
             </button>
 
             <div className={clsx("max-w-md w-full transition-all duration-300", isShaking && "animate-shake")}>

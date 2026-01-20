@@ -1,4 +1,4 @@
-// hooks/API/usePusherGlobal.js
+// hooks/API/usePusherGlobal.js modifié 19/01
 import { useEffect, useRef, useState } from 'react';
 import Pusher from "pusher-js";
 import { gameEvents, GAME_EVENTS } from '@/lib/gameEventBus';
@@ -21,7 +21,6 @@ export function usePusherGlobal() {
 
     // 2️⃣ Connexion Pusher et écoute des événements
     useEffect(() => {
-        // Ne pas créer une nouvelle connexion si elle existe déjà
         if (!gameCode || pusherRef.current) {
             return;
         }
@@ -43,17 +42,33 @@ export function usePusherGlobal() {
         channel.bind('AppUnlocked', (data) => {
             console.log("🔓 [Pusher] AppUnlocked reçu:", data);
 
-            // Mise à jour du localStorage
+            // 1️⃣ Mettre à jour unlockedApps
             const unlocked = JSON.parse(localStorage.getItem('unlockedApps') || '[]');
             if (!unlocked.includes(data.appId)) {
                 unlocked.push(data.appId);
                 localStorage.setItem('unlockedApps', JSON.stringify(unlocked));
-                console.log("💾 [Pusher] localStorage mis à jour:", unlocked);
+                console.log("💾 [Pusher] unlockedApps mis à jour:", unlocked);
             }
 
-            // ✅ CRITICAL : Émettre l'événement sur le bus
+            // 2️⃣ Ajouter le nom de fichier dans game_codes (pour sidebar)
+            if (data.fileName) {
+                const currentCodes = JSON.parse(localStorage.getItem('game_codes') || '[]');
+
+                // Vérifier si le fichier n'existe pas déjà
+                if (!currentCodes.find(c => c.value === data.fileName)) {
+                    currentCodes.push({
+                        label: `APP: ${data.appId.toUpperCase()}`,
+                        value: data.fileName
+                    });
+                    localStorage.setItem('game_codes', JSON.stringify(currentCodes));
+                    console.log("✅ [Pusher] Nom de fichier ajouté:", data.fileName);
+                }
+            }
+
+            // 3️⃣ Émettre l'événement sur le bus
             gameEvents.emit(GAME_EVENTS.APP_UNLOCKED, {
                 appId: data.appId,
+                fileName: data.fileName,
                 unlockedApps: unlocked
             });
         });
@@ -70,11 +85,9 @@ export function usePusherGlobal() {
 
             } else if (type === 'case_update') {
                 if (index === -1) {
-                    // Casier global
                     localStorage.setItem(`locker_${side}`, status);
                     gameEvents.emit(GAME_EVENTS.LOCKER_UPDATED, { side, status });
                 } else {
-                    // Case spécifique du Snake
                     localStorage.setItem(`snake_${side}_${index}`, status);
                     gameEvents.emit(GAME_EVENTS.SNAKE_UPDATED, { side, index, status });
                 }
@@ -87,7 +100,72 @@ export function usePusherGlobal() {
             gameEvents.emit(GAME_EVENTS.VIDEO_TRIGGERED, { videoId: data.videoId });
         });
 
-        // 🔥 Événement de debug Pusher
+        // 🔥 EVENT 4 : LabyrinthCompleted
+        channel.bind('LabyrinthCompleted', (data) => {
+            console.log("🎯 [Pusher] LabyrinthCompleted reçu:", data);
+
+            // 1️⃣ Mettre à jour le timer
+            if (data.new_ending_at_ms) {
+                localStorage.setItem('game_ending_at_ms', data.new_ending_at_ms);
+                console.log("⏱️ [Pusher] Timer mis à jour:", data.new_ending_at_ms);
+            }
+
+            // 2️⃣ Stocker le code final brut (pour l'énigme finale)
+            if (data.final_code) {
+                localStorage.setItem('final_folder_code', data.final_code);
+                console.log("📁 [Pusher] Code dossier stocké:", data.final_code);
+            }
+
+            // 3️⃣ Ajouter à la liste des codes interceptés (sidebar)
+            const currentCodes = JSON.parse(localStorage.getItem('game_codes') || '[]');
+            if (data.final_code && !currentCodes.find(c => c.value === data.final_code)) {
+                currentCodes.push({
+                    label: "DOSSIER TERMINAL",
+                    value: data.final_code
+                });
+                localStorage.setItem('game_codes', JSON.stringify(currentCodes));
+                console.log("✅ [Pusher] Code ajouté à game_codes");
+            }
+
+            // 4️⃣ Débloquer l'app boussole pour tous
+            const unlocked = JSON.parse(localStorage.getItem('unlockedApps') || '[]');
+            if (!unlocked.includes('boussole')) {
+                unlocked.push('boussole');
+                localStorage.setItem('unlockedApps', JSON.stringify(unlocked));
+                console.log("🧭 [Pusher] App boussole débloquée !");
+            }
+
+            // 5️⃣ Émettre les événements sur le bus
+            gameEvents.emit(GAME_EVENTS.LABYRINTH_COMPLETED, {
+                newEndingAtMs: data.new_ending_at_ms,
+                malusMinutes: data.malus_minutes,
+                finalCode: data.final_code
+            });
+
+            gameEvents.emit(GAME_EVENTS.APP_UNLOCKED, {
+                appId: 'boussole',
+                fileName: data.final_code,
+                unlockedApps: unlocked
+            });
+        });
+
+
+        // 🔥 EVENT 5 : GameStarting
+        channel.bind('GameStarting', (data) => {
+            console.log("🎮 [Pusher] GameStarting reçu:", data);
+
+            if (data.ending_at_ms) {
+                localStorage.setItem('game_ending_at_ms', data.ending_at_ms);
+                console.log("⏱️ [Pusher] Timer initialisé:", data.ending_at_ms);
+
+                // Émettre l'événement pour que le TimerContext se mette à jour
+                gameEvents.emit(GAME_EVENTS.GAME_STARTING, {
+                    endingAtMs: data.ending_at_ms
+                });
+            }
+        });
+
+        // 🔥 Événements de debug Pusher
         pusher.connection.bind('connected', () => {
             console.log("✅ [Pusher] État: CONNECTÉ");
         });
@@ -100,7 +178,7 @@ export function usePusherGlobal() {
             console.error("❌ [Pusher] Erreur de connexion:", err);
         });
 
-        // Cleanup à la destruction
+        // Cleanup
         return () => {
             console.log("🔌 [Pusher] Nettoyage de la connexion...");
             if (channelRef.current) {

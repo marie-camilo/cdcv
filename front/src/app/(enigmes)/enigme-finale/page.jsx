@@ -2,151 +2,187 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 
-// --- GÉNÉRATEUR DE CHAOS MASSIF ---
-const generateMassiveNoise = (depth = 0) => {
-    if (depth > 3) return {};
-    const node = {};
-    const extensions = ['.bak', '.tmp', '.sys', '.dat', '.conf', '.log'];
-    const prefixes = ['sys_config', 'module_x86', 'kernel_data', 'cache_temp', 'process_ref', 'stack_dump'];
-
-    // 15 fichiers par dossier
-    for (let i = 0; i < 15; i++) {
-        const fileName = `${prefixes[Math.floor(Math.random() * prefixes.length)]}_v${depth}.${i}${extensions[Math.floor(Math.random() * extensions.length)]}`;
-        node[fileName] = `MEMORY_OFFSET: 0x${Math.random().toString(16).toUpperCase().slice(2, 8)}\nSTATUS: ACTIVE`;
+// Génère du bruit réaliste
+const noise = (n = 5) => {
+    const files = {};
+    for (let i = 0; i < n; i++) {
+        files[`data_${Math.random().toString(36).slice(2, 6)}.tmp`] = '[CORRUPTED]';
     }
-
-    // 5 sous-dossiers par dossier
-    if (depth < 2) {
-        const folderNames = ['system32', 'drivers', 'cache', 'logs', 'backup', 'security', 'env', 'share'];
-        for (let i = 0; i < 5; i++) {
-            const folderName = `${folderNames[Math.floor(Math.random() * folderNames.length)]}_0${i}`;
-            node[folderName] = generateMassiveNoise(depth + 1);
-        }
-    }
-    return node;
+    return files;
 };
 
-// --- CONSTRUCTION DE L'OS AVEC CHEMINS CAMOUFLÉS ---
-const FILE_SYSTEM = {
-    "bin": generateMassiveNoise(1),
-    "etc": generateMassiveNoise(1),
-    "var": generateMassiveNoise(1),
-    "usr": generateMassiveNoise(1),
-    "Foyer": {
-        ...generateMassiveNoise(1),
-        "Radio": {
-            ...generateMassiveNoise(1),
-            "Communication": {
-                ...generateMassiveNoise(1),
-                "FabRom64": {
-                    "Linux": {
-                        ...generateMassiveNoise(2),
-                        // Le fichier clé est noyé dans la liste
-                        "sys_config_v2.0.bak": "--- SECURE CORE ---\nIDENTITY: VERT\nSECURITY_CODE: 7412\nSTATUS: VERIFIED"
-                    }
-                }
-            },
-            "Developpement": {
-                ...generateMassiveNoise(1),
-                "AliGog29": {
-                    "Linux": {
-                        ...generateMassiveNoise(2),
-                        // Même nom de fichier que le chemin vert
-                        "sys_config_v2.0.bak": "--- SECURE CORE ---\nIDENTITY: SABOTEUR\nSECURITY_CODE: 0305\nSTATUS: OVERRIDE"
-                    }
+// Crée le système de fichiers basé sur les choix du jeu
+const createFS = (labPath, boussPath, secretFolder) => {
+    const isGoodPath = labPath === 'reactor_core_path' && boussPath === 'terminal_access_granted';
+    const finalCode = isGoodPath ? '7412' : '0305';
+    const endMessage = isGoodPath
+        ? `[SYSTÈME]\n\nCode d'arrêt d'urgence: ${finalCode}\n\nEntrez ce code pour stopper le compte à rebours.`
+        : `[ALERTE]\n\nProtocole compromis détecté.\nCode override: ${finalCode}\n\nLes imposteurs ont pris le contrôle.`;
+
+    return {
+        "mission_foyer_log": {
+            ...noise(3),
+            "readme.txt": "Secteur FOYER sécurisé.\nContinuez vers: [CORRUPTED]",
+            "security_bypass_key": {
+                ...noise(3),
+                "status.log": "Puzzles validés.\nAccès radio débloqué.\nSuivant: [CORRUPTED]",
+                "comm_relay_data": {
+                    ...noise(3),
+                    "transmission.txt": `Signal reçu du labyrinthe.\nDossier identifié: [CORRUPTED]`,
+                    [labPath]: {
+                        ...noise(3),
+                        "coords.dat": `Coordonnées boussole validées.\nChemin: ${boussPath}/`,
+                        [boussPath]: {
+                            ...noise(4),
+                            "hint.txt": `Dossier final à trouver.\nIndice: Le nom commence par '${secretFolder.slice(0, 3)}'...`,
+                            // Vrai dossier secret
+                            [secretFolder]: {
+                                "code.txt": endMessage
+                            },
+                            // Faux dossiers pour brouiller
+                            "archives": { ...noise(5), "empty.txt": "Rien ici." },
+                            "backup": { ...noise(5), "old.txt": "Dossier obsolète." },
+                            "temp": { ...noise(5), "null.txt": "Fichier vide." }
+                        }
+                    },
+                    // Si mauvais chemin laby, l'autre existe aussi mais vide
+                    ...(labPath === 'reactor_core_path' ? {
+                        "shadow_ops_path": { "warning.txt": "⚠️ Chemin incorrect. Rebroussez." }
+                    } : {
+                        "reactor_core_path": { "warning.txt": "⚠️ Accès bloqué par sabotage." }
+                    })
                 }
             }
-        }
-    }
+        },
+        "help.txt": "Commandes: ls, cd, cat, pwd, clear\n\nCommencez par: cd mission_foyer_log"
+    };
 };
 
 export default function EnigmeFinalePage() {
     const router = useRouter();
     const [input, setInput] = useState("");
-    const [currentPath, setCurrentPath] = useState([]);
-    const [history, setHistory] = useState([
-        { type: 'sys', content: "BASH v5.2.15(1)-release (x86_64-pc-linux-gnu)" },
-        { type: 'sys', content: "RECOVERY_MODE: ACTIVE // THREAT_LEVEL: HIGH" },
-        { type: 'sys', content: "Type 'help' for commands list." }
-    ]);
-    const terminalEndRef = useRef(null);
+    const [path, setPath] = useState([]);
+    const [history, setHistory] = useState([]);
+    const [ended, setEnded] = useState(false);
+    const [fs, setFs] = useState(null);
+    const endRef = useRef(null);
+    const inputRef = useRef(null);
 
-    useEffect(() => { terminalEndRef.current?.scrollIntoView(); }, [history]);
+    useEffect(() => {
+        // Récupérer les données du jeu
+        const labCode = localStorage.getItem('final_folder_code') || 'REACTOR_CORE';
+        const boussoleSabotaged = localStorage.getItem('boussole_sabotaged') === 'true';
 
-    const getDir = (path) => path.reduce((obj, key) => obj && obj[key], FILE_SYSTEM);
+        // Convertir en noms de dossiers
+        const labPath = labCode === 'REACTOR_CORE' ? 'reactor_core_path' : 'shadow_ops_path';
+        const boussPath = boussoleSabotaged ? 'terminal_compromised' : 'terminal_access_granted';
 
-    const handleStopGame = (isSuccess) => {
-        const message = isSuccess
-            ? "\n[OK] CODE 7412 ACCEPTÉ.\n[OK] ARRÊT DU COMPTE À REBOURS.\n[INFO] REDIRECTION VERS LES CRÉDITS..."
-            : "\n[!] PROTOCOLE 0000 DÉTECTÉ.\n[!] ALERTE SABOTAGE ACTIVÉE.\n[INFO] FERMETURE DE LA SESSION...";
+        // Dossier secret (les joueurs doivent le deviner via indices)
+        const secretFolder = 'kernel_x64'; // Tu peux changer ce nom
 
-        setHistory(prev => [...prev, { type: 'sys', content: message }]);
+        setFs(createFS(labPath, boussPath, secretFolder));
 
-        // Redirection après 3 secondes pour laisser lire le message
-        setTimeout(() => {
-            router.push('/credits');
-        }, 1500000);
+        setHistory([
+            { t: 'sys', c: "╔═══════════════════════════════════════════════╗" },
+            { t: 'sys', c: "║  TERMINAL v5.2 - MODE RÉCUPÉRATION            ║" },
+            { t: 'sys', c: "╚═══════════════════════════════════════════════╝" },
+            { t: 'sys', c: "" },
+            { t: 'warn', c: "[!] Compte à rebours actif" },
+            { t: 'warn', c: "[!] Trouvez code.txt pour l'arrêter" },
+            { t: 'sys', c: "" },
+            { t: 'sys', c: "Tapez: help" },
+        ]);
+    }, []);
+
+    useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [history]);
+    useEffect(() => { inputRef.current?.focus(); }, []);
+
+    const getDir = (p) => p.reduce((o, k) => o?.[k], fs);
+
+    const endGame = (win) => {
+        setEnded(true);
+        setHistory(h => [...h,
+            { t: win ? 'success' : 'error', c: win
+                    ? "\n✅ CODE 7412 ACCEPTÉ\nMISSION RÉUSSIE !"
+                    : "\n❌ CODE 0305 DÉTECTÉ\nSABOTAGE CONFIRMÉ !"
+            }
+        ]);
+        setTimeout(() => router.push(`/credits?status=${win ? 'success' : 'sabotage'}`), 3000);
     };
 
-    const handleCmd = (e) => {
+    const run = (e) => {
         e.preventDefault();
-        const full = input.trim();
-        if (!full) return;
-        const [cmd, ...args] = full.split(/\s+/);
-        const target = args.join(" ");
-        const dir = getDir(currentPath);
-        let res = "";
+        if (ended || !fs) return;
 
-        switch (cmd.toLowerCase()) {
-            case "help": res = "Available: ls, cd [dir], cd .., cat [file], clear"; break;
-            case "ls":
-                const items = Object.keys(dir || {});
-                res = items.length ? items.map(i => typeof dir[i] === 'object' ? `[DIR] ${i}` : i).join("\n") : "Total 0";
+        const cmd = input.trim();
+        if (!cmd) return;
+
+        const [c, ...a] = cmd.split(/\s+/);
+        const arg = a.join(" ");
+        const dir = getDir(path);
+        const prompt = path.length ? `/${path.join('/')}` : '/';
+        let out = [];
+
+        switch (c) {
+            case 'help':
+                out = [{ t: 'sys', c: "ls, cd [dir], cd .., cat [file], pwd, clear" }];
                 break;
-            case "cd":
-                if (target === "..") { if (currentPath.length) setCurrentPath(currentPath.slice(0, -1)); }
-                else if (dir[target] && typeof dir[target] === 'object') setCurrentPath([...currentPath, target]);
-                else res = `cd: ${target}: No such file or directory`;
+            case 'pwd':
+                out = [{ t: 'sys', c: prompt }];
                 break;
-            case "cat":
-                if (typeof dir[target] === 'string') {
-                    res = dir[target];
-                    // Si le joueur lit le fichier de fin
-                    if (target === "sys_config_v2.0.bak") {
-                        setTimeout(() => handleStopGame(res.includes("7412")), 1000);
-                    }
-                } else res = `cat: ${target}: Is a directory or unreadable`;
+            case 'ls':
+                if (!dir) { out = [{ t: 'err', c: "Erreur" }]; break; }
+                const items = Object.keys(dir).sort((a, b) => {
+                    const ad = typeof dir[a] === 'object', bd = typeof dir[b] === 'object';
+                    return ad === bd ? a.localeCompare(b) : ad ? -1 : 1;
+                });
+                out = [{ t: 'sys', c: items.map(i => typeof dir[i] === 'object' ? `📁 ${i}/` : `   ${i}`).join("\n") || "(vide)" }];
                 break;
-            case "clear": setHistory([]); setInput(""); return;
-            default: res = `${cmd}: command not found`;
+            case 'cd':
+                if (!arg || arg === '~' || arg === '/') setPath([]);
+                else if (arg === '..') { if (path.length) setPath(path.slice(0, -1)); }
+                else if (arg.startsWith('/')) {
+                    const p = arg.split('/').filter(Boolean);
+                    if (p.reduce((o, k) => o?.[k], fs) && typeof p.reduce((o, k) => o?.[k], fs) === 'object') setPath(p);
+                    else out = [{ t: 'err', c: `cd: ${arg}: introuvable` }];
+                } else if (dir?.[arg] && typeof dir[arg] === 'object') setPath([...path, arg]);
+                else out = [{ t: 'err', c: `cd: ${arg}: introuvable` }];
+                break;
+            case 'cat':
+                if (!arg) out = [{ t: 'err', c: "cat: fichier manquant" }];
+                else if (typeof dir?.[arg] === 'string') {
+                    out = [{ t: 'file', c: dir[arg] }];
+                    if (arg === 'code.txt') setTimeout(() => endGame(dir[arg].includes('7412')), 2000);
+                } else out = [{ t: 'err', c: `cat: ${arg}: introuvable` }];
+                break;
+            case 'clear':
+                setHistory([]); setInput(""); return;
+            default:
+                out = [{ t: 'err', c: `${c}: commande inconnue` }];
         }
-        setHistory([...history, { type: 'user', content: `guest@root:~/${currentPath.join('/')}$ ${full}` }, { type: 'sys', content: res }]);
+
+        setHistory(h => [...h, { t: 'user', c: `$ ${cmd}` }, ...out]);
         setInput("");
     };
 
+    const cls = t => ({ user: 'text-white font-bold', err: 'text-red-400', success: 'text-green-400 font-bold', warn: 'text-yellow-400', info: 'text-cyan-400', file: 'text-green-300 bg-green-900/30 p-2 rounded my-1' }[t] || 'text-green-400/80');
+
+    if (!fs) return <main className="min-h-screen bg-black flex items-center justify-center"><span className="text-green-500 animate-pulse">Chargement...</span></main>;
+
     return (
-        <main className="min-h-screen bg-[#020202] flex items-center justify-center p-2 sm:p-4">
-            <div className="w-full max-w-4xl h-[650px] bg-black border border-green-900/40 rounded-sm flex flex-col font-mono text-[10px] leading-tight shadow-inner overflow-hidden">
-                {/* OS Bar */}
-                <div className="bg-green-900/10 px-3 py-1.5 text-[9px] flex justify-between text-green-500/70 border-b border-green-900/20">
-                    <span>STATION_TERMINAL_ROOT</span>
-                    <span className="animate-pulse">● SESSION_ACTIVE</span>
+        <main className="min-h-screen bg-black flex items-center justify-center p-2">
+            <div className="w-full max-w-3xl h-[40vh] bg-zinc-950 border border-green-900/50 rounded flex flex-col font-mono text-xs">
+                <div className="bg-green-900/20 px-3 py-1.5 flex justify-between border-b border-green-900/30">
+                    <span className="text-green-500/60">terminal@station</span>
+                    <span className={`w-2 h-2 rounded-full ${ended ? 'bg-red-500' : 'bg-green-500 animate-pulse'}`}></span>
                 </div>
-
-                {/* History */}
-                <div className="flex-1 overflow-y-auto p-4 text-green-400/90 scrollbar-hide">
-                    {history.map((h, i) => (
-                        <div key={i} className={`mb-1.5 ${h.type === 'user' ? 'text-white font-bold' : 'whitespace-pre-wrap opacity-80 border-l border-green-900/30 pl-2'}`}>
-                            {h.content}
-                        </div>
-                    ))}
-                    <div ref={terminalEndRef} />
+                <div className="flex-1 overflow-y-auto p-3 space-y-1">
+                    {history.map((h, i) => <div key={i} className={`whitespace-pre-wrap ${cls(h.t)}`}>{h.c}</div>)}
+                    <div ref={endRef} />
                 </div>
-
-                {/* Input Area */}
-                <form onSubmit={handleCmd} className="p-4 bg-zinc-900/20 border-t border-green-900/20 flex gap-2">
-                    <span className="text-green-700 font-bold shrink-0">guest@root:~/${currentPath.join('/')}$</span>
-                    <input autoFocus value={input} onChange={e => setInput(e.target.value)} className="bg-transparent outline-none flex-1 text-white border-none focus:ring-0 p-0" spellCheck="false" autoComplete="off" />
+                <form onSubmit={run} className="p-3 bg-green-900/10 border-t border-green-900/30 flex gap-2">
+                    <span className="text-green-600">$</span>
+                    <input ref={inputRef} value={input} onChange={e => setInput(e.target.value)} disabled={ended} className="bg-transparent outline-none flex-1 text-white" autoFocus />
                 </form>
             </div>
         </main>

@@ -6,7 +6,6 @@ import { useVideoTrigger } from '@/hooks/API/useVideoTrigger';
 
 const VIDEO_MAP = {
     'foyer': '/video-foyer.mov',
-    // Ajoute d'autres vidéos ici si besoin
 };
 
 export default function GlobalVideoOverlay() {
@@ -21,14 +20,14 @@ export default function GlobalVideoOverlay() {
     const handleVideoEnd = () => {
         clearVideo();
         if (activeVideo === 'foyer') {
-            router.push('/enigme-3');
+            router.push('/');
         }
     };
 
     const handleSkip = () => {
         clearVideo();
         if (activeVideo === 'foyer') {
-            router.push('/enigme-3');
+            router.push('/');
         }
     };
 
