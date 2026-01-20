@@ -73,7 +73,6 @@ export default function TeamBPage() {
                 malus_count: malusCount
             });
 
-            // ✅ UTILISER apiFetch au lieu de fetch
             const data = await apiFetch('/api/v1/labyrinth/complete', {
                 method: 'POST',
                 body: JSON.stringify({
