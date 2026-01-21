@@ -13,7 +13,14 @@ export default function LockerGrid({
     const isValidated = status === 'validated';
     const isFailed = status === 'failed';
 
-    // ✨ STYLES DYNAMIQUES MIS À JOUR
+    const sideValue = String(side).toLowerCase();
+    const startNumber = (sideValue === 'top' || sideValue === 'left') ? 1 : 9;
+    const verticalMapping = [
+        0, 3, 5,
+        1, null, 6,
+        2, 4, 7
+    ];
+
     let borderStyle = 'border-2 border-[var(--color-light-green)]/30';
     if (isLocked) borderStyle = 'border-4 border-[var(--color-red)] shadow-[0_0_20px_rgba(173,11,22,0.3)] animate-pulse';
     if (isFailed) borderStyle = 'border-2 border-[var(--color-mat-red)] opacity-70';
@@ -21,13 +28,11 @@ export default function LockerGrid({
 
     return (
         <div className="relative group">
-            {/* Grille */}
             <div className={`size-80 grid grid-cols-3 grid-rows-3 transition-all duration-300 ${borderStyle} ${isLocked ? 'cursor-pointer' : ''} bg-black/60 backdrop-blur-sm`}>
-                {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((position) => {
-                    // Case centrale (4)
-                    if (position === 4) {
+                {verticalMapping.map((relativeIndex, position) => {
+                    if (relativeIndex === null) {
                         return (
-                            <div key={position} className={`flex items-center justify-center text-4xl border border-white/5 ${
+                            <div key="status" className={`flex items-center justify-center text-4xl border border-white/5 ${
                                 isValidated ? 'bg-[var(--color-light-green)]/20 text-[var(--color-light-green)]' :
                                     isFailed ? 'bg-[var(--color-mat-red)]/20 text-[var(--color-mat-red)]' :
                                         'bg-white/5'
@@ -38,26 +43,24 @@ export default function LockerGrid({
                         );
                     }
 
-                    // Autres cases
-                    const caseIndex = position < 4 ? position : position - 1;
-                    const caseState = cases[caseIndex];
+                    const displayNum = startNumber + relativeIndex;
+                    const caseState = cases[relativeIndex];
 
                     return (
                         <div
                             key={position}
                             className={`p-2 flex items-center justify-center text-lg font-bold transition-all border border-white/5 ${
                                 isLocked ? 'cursor-not-allowed text-white/10' :
-                                    // ✨ ICI : On utilise var(--color-mat-red) pour l'échec
                                     caseState === 'success' ? 'bg-[var(--color-light-green)] text-black cursor-default' :
                                         caseState === 'fail' ? 'bg-[var(--color-mat-red)] text-white cursor-default' :
                                             'cursor-pointer hover:bg-[var(--color-light-green)] hover:text-black text-white/80'
                             }`}
                             onClick={(e) => {
                                 e.stopPropagation();
-                                if (!isLocked) onCaseClick(side, caseIndex);
+                                if (!isLocked) onCaseClick(side, relativeIndex);
                             }}
                         >
-                            {position < 4 ? position + 1 : position}
+                            {displayNum}
                         </div>
                     );
                 })}
@@ -78,13 +81,6 @@ export default function LockerGrid({
                     <div className="text-[var(--color-red)] font-black tracking-[0.3em] text-lg uppercase border-2 border-[var(--color-red)] px-4 py-1">
                         LOCKED
                     </div>
-                </div>
-            )}
-
-            {/* Message FAILED */}
-            {isFailed && (
-                <div className="absolute -bottom-8 left-0 right-0 text-center text-[var(--color-mat-red)] text-xs font-mono font-bold tracking-widest animate-pulse">
-                    ACCÈS RÉSERVÉ
                 </div>
             )}
         </div>
