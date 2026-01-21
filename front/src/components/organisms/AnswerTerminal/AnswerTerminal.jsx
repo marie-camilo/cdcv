@@ -53,8 +53,7 @@ export default function AnswerTerminal({ onValidate, expectedAnswer }) {
                             </p>
                         ) : (
                             <p className="text-[var(--color-light-green)]/50 text-[10px] font-mono tracking-wider uppercase">
-                                // SYSTÈME EN ATTENTE <br/>
-                                // TENTATIVES : <span className="text-white">{attempts}</span>
+                                // TENTATIVES ILLIMITÉES <br/>
                             </p>
                         )}
                     </div>

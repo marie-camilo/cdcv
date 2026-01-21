@@ -14,7 +14,7 @@ export default function Enigme1Page() {
     const [gameCode, setGameCode] = useState(null);
     const pusherRef = useRef(null);
 
-    // ✅ 1) Récupération du code de partie
+    // 1) Récupération du code de partie
     useEffect(() => {
         document.title = "Énigme 1 | Infiltration";
 
@@ -37,7 +37,7 @@ export default function Enigme1Page() {
         fetchSession();
     }, []);
 
-    // ✅ 2) ÉCOUTE PUSHER pour synchroniser les apps débloquées
+    // 2) ÉCOUTE PUSHER
     useEffect(() => {
         if (!gameCode || pusherRef.current) return;
 
@@ -49,19 +49,13 @@ export default function Enigme1Page() {
         pusherRef.current = pusher;
         const channel = pusher.subscribe(`game.${gameCode}`);
 
-        // 🔥 Écoute du déblocage d'app
         channel.bind('AppUnlocked', (data) => {
-            console.log("🔓 NOUVELLE APP DÉBLOQUÉE :", data.appId);
-
-            // Met à jour le localStorage pour tous les joueurs
             const unlocked = JSON.parse(localStorage.getItem('unlockedApps') || '[]');
             if (!unlocked.includes(data.appId)) {
                 unlocked.push(data.appId);
                 localStorage.setItem('unlockedApps', JSON.stringify(unlocked));
-                console.log("✅ localStorage mis à jour:", unlocked);
             }
 
-            // Si c'est l'app "scan" (celle débloquée par cette énigme)
             if (data.appId === 'scan') {
                 setIsModalOpen(true);
             }
@@ -78,30 +72,17 @@ export default function Enigme1Page() {
     const handleSuccess = async () => {
         try {
             const codeToUse = gameCode || localStorage.getItem('currentGameCode');
+            if (!codeToUse) return;
 
-            if (!codeToUse) {
-                alert("Erreur : Code de partie introuvable. Veuillez vous reconnecter.");
-                return;
-            }
-
-            console.log("📡 Envoi de la validation au serveur...");
-
-            // ✅ APPEL API : le backend enverra l'événement Pusher à TOUT LE GROUPE
             await validateGameStep(codeToUse);
 
-            // ✅ Ajout du code de position (spécifique à cette énigme)
             const currentCodes = JSON.parse(localStorage.getItem('game_codes') || '[]');
             if (!currentCodes.find(c => c.value === "FOYER")) {
                 currentCodes.push({ label: "POSITION", value: "FOYER" });
                 localStorage.setItem('game_codes', JSON.stringify(currentCodes));
             }
-
-            console.log("✅ Validation envoyée avec succès");
-
         } catch (error) {
-            console.error("❌ Erreur lors de la validation :", error.message);
-            // En cas d'erreur réseau, on peut quand même ouvrir la modal localement
-            alert("Erreur de connexion. Vérifiez votre réseau.");
+            console.error("Erreur lors de la validation :", error.message);
         }
     };
 
@@ -110,18 +91,18 @@ export default function Enigme1Page() {
         "> M. JACQUOT :",
         "> Ça y est, j'ai réussi à forcer leur premier point d'entrée.",
         "> Je vous envoie les données brutes que j'ai pu intercepter.",
-        "> Regardez l'écran, ces chiffres doivent former un code.",
+        "> Regardez l'écran, ces chiffres doivent vous aider à chercher un mot.",
         "> Une fois que vous l'avez, tapez-le dans la console juste en dessous.",
-        "> Concentrez-vous, on ne peut pas se permettre de rater le premier verrou.",
+        "> Ne vous inquiétez pas pour le système de sécurité : le nombre de tentatives est illimité.",
         "> - Jacquot"
     ];
 
     const numbers = [
-        { val: "6", color: "var(--color-mat-blue)" },
-        { val: "15", color: "var(--color-sand)" },
+        { val: "6", color: "var(--color-mat-red)" },
+        { val: "15", color: "var(--color-mat-red)" },
         { val: "25", color: "var(--color-mat-red)" },
-        { val: "5", color: "var(--color-red)" },
-        { val: "18", color: "var(--color-mat-blue)" }
+        { val: "5", color: "var(--color-mat-red)" },
+        { val: "18", color: "var(--color-mat-red)" }
     ];
 
     return (
@@ -133,7 +114,8 @@ export default function Enigme1Page() {
                 </article>
 
                 <article className="flex-1 flex items-center justify-center">
-                    <div className="w-full grid grid-cols-2 gap-4 bg-[var(--color-mid-red)]/20 rounded-2xl p-6 border border-[var(--color-mat-red)]/40 shadow-2xl backdrop-blur-sm">                        {numbers.map((n, index) => (
+                    <div className="w-full grid grid-cols-2 gap-4 bg-[var(--color-mid-red)]/20 rounded-2xl p-6 border border-[var(--color-mat-red)]/40 shadow-2xl backdrop-blur-sm">
+                        {numbers.map((n, index) => (
                             <div key={index} className="text-8xl font-black text-center" style={{ color: n.color }}>
                                 {n.val}
                             </div>
@@ -145,7 +127,7 @@ export default function Enigme1Page() {
                     <AnswerTerminal
                         expectedAnswer="FOYER"
                         onValidate={handleSuccess}
-                        placeholder="MOT DE PASSE..."
+                        placeholder="ENTRER LE MOT..."
                     />
                 </article>
             </section>
@@ -153,7 +135,7 @@ export default function Enigme1Page() {
             <BaseModal
                 isOpen={isModalOpen}
                 title="< ACCÈS DÉBLOQUÉ />"
-                message="Code validé. Module de Scan actif. Rendez-vous au Foyer. - LES CHEMISES ROUGES"
+                message="Eh ben... C'était laborieux. Vous venez de débloquer le module de Scan QR-Code. Rendez-vous au Foyer pour la suite des énigmes, si vous y arrivez... - LES CHEMISES ROUGES"
                 onConfirm={() => { setIsModalOpen(false); router.push('/'); }}
             />
         </main>
