@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import {apiFetch} from "@/hooks/API/fetchAPI";
 
 export default function TeamBPage() {
-    const [lives, setLives] = useState(10); // ✅ CHANGÉ : 10 vies au lieu de 5
+    const [lives, setLives] = useState(10);
     const [moveCount, setMoveCount] = useState(0);
     const [showWarning, setShowWarning] = useState(true);
     const [resetTrigger, setResetTrigger] = useState(0);
@@ -25,7 +25,6 @@ export default function TeamBPage() {
                 router.replace('/enigme-3/guideur');
             }
 
-            // ✅ UTILISER apiFetch au lieu de fetch
             try {
                 const data = await apiFetch('/api/v1/labyrinth/code');
 
@@ -107,7 +106,6 @@ export default function TeamBPage() {
                 <div className={styles.warningOverlay}>
                     <div className={styles.warningModal}>
                         <div className={styles.warningHeader}>
-                            <span className={styles.warningIcon}>⚠️</span>
                             <h2 className={styles.warningTitle}>ATTENTION PILOTES</h2>
                         </div>
 
@@ -116,14 +114,19 @@ export default function TeamBPage() {
                                 Vous êtes dans une <strong>zone restreinte</strong>.
                             </p>
                             <p className={styles.warningText}>
-                                ⚠️ <strong>NE BOUGEZ PAS</strong> avant d'avoir établi le contact avec votre équipe.
+                                <strong>NE BOUGEZ PAS</strong> avant d'avoir établi le contact avec votre équipe.
                             </p>
                             <p className={styles.warningText}>
                                 Attendez leurs instructions. Chaque mouvement compte.
                             </p>
+
+                            <p className={styles.warningText}>
+                                Pour vous déplacer, utilisez les flèches du clavier.
+                            </p>
+
                             <p className={styles.warningTextDanger}>
-                                {/* ✅ CHANGÉ : Texte mis à jour */}
-                                10 erreurs maximum | Chaque erreur = malus de 1 minute (max 10 minutes)
+                                Vous avez le droit à 10 erreurs maximum <br/> <br/>
+                                Chaque erreur = malus de 1 minute (max 10 minutes)
                             </p>
                         </div>
 
@@ -134,12 +137,10 @@ export default function TeamBPage() {
                 </div>
             )}
 
-            {/* ✅ MODIF : Alerte CODE MANQUANT plus grosse et visible */}
             {!gameCode && (
                 <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 backdrop-blur-sm">
                     <div className="max-w-md w-full mx-4 p-8 bg-red-900/40 border-4 border-red-500 rounded-xl shadow-[0_0_50px_rgba(239,68,68,0.6)] animate-pulse">
                         <div className="flex flex-col items-center text-center">
-                            <span className="text-6xl mb-4">⚠️</span>
                             <h2 className="text-3xl font-black text-red-500 mb-4 font-mono uppercase tracking-wider">
                                 CODE PARTIE MANQUANT
                             </h2>
@@ -156,7 +157,6 @@ export default function TeamBPage() {
 
             <div className={styles.mazeWrapper}>
                 <div className={styles.infoBar}>
-                    {/* ✅ MODIF : 10 hearts au lieu de 5 */}
                     <div className={styles.heartsContainer}>
                         {[...Array(10)].map((_, i) => (
                             <span key={i} className={i < lives ? styles.heartFull : styles.heartEmpty}>
@@ -165,7 +165,6 @@ export default function TeamBPage() {
                         ))}
                     </div>
 
-                    {/* ✅ MODIF : Affichage malus en minutes */}
                     <div className="text-orange-500 font-mono font-bold">
                         Malus: {malusCount} (-{malusCount}min)
                     </div>

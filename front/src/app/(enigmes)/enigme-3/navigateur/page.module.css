@@ -91,17 +91,6 @@
   border-bottom: 2px solid var(--color-mid-red);
 }
 
-.warningIcon {
-  font-size: 42px;
-  animation: shake 0.5s infinite;
-}
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
-}
-
 .warningTitle {
   font-family: 'Courier New', monospace;
   font-size: 24px;
