@@ -17,9 +17,8 @@ import {
     IoChatbubblesOutline,
 } from "react-icons/io5";
 
-import { useTimer } from "@/app/context/TimerContext";
 import { checkPlayerCookie, getCodeFromCookie } from "@/hooks/API/rules";
-import { getEndingAt, getPlayerRole } from "@/hooks/API/gameRequests";
+import { getPlayerRole } from "@/hooks/API/gameRequests";
 
 const ROLE_DESCRIPTIONS = {
     cadreur: {
@@ -88,8 +87,8 @@ function RoleModal({ isOpen, onClose, roleName }) {
                         {roleName || "AGENT"}
                     </h2>
                     <span className="text-[10px] text-[var(--color-light-green)] bg-[var(--color-light-green)]/10 px-2 py-1 mt-2 rounded uppercase tracking-widest">
-            Accréditation confirmée
-          </span>
+                        Accréditation confirmée
+                    </span>
                 </div>
 
                 <div className="space-y-4 font-mono text-sm">
@@ -129,8 +128,6 @@ function RoleModal({ isOpen, onClose, roleName }) {
 }
 
 export default function Navbar() {
-    const { startFromEndingAt } = useTimer();
-
     const [playerName, setPlayerName] = useState("Agent");
     const [playerRole, setPlayerRole] = useState(null);
 
@@ -141,40 +138,37 @@ export default function Navbar() {
     useEffect(() => {
         const initData = async () => {
             try {
-                // ✅ Player
+                // ✅ Charger les infos du joueur
                 const data = await checkPlayerCookie();
                 if (data?.player?.name) setPlayerName(data.player.name);
 
-                // ✅ Role
+                // ✅ Charger le rôle
                 const roleData = await getPlayerRole();
                 if (roleData?.role) setPlayerRole(roleData.role);
 
-                // ✅ Game code
+                // ✅ Vérifier et stocker le game code (pour le sync DB du TimerContext)
                 const codeRes = await getCodeFromCookie();
                 const gameCode = codeRes?.game?.code;
 
-                if (!gameCode) {
-                    console.warn("Navbar: gameCode introuvable");
-                    return;
+                if (gameCode) {
+                    localStorage.setItem('currentGameCode', gameCode);
+                    console.log("✅ [Navbar] Game code stocké:", gameCode);
+                } else {
+                    console.warn("⚠️ [Navbar] Game code introuvable");
                 }
 
-                // ✅ EndingAt fetch (1 seule fois)
-                const ending = await getEndingAt(gameCode);
+                // ✅ SUPPRIMÉ : Ne plus appeler getEndingAt ni startFromEndingAt
+                // Le TimerContext gère automatiquement le chargement depuis localStorage
+                // et la synchronisation avec la DB
 
-                if (!ending?.ending_at_ms) {
-                    console.error("Navbar: ending_at_ms manquant", ending);
-                    return;
-                }
-
-                startFromEndingAt(Number(ending.ending_at_ms));
             } catch (err) {
-                console.error("Erreur chargement navbar:", err);
+                console.error("❌ [Navbar] Erreur chargement:", err);
                 setPlayerName("Agent");
             }
         };
 
         initData();
-    }, [startFromEndingAt]);
+    }, []); // ✅ Pas de dépendance à startFromEndingAt
 
     return (
         <>
@@ -196,12 +190,12 @@ export default function Navbar() {
                                                 : "text-[var(--color-light-green)]"
                                         }`}
                                     >
-                    {playerRole}
-                  </span>
+                                        {playerRole}
+                                    </span>
                                 ) : (
                                     <span className="text-[9px] text-white/40 font-mono tracking-wider uppercase animate-pulse">
-                    ...
-                  </span>
+                                        ...
+                                    </span>
                                 )}
                             </div>
                         </div>

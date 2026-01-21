@@ -21,6 +21,7 @@ export function TimerProvider({ children }) {
 
     const intervalRef = useRef(null);
     const endingAtRef = useRef(null);
+    const isInitializedRef = useRef(false);
 
     // ✅ Fonction pour arrêter le timer
     const stop = useCallback(() => {
@@ -65,7 +66,7 @@ export function TimerProvider({ children }) {
             setSeconds(safe);
 
             // Détection de la fin du timer
-            if (safe <= 0) {
+            if (safe <= 0 && !isFinished) {
                 stop();
                 setIsFinished(true);
                 console.log("⏱️ [Timer] Temps écoulé !");
@@ -75,10 +76,13 @@ export function TimerProvider({ children }) {
         stop();
         compute();
         intervalRef.current = setInterval(compute, 1000);
-    }, [stop]);
+    }, [stop, isFinished]);
 
-    // ✅ 1. Charger ending_at depuis localStorage au démarrage
+    // ✅ 1. Charger ending_at depuis localStorage au démarrage (UNE SEULE FOIS)
     useEffect(() => {
+        if (isInitializedRef.current) return;
+        isInitializedRef.current = true;
+
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
             const parsed = Number(stored);
@@ -120,17 +124,15 @@ export function TimerProvider({ children }) {
             if (!gameCode) return;
 
             try {
-                // ✅ Import dynamique pour éviter les problèmes SSR
                 const { apiFetch } = await import('@/hooks/API/fetchAPI');
                 const data = await apiFetch(`/api/v1/game/end/${gameCode}`);
-
-
 
                 if (data?.ending_at_ms) {
                     const dbEndingAt = Number(data.ending_at_ms);
                     const localEndingAt = Number(localStorage.getItem(STORAGE_KEY));
 
-                    if (dbEndingAt !== localEndingAt) {
+                    // ✅ Ne sync que si différent de plus de 2 secondes (évite les micro-updates)
+                    if (Math.abs(dbEndingAt - localEndingAt) > 2000) {
                         console.log("🔄 [Timer] Sync DB → localStorage:", dbEndingAt);
                         startFromEndingAt(dbEndingAt);
                     }
@@ -140,10 +142,15 @@ export function TimerProvider({ children }) {
             }
         };
 
-        syncWithDB();
+        // Premier sync après 5 secondes (pour laisser le temps au chargement initial)
+        const initialTimeout = setTimeout(syncWithDB, 5000);
+        // Puis toutes les 2 minutes
         const syncInterval = setInterval(syncWithDB, 120000);
 
-        return () => clearInterval(syncInterval);
+        return () => {
+            clearTimeout(initialTimeout);
+            clearInterval(syncInterval);
+        };
     }, [startFromEndingAt]);
 
     // ✅ Nettoyage à la destruction du composant
