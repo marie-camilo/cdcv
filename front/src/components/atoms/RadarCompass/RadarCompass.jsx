@@ -90,7 +90,6 @@ export default function RadarCompass({ targets, foundIds, isPirateVision }) {
     if (!permissionGranted) {
         return (
             <div className="flex flex-col items-center justify-center w-64 h-64 border border-[var(--color-red)] rounded-full bg-black/90 p-4 text-center shadow-[0_0_30px_rgba(255,0,0,0.1)] z-50">
-                <p className="text-[var(--color-red)] text-[10px] mb-4 font-mono tracking-widest uppercase font-black">System Offline</p>
                 <button onClick={requestAccess} className="px-6 py-2 border border-[var(--color-red)] text-[var(--color-red)] font-mono text-xs hover:bg-[var(--color-red)] hover:text-black transition-all">INITIALISER</button>
             </div>
         );
@@ -114,7 +113,6 @@ export default function RadarCompass({ targets, foundIds, isPirateVision }) {
             <div className="absolute bottom-0 left-1/2 w-[1px] h-3 bg-[var(--color-red)] -translate-x-1/2"></div>
             <div className="absolute left-0 top-1/2 w-3 h-[1px] bg-[var(--color-red)] -translate-y-1/2"></div>
             <div className="absolute right-0 top-1/2 w-3 h-[1px] bg-[var(--color-red)] -translate-y-1/2"></div>
-
             <div className="absolute top-[-10px] left-1/2 -translate-x-1/2 z-40 drop-shadow-[0_0_8px_rgba(255,0,0,0.6)]">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 2L2 22H22L12 2Z" fill="var(--color-red)"/>
@@ -122,7 +120,6 @@ export default function RadarCompass({ targets, foundIds, isPirateVision }) {
                 </svg>
             </div>
 
-            {/* Disque Rotatif (Le contenu qui tourne) */}
             <div
                 className="absolute inset-2 rounded-full will-change-transform overflow-hidden"
                 style={{
@@ -130,21 +127,16 @@ export default function RadarCompass({ targets, foundIds, isPirateVision }) {
                     background: "radial-gradient(circle, rgba(255, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0) 70%)"
                 }}
             >
-                {/* Axes Intérieurs */}
                 <div className="absolute left-1/2 top-0 bottom-0 w-[1px] border-r border-dashed border-[var(--color-red)] opacity-50 -translate-x-1/2"></div>
                 <div className="absolute top-1/2 left-0 right-0 h-[1px] border-b border-dashed border-[var(--color-red)] opacity-50 -translate-y-1/2"></div>
-
-                {/* Nord (Indiqué en Rouge) */}
-                <div className="absolute top-4 left-1/2 -translate-x-1/2" style={counterRotateStyle}>
-                    <div className="text-[var(--color-classic-red)] font-black text-sm tracking-widest drop-shadow-md">N</div>
+                <div className="absolute top-4 left-1/2 -translate-x-1/2 flex flex-col items-center">
+                    <span className="text-[var(--color-classic-red)] text-3xl font-black drop-shadow-[0_0_15px_rgba(255,0,0,0.8)]">N</span>
+                    <div className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[8px] border-b-[var(--color-classic-red)] mt-[-4px]" />
                 </div>
 
-                {/* CIBLES */}
                 {showDots && targets.map((target) => {
                     const isFound = foundIds.includes(target.id);
                     const isSaboteurType = target.type === 'sabotaged';
-
-                    // Condition de visibilité : Normal OU Déjà trouvé OU Hack actif
                     const shouldShow = !isSaboteurType || isFound || isPirateVision;
                     if (!shouldShow) return null;
 
@@ -155,7 +147,7 @@ export default function RadarCompass({ targets, foundIds, isPirateVision }) {
 
                     return (
                         <div key={target.id} className="absolute top-1/2 left-1/2 w-0 h-0 flex items-center justify-center" style={transformStyle}>
-                            <div style={counterRotateStyle} className="relative flex items-center justify-center">
+                            <div style={counterRotateStyle} className="relative flex flex-col items-center justify-center">
                                 {isFound ? (
                                     <div className="w-6 h-6 rounded-full bg-[var(--color-light-green)]/20 border border-[var(--color-light-green)] flex items-center justify-center shadow-[0_0_10px_var(--color-light-green)]">
                                         <PuzzleIcon className="w-3 h-3 text-[var(--color-light-green)]" />
@@ -168,13 +160,20 @@ export default function RadarCompass({ targets, foundIds, isPirateVision }) {
                                         </div>
                                     </div>
                                 )}
+                                {!isFound && (
+                                    <span
+                                        className="absolute top-7 bg-black/80 text-[10px] font-mono font-bold px-1.5 py-0.5 rounded border border-white/20 whitespace-nowrap z-50 pointer-events-none"
+                                        style={{ color: color }}
+                                    >
+                                        #{target.slotNumber}
+                                    </span>
+                                )}
                             </div>
                         </div>
                     );
                 })}
             </div>
 
-            {/* Cap Digital */}
             <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[var(--color-red)] font-mono text-xs font-bold tracking-[2px] opacity-80 border-x border-[var(--color-red)]/30 px-3">
                 {Math.round(headingRender).toString().padStart(3, '0')}°
             </div>

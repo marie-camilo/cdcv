@@ -51,7 +51,7 @@ const generateRandomExits = () => {
             backendDirection: 'north',
             type: 'VERTE',
             color: 'green',
-            command: 'chemise-vendredi', // Code Enquêteur
+            command: 'dress-to-impress', // Code Enquêteur
         },
         {
             x: MAZE_SIZE - 2, y: 12,
@@ -59,7 +59,7 @@ const generateRandomExits = () => {
             backendDirection: 'east',
             type: 'VERTE',
             color: 'green',
-            command: 'chemise-mardi', // Code Saboteur
+            command: 'msp', // Code Saboteur
         },
         {
             x: 11, y: MAZE_SIZE - 2,
