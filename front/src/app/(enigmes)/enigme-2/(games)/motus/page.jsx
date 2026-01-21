@@ -250,8 +250,8 @@ const styles = {
     },
 
     // Status Couleurs (Palette)
-    correct: { backgroundColor: "var(--color-mat-blue)", borderColor: "var(--color-mat-blue)", color: "white" },
-    present: { backgroundColor: "transparent", borderColor: "var(--color-sand)", color: "var(--color-sand)", borderRadius: "50%" },
+    correct: { backgroundColor: "#b4d179", borderColor: "#b4d179", color: "var(--color-darker-red)" },
+    present: { backgroundColor: "transparent", borderColor: "#f5b942", color: "#f5b942", borderRadius: "50%" },
     absent: { opacity: 0.3, borderColor: "transparent" },
 
     form: { marginTop: "30px" },
