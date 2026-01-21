@@ -23,7 +23,7 @@ const SimonFastCyber = () => {
     const colorMap = {
         green:  { bg: "#7A8C5E", glow: "#D0FF71" },
         red:    { bg: "#AD0B16", glow: "#ff3333" },
-        yellow: { bg: "#8C8166", glow: "#EBDDC4" },
+        yellow: { bg: "#f1c97f", glow: "#f5b942" },
         blue:   { bg: "#5A6B7A", glow: "#A9B9C8" }
     };
 
