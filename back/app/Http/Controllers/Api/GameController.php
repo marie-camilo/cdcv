@@ -75,7 +75,9 @@ class GameController extends Controller
         return $response;
     }
 
-
+    /**
+     * ✅ Retourne le timestamp de fin en millisecondes
+     */
     public function getEndingAt(Request $request, string $code)
     {
         $game = Game::where('code', $code)->firstOrFail();
@@ -86,10 +88,12 @@ class GameController extends Controller
             ], 400);
         }
 
-        // ✅ FIX : Utiliser timestamp * 1000
+        // ✅ CORRECTION : Timestamp en millisecondes
+        // Carbon retourne un timestamp en secondes, on multiplie par 1000
+        $timestampMs = \Carbon\Carbon::parse($game->ending_at)->timestamp * 1000;
+
         return response()->json([
-            'ending_at_ms' => \Carbon\Carbon::parse($game->ending_at)->timestamp * 1000,
+            'ending_at_ms' => $timestampMs,
         ]);
     }
-
 }
