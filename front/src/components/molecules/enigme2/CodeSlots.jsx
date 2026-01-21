@@ -19,7 +19,7 @@ export default function CodeSlots({ digits }) {
                         src="/casier.svg"
                         alt="Module Slot"
                         fill
-                        className="object-contain opacity-80 group-hover:opacity-100 transition-opacity"
+                        className="object-contain bg-gray-800"
                     />
 
                     <div className="z-10 flex items-center justify-center w-full h-full pb-1">
