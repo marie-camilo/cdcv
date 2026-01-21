@@ -41,19 +41,19 @@ const TOOLS_DATA = {
         image: '/scan.png',
         fallbackIcon: RiCameraLine,
         href: '/scan',
-        description: "MODULE CRITIQUE. Ce scanner est le seul moyen de passer à l'étape suivante via les codes visuels.",
+        description: "MODULE CRITIQUE. Ce scanner est le seul moyen de passer à l'étape suivante via les QR Codes à scanner.",
         color: 'text-[var(--color-light-green)]',
         borderColor: 'border-[var(--color-light-green)]',
     },
     puzzle: {
         id: 'puzzle',
-        name: 'DÉCRYPTEUR PUZZLE',
+        name: 'DÉCRYPTEUR FOYER',
         role: 'TOUS LES AGENTS',
         roleKey: 'all',
         image: '/puzzle.png',
         fallbackIcon: RiPuzzleLine,
         href: '/enigme-2',
-        description: "Interface de résolution d'anomalies logiques et de reconstruction de données.",
+        description: "Interface de résolution d'anomalies logiques et de mini-jeux.",
         color: 'text-[var(--color-light-green)]',
         borderColor: 'border-[var(--color-light-green)]',
     },
@@ -65,7 +65,7 @@ const TOOLS_DATA = {
         image: '/talkies.png',
         fallbackIcon: RiCellphoneFill,
         href: '/enigme-3',
-        description: "Ligne cryptée pour coordonner les actions avec les autres unités.",
+        description: "Talkies-Walkies cryptés pour coordonner les actions avec les autres agents.",
         color: 'text-[var(--color-light-green)]',
         borderColor: 'border-[var(--color-light-green)]',
     },
@@ -77,7 +77,7 @@ const TOOLS_DATA = {
         image: '/boussole.png',
         fallbackIcon: RiCompass3Line,
         href: '/enigme-4',
-        description: "Module de géolocalisation pour s'orienter vers les objectifs physiques.",
+        description: "Module de géolocalisation pour localiser des pièces égarées..",
         color: 'text-[var(--color-light-green)]',
         borderColor: 'border-[var(--color-light-green)]',
     },
@@ -89,7 +89,7 @@ const TOOLS_DATA = {
         image: '/terminal.png',
         fallbackIcon: RiTerminalBoxLine,
         href: '/enigme-finale',
-        description: "L'ultime barrière. Accès direct au noyau central du système.",
+        description: "L'ultime et dernier outil. Accès direct au noyau central du système.",
         color: 'text-[var(--color-light-green)]',
         borderColor: 'border-[var(--color-light-green)]',
     }
@@ -192,7 +192,6 @@ const AppIcon = ({ id, unlockedApps, seenApps, onOpen }) => {
 export default function InfiltrationHub() {
     const router = useRouter();
 
-    // ✅ HOOK RÉACTIF : se met à jour automatiquement via Pusher
     const unlockedApps = useUnlockedApps();
 
     const [seenApps, setSeenApps] = useState([]);
@@ -200,12 +199,10 @@ export default function InfiltrationHub() {
     const [selectedTool, setSelectedTool] = useState(null);
     const [startTyping, setStartTyping] = useState(false);
 
-    // DEBUG : Afficher les apps débloquées dans la console
     useEffect(() => {
-        console.log("🎯 [PAGE] Apps débloquées actuelles:", unlockedApps);
+        console.log("[PAGE] Apps débloquées actuelles:", unlockedApps);
     }, [unlockedApps]);
 
-    // LOGIQUE DE GARDE / SESSION
     useEffect(() => {
         const init = async () => {
             try {
@@ -220,7 +217,6 @@ export default function InfiltrationHub() {
                 const roleRes = await getPlayerRole();
                 setUserRole(roleRes?.role?.toLowerCase() || localStorage.getItem('userRole'));
 
-                // Chargement des apps vues
                 const storedSeen = JSON.parse(localStorage.getItem('seenApps') || '[]');
                 setSeenApps(storedSeen);
             } catch (e) {
@@ -231,7 +227,6 @@ export default function InfiltrationHub() {
         init();
     }, [router]);
 
-    // TIMER TERMINAL
     useEffect(() => {
         const typingTimer = setTimeout(() => setStartTyping(true), 1000);
         return () => clearTimeout(typingTimer);
@@ -240,7 +235,6 @@ export default function InfiltrationHub() {
     const handleOpenTool = (id) => {
         setSelectedTool(TOOLS_DATA[id]);
 
-        // Marquer comme vu pour arrêter le pulse
         if (!seenApps.includes(id)) {
             const newSeen = [...seenApps, id];
             setSeenApps(newSeen);
@@ -251,7 +245,7 @@ export default function InfiltrationHub() {
     const terminalLines = [
         "> CONNEXION SÉCURISÉE ÉTABLIE...",
         "> MESSAGE DE : M. JACQUOT",
-        "> Bon, j'ai réussi à leur forcer la porte...",
+        "> Bon, j'ai réussi à forcer leur porte...",
         "> J'ai pu injecter mes propres outils dans leur réseau.",
         "> Regardez les icônes en dessous : ",
         "> Si ça clignote, c'est que je viens de débloquer le module.",
